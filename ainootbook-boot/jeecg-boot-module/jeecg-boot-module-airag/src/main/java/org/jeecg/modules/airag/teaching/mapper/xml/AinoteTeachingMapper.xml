@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.airag.teaching.mapper.AinoteTeachingMapper">
+
+    <select id="selectByCourseAndDepartAndSemester" resultType="org.jeecg.modules.airag.teaching.entity.AinoteTeaching">
+        SELECT * FROM ainote_teaching
+        WHERE course_id = #{courseId}
+          AND depart_id = #{departId}
+          AND semester = #{semester}
+    </select>
+
+    <select id="selectExistingByKeys" resultType="org.jeecg.modules.airag.teaching.entity.AinoteTeaching">
+        SELECT * FROM ainote_teaching
+        WHERE course_id = #{courseId}
+          AND semester = #{semester}
+          AND depart_id IN
+        <foreach collection="departIds" item="departId" open="(" separator="," close=")">
+            #{departId}
+        </foreach>
+    </select>
+
+</mapper>

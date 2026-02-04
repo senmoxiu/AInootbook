@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.airag.teaching.mapper.AinoteTeachingMapper">
+
+    <!-- 根据课程ID、组织ID、学期查询教学关系 -->
+    <select id="selectByCourseAndDepartAndSemester" resultType="org.jeecg.modules.airag.teaching.entity.AinoteTeaching">
+        SELECT *
+        FROM ainote_teaching
+        WHERE course_id = #{courseId}
+          AND depart_id = #{departId}
+          AND semester = #{semester}
+          AND del_flag = 0
+    </select>
+
+    <!-- 批量查询已存在的教学关系（用于差分计算） -->
+    <select id="selectExistingByKeys" resultType="org.jeecg.modules.airag.teaching.entity.AinoteTeaching">
+        SELECT *
+        FROM ainote_teaching
+        WHERE course_id = #{courseId}
+          AND semester = #{semester}
+          AND depart_id IN
+          <foreach collection="departIds" item="departId" open="(" separator="," close=")">
+              #{departId}
+          </foreach>
+          AND del_flag = 0
+    </select>
+
+</mapper>
