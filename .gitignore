@@ -17,3 +17,8 @@ derby.log
 .history
 .ace-tool/
 .claude/
+
+## AI 辅助文件
+CLAUDE.md
+openspec/
+nul
