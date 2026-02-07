@@ -44,6 +44,11 @@ public class LLMConsts {
     public static final String MODEL_TYPE_IMAGE = "IMAGE";
 
     /**
+     * 模型类型: 语音识别
+     */
+    public static final String MODEL_TYPE_ASR = "ASR";
+
+    /**
      * 向量模型：默认维度
      */
     public static final Integer EMBED_MODEL_DEFAULT_DIMENSION = 1536;

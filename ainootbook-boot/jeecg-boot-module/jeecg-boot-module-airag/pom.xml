@@ -34,6 +34,7 @@
         <kotlin.version>2.2.0</kotlin.version>
         <liteflow.version>2.15.0</liteflow.version>
         <apache-tika.version>3.2.3</apache-tika.version>
+        <dashscope.version>2.14.2</dashscope.version>
     </properties>
 
     <dependencyManagement>
@@ -238,6 +239,19 @@
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
             <version>1.12.2</version>
+        </dependency>
+
+        <!-- 阿里 DashScope SDK - 文档识别、音视频识别 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dashscope-sdk-java</artifactId>
+            <version>${dashscope.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

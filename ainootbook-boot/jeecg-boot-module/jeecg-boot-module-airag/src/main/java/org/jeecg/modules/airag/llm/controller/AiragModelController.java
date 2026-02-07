@@ -21,6 +21,7 @@ import org.jeecg.modules.airag.common.handler.AIChatParams;
 import org.jeecg.modules.airag.llm.consts.LLMConsts;
 import org.jeecg.modules.airag.llm.entity.AiragModel;
 import org.jeecg.modules.airag.llm.handler.AIChatHandler;
+import org.jeecg.modules.airag.llm.handler.DashscopeAsrHandler;
 import org.jeecg.modules.airag.llm.handler.EmbeddingHandler;
 import org.jeecg.modules.airag.llm.service.IAiragModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class AiragModelController extends JeecgController<AiragModel, IAiragMode
 
     @Autowired
     AIChatHandler aiChatHandler;
+
+    @Autowired
+    DashscopeAsrHandler dashscopeAsrHandler;
 
     /**
      * 分页列表查询
@@ -181,6 +185,8 @@ public class AiragModelController extends JeecgController<AiragModel, IAiragMode
             }else if(LLMConsts.MODEL_TYPE_IMAGE.equals(airagModel.getModelType())){
                 AIChatParams aiChatParams = new AIChatParams();
                 aiChatHandler.imageGenerate(airagModel, "To test whether it can be successfully called, simply return success", aiChatParams);
+            }else if(LLMConsts.MODEL_TYPE_ASR.equals(airagModel.getModelType())){
+                dashscopeAsrHandler.testConnection(airagModel);
             }
             //update-end---author:wangshuai---date:2026-01-07---for:【QQYUN-12145】【AI】AI 绘画创作---
         }catch (Exception e){
