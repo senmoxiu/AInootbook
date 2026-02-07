@@ -120,12 +120,17 @@
         { "label": "wanx2.1-imageedit", "value": "wanx2.1-imageedit","descr": "是阿里云百炼平台提供的通用图像编辑模型，适用于多种图像处理任务，如风格迁移、内容编辑、尺寸优化等","type": "imageGen"},
         { "label": "wanx-v1", "value": "wanx-v1","descr": "是通义万相系列中的文本生成图像模型，支持中英文双语输入和多种图像风格生成","type": "imageGen"}
       ],
-      "type": ["LLM", "EMBED","IMAGE"],
+      "AUDIO": [
+        { "label": "qwen3-asr-flash-filetrans", "value": "qwen3-asr-flash-filetrans", "descr": "通义千问语音识别模型，支持音频文件转写，高性能异步转写。", "type": "audio"}
+      ],
+      "type": ["LLM", "EMBED", "IMAGE", "AUDIO"],
       "baseUrl": "https://dashscope.aliyuncs.com/api/v1/services/",
       "baseImageUrl": "https://dashscope.aliyuncs.com/api/v1/",
+      "baseAudioUrl": "https://dashscope.aliyuncs.com/api/v1/",
       "LLMDefaultValue": "qwen-plus",
       "EMBEDDefaultValue": "text-embedding-v2",
-      "IMAGEDefaultValue": "wan2.2-t2i-plus"
+      "IMAGEDefaultValue": "wan2.2-t2i-plus",
+      "AUDIODefaultValue": "qwen3-asr-flash-filetrans"
     },
     {
       "title": "千帆大模型",

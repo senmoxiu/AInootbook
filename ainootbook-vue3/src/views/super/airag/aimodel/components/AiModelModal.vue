@@ -53,6 +53,7 @@
                     <span v-if="item === 'LLM'">语言模型</span>
                     <span v-else-if="item === 'EMBED'">向量模型</span>
                     <span v-else-if="item === 'IMAGE'">图像模型</span>
+                    <span v-else-if="item === 'AUDIO'">语音识别</span>
                   </a-select-option>
                 </a-select>
               </template>
@@ -72,6 +73,7 @@
                           <a-tag v-if="type && type.split(',').includes('image')" color="#C3D9DC">图像分析</a-tag>
                           <a-tag v-if="type && type.split(',').includes('vector')" color="#D4E0D8">向量</a-tag>
                           <a-tag v-if="type && type.split(',').includes('embeddings')" color="#FFEBD3">文本嵌入</a-tag>
+                          <a-tag v-if="type && type.split(',').includes('audio')" color="#D4E0D8">语音识别</a-tag>
                         </div>
                       </div>
                     </a-tooltip>
@@ -93,7 +95,7 @@
             </a-tooltip>
           </span>
           </template>
-          <AiModelSeniorForm ref="modelParamsRef" :modelParams="modelParams"></AiModelSeniorForm>
+          <AiModelSeniorForm ref="modelParamsRef" :modelParams="modelParams" :type="currentSeniorType"></AiModelSeniorForm>
         </a-tab-pane>
       </a-tabs>
 
@@ -166,6 +168,8 @@
       const testLoading = ref<boolean>(false);
       //模型是否已激活
       const modelActivate = ref<boolean>(false);
+      //高级配置类型：model=语言模型/knowledge=知识库/audio=语音识别
+      const currentSeniorType = ref<string>('model');
 
       const getImage = (name) => {
         return imageList.value[name];
@@ -215,6 +219,10 @@
             }
             if(values.result.modelType && values.result.modelType === 'LLM'){
               modelParamsShow.value = true;
+              currentSeniorType.value = 'model';
+            } else if (values.result.modelType && values.result.modelType === 'AUDIO') {
+              modelParamsShow.value = true;
+              currentSeniorType.value = 'audio';
             }
             if (values.result.activateFlag) {
               modelActivate.value = true;
@@ -403,11 +411,17 @@
         modelNameAddOption.value = modelData.value[value];
         if(value === 'LLM'){
           modelParamsShow.value = true;
+          currentSeniorType.value = 'model';
+        }else if(value === 'AUDIO'){
+          modelParamsShow.value = true;
+          currentSeniorType.value = 'audio';
         }else{
           modelParamsShow.value = false;
         }
         if(value === "IMAGE" && modelData.value.baseImageUrl){
           setFieldsValue({ 'baseUrl': modelData.value.baseImageUrl })
+        } else if (value === "AUDIO" && modelData.value.baseAudioUrl) {
+          setFieldsValue({ 'baseUrl': modelData.value.baseAudioUrl })
         } else if(modelData.value.baseUrl) {
           setFieldsValue({ 'baseUrl': modelData.value.baseUrl })
         }

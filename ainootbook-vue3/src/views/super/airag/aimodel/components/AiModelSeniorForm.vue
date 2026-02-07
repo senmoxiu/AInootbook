@@ -123,6 +123,37 @@
         <a-input-number v-bind="similarityProps" v-model:value="model.similarity" :disabled="model['similarity'] === null"/>
       </a-space>
     </div>
+
+    <!-- 语音识别配置区域 -->
+    <div class="setting-item" v-if="type === 'audio'">
+      <div class="label">
+        <span>语种选择</span>
+        <a-tooltip :title="tips.language">
+          <Icon icon="ant-design:question-circle" />
+        </a-tooltip>
+      </div>
+      <a-select v-model:value="model.language" style="width: 100%" placeholder="请选择语种">
+        <a-select-option v-for="opt in languageOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</a-select-option>
+      </a-select>
+    </div>
+    <div class="setting-item" v-if="type === 'audio'">
+      <div class="label">
+        <span>智能标点 (ITN)</span>
+        <a-tooltip :title="tips.enable_itn">
+          <Icon icon="ant-design:question-circle" />
+        </a-tooltip>
+      </div>
+      <a-switch v-model:checked="enableItn" checked-children="开启" un-checked-children="关闭" />
+    </div>
+    <div class="setting-item" v-if="type === 'audio'">
+      <div class="label">
+        <span>词级时间戳</span>
+        <a-tooltip :title="tips.enable_words">
+          <Icon icon="ant-design:question-circle" />
+        </a-tooltip>
+      </div>
+      <a-switch v-model:checked="enableWords" checked-children="开启" un-checked-children="关闭" />
+    </div>
   </div>
 </template>
 
@@ -195,7 +226,10 @@
           '设置Ai最大回复内容大小，会影响返回结果的长度。普通聊天建议500-800；短文生成建议800-2000；代码生成建议2000-3600；长文生成建议4000左右（或选择长回复模型)',
         topNumber: '用于筛选与用户问题相似度最高的文本片段。系统同时会根据选用模型上下文窗口大小动态调整分段数量。',
         similarity: '用于设置文本片段筛选的相似度阅值。',
-        timeout: '等待AI响应的最长时间，单位为秒。'
+        timeout: '等待AI响应的最长时间，单位为秒。',
+        language: '指定录音文件的语种。不传则默认为auto（自动检测）。',
+        enable_itn: '开启后模型会自动对识别结果进行标点断句和逆文本规范化（如将"一二三"转为"123"）。',
+        enable_words: '开启后将返回每个词的时间戳信息。'
       };
 
       // 参数：温度
@@ -250,8 +284,17 @@
         step: 1,
         max: 3600,
       })
-      
-      
+
+      // ASR: 语种选项
+      const languageOptions = [
+        { label: '自动检测 (Auto)', value: 'auto' },
+        { label: '中文 (Zh)', value: 'zh' },
+        { label: '英语 (En)', value: 'en' },
+        { label: '日语 (Ja)', value: 'ja' },
+        { label: '韩语 (Ko)', value: 'ko' },
+        { label: '粤语 (Yue)', value: 'yue' }
+      ];
+
       //参数对象
       const model = ref<any>(props.modelParams || {})
       
@@ -302,7 +345,19 @@
         get:()=> model.value.timeout != null,
         set:(value) => model.value.timeout = !value? null: 60
       });
-      
+
+      // ASR: 智能标点
+      const enableItn = computed({
+        get: () => model.value.enable_itn !== false,
+        set: (value) => model.value.enable_itn = value
+      });
+
+      // ASR: 词级时间戳
+      const enableWords = computed({
+        get: () => model.value.enable_words === true,
+        set: (value) => model.value.enable_words = value
+      });
+
       // 加载预设
       function onLoadPreset(idx: number) {
         const preset = presets[idx];
@@ -352,6 +407,9 @@
         setModalParams,
         timeoutEnable,
         timeoutProps,
+        languageOptions,
+        enableItn,
+        enableWords,
       };
     },
   };
