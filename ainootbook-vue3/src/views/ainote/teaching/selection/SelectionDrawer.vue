@@ -1,13 +1,5 @@
 <template>
-  <BasicDrawer
-    v-bind="$attrs"
-    @register="registerDrawer"
-    :title="getTitle"
-    :width="600"
-    :showFooter="true"
-    @ok="handleSubmit"
-    destroyOnClose
-  >
+  <BasicDrawer v-bind="$attrs" @register="registerDrawer" :title="getTitle" :width="600" :showFooter="true" @ok="handleSubmit" destroyOnClose>
     <BasicForm @register="registerForm" />
   </BasicDrawer>
 </template>
@@ -16,47 +8,36 @@
   import { ref, computed, unref } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
-  import { formSchema } from './course.data';
-  import { saveOrUpdateCourse } from '/@/api/ainote/course.api';
+  import { formSchema } from './selection.data';
+  import { saveOrUpdateSelection } from '/@/api/ainote/selection.api';
 
-  // 声明 Emits
   const emit = defineEmits(['success', 'register']);
 
   const isUpdate = ref(true);
 
-  // 注册表单
   const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
     labelWidth: 100,
     schemas: formSchema,
     showActionButtonGroup: false,
   });
 
-  // 注册抽屉
   const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
     await resetFields();
     setDrawerProps({ confirmLoading: false });
     isUpdate.value = !!data?.isUpdate;
-
     if (unref(isUpdate)) {
-      await setFieldsValue({
-        ...data.record,
-      });
+      await setFieldsValue({ ...data.record });
     }
   });
 
-  // 标题
-  const getTitle = computed(() => (!unref(isUpdate) ? '新增课程' : '编辑课程'));
+  const getTitle = computed(() => (!unref(isUpdate) ? '新增选课' : '编辑选课'));
 
-  // 提交事件
   async function handleSubmit() {
     try {
       const values = await validate();
       setDrawerProps({ confirmLoading: true });
-      // 提交表单
-      await saveOrUpdateCourse(values, unref(isUpdate));
-      // 关闭抽屉
+      await saveOrUpdateSelection(values, unref(isUpdate));
       closeDrawer();
-      // 刷新列表
       emit('success');
     } finally {
       setDrawerProps({ confirmLoading: false });

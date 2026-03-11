@@ -13,28 +13,32 @@
           <a-button type="primary" preIcon="ant-design:upload-outlined">导入</a-button>
         </a-upload>
       </template>
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
-          <TableAction
-            :actions="[
-              {
-                label: '编辑',
-                onClick: handleEdit.bind(null, record),
+      <template #action="{ record }">
+        <TableAction
+          :actions="[
+            {
+              label: '编辑',
+              onClick: handleEdit.bind(null, record),
+            },
+            {
+              label: '章节管理',
+              onClick: handleChapterManage.bind(null, record),
+            },
+            {
+              label: '删除',
+              color: 'error',
+              popConfirm: {
+                title: '是否确认删除',
+                confirm: handleDelete.bind(null, record),
               },
-              {
-                label: '删除',
-                color: 'error',
-                popConfirm: {
-                  title: '是否确认删除',
-                  confirm: handleDelete.bind(null, record),
-                },
-              },
-            ]"
-          />
-        </template>
+            },
+          ]"
+        />
       </template>
     </BasicTable>
     <CourseDrawer @register="registerDrawer" @success="handleSuccess" />
+    <!-- 章节管理抽屉 -->
+    <ChapterDrawer @register="registerChapterDrawer" />
   </div>
 </template>
 
@@ -45,6 +49,7 @@
   import { columns, searchFormSchema } from './course.data';
   import { getCourseList, deleteCourse, batchDeleteCourse, exportCourseXls, importCourseExcel } from '/@/api/ainote/course.api';
   import CourseDrawer from './CourseDrawer.vue';
+  import ChapterDrawer from '../chapter/ChapterDrawer.vue';
 
   // 列表页面公共参数、方法
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
@@ -56,7 +61,7 @@
         schemas: searchFormSchema,
       },
       actionColumn: {
-        width: 150,
+        width: 220,
         title: '操作',
         dataIndex: 'action',
         fixed: 'right',
@@ -74,8 +79,11 @@
   // 注册 table
   const [registerTable, { reload }, { rowSelection, selectedRowKeys }] = tableContext;
 
-  // 注册抽屉
+  // 注册课程抽屉
   const [registerDrawer, { openDrawer }] = useDrawer();
+
+  // 注册章节管理抽屉
+  const [registerChapterDrawer, { openDrawer: openChapterDrawer }] = useDrawer();
 
   /**
    * 新增事件
@@ -110,6 +118,16 @@
     await batchDeleteCourse({ ids: selectedRowKeys.value }, () => {
       selectedRowKeys.value = [];
       reload();
+    });
+  }
+
+  /**
+   * 章节管理事件
+   */
+  function handleChapterManage(record) {
+    openChapterDrawer(true, {
+      courseId: record.id,
+      courseName: record.courseName,
     });
   }
 

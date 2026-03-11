@@ -37,7 +37,7 @@ export const columns: BasicColumn[] = [
     width: 80,
     customRender: ({ text }) => {
       const color = text == '1' ? 'green' : 'red';
-      return render.renderTag(render.renderDict(text, 'teaching_status'), color);
+      return render.renderTag(render.renderDict(text, 'ainote_teaching_status'), color);
     },
   },
   {
@@ -74,7 +74,7 @@ export const searchFormSchema: FormSchema[] = [
     field: 'status',
     component: 'JDictSelectTag',
     componentProps: {
-      dictCode: 'teaching_status',
+      dictCode: 'ainote_teaching_status',
     },
     colProps: { span: 6 },
   },
@@ -141,11 +141,11 @@ export const formSchema: FormSchema[] = [
     label: '状态',
     field: 'status',
     component: 'RadioButtonGroup',
-    defaultValue: '1',
+    defaultValue: 1,
     componentProps: {
       options: [
-        { label: '启用', value: '1' },
-        { label: '禁用', value: '0' },
+        { label: '启用', value: 1 },
+        { label: '禁用', value: 0 },
       ],
     },
   },

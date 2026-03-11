@@ -28,6 +28,8 @@
     value?: string | string[];
     placeholder?: string;
     multiple?: boolean;
+    /** 允许的 orgCategory 列表，不传则展示所有组织 */
+    orgCategories?: string[];
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -55,22 +57,40 @@
     try {
       const result = await queryDepartTreeSync();
       if (result && Array.isArray(result)) {
-        // 过滤并转换树数据
-        state.treeData = filterAndTransformTree(result);
+        // 如果指定了 orgCategories，按条件过滤；否则展示所有节点
+        state.treeData = props.orgCategories?.length
+          ? filterAndTransformTree(result)
+          : transformTree(result);
       }
     } catch (error) {
       console.error('加载部门树数据失败:', error);
     }
   }
 
-  // 过滤并转换树数据（仅保留 org_category ∈ {5,6,7} 的节点）
+  // 直接转换树数据（不过滤 orgCategory）
+  function transformTree(nodes: any[]): any[] {
+    return nodes.map((node) => {
+      const newNode: any = {
+        title: node.title || node.departName,
+        value: node.key || node.id,
+        key: node.key || node.id,
+        orgCategory: node.orgCategory || node.org_category,
+      };
+      if (node.children && node.children.length > 0) {
+        newNode.children = transformTree(node.children);
+      }
+      return newNode;
+    });
+  }
+
+  // 过滤并转换树数据（仅保留指定 orgCategory 的节点）
   function filterAndTransformTree(nodes: any[]): any[] {
+    const allowed = props.orgCategories || [];
     const result: any[] = [];
 
     for (const node of nodes) {
-      // 检查 org_category 是否为 5（院系）、6（专业）、7（班级）
       const orgCategory = node.orgCategory || node.org_category;
-      if (orgCategory === '5' || orgCategory === '6' || orgCategory === '7') {
+      if (allowed.includes(orgCategory)) {
         const newNode: any = {
           title: node.title || node.departName,
           value: node.key || node.id,
@@ -99,7 +119,7 @@
 
   // 树节点过滤（搜索）
   function filterTreeNode(inputValue: string, treeNode: any) {
-    return treeNode.title.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0;
+    return (treeNode.title || '').toLowerCase().indexOf(inputValue.toLowerCase()) >= 0;
   }
 
   // 处理值变化

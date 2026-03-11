@@ -8,16 +8,7 @@
     @ok="handleSubmit"
     destroyOnClose
   >
-    <BasicForm @register="registerForm">
-      <template #departSelect="{ model, field }">
-        <DepartTreeSelect
-          v-model:value="model[field]"
-          placeholder="请选择组织（院系/专业/班级）"
-          :multiple="false"
-          :orgCategories="['5', '6', '7']"
-        />
-      </template>
-    </BasicForm>
+    <BasicForm @register="registerForm" />
   </BasicDrawer>
 </template>
 
@@ -25,14 +16,13 @@
   import { ref, computed, unref } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
-  import { formSchema } from './teaching.data';
-  import { saveOrUpdateTeaching } from '/@/api/ainote/teaching.api';
-  import DepartTreeSelect from '../components/DepartTreeSelect.vue';
+  import { formSchema } from './chapter.data';
+  import { saveOrUpdateChapter } from '/@/api/ainote/chapter.api';
 
   // 声明 Emits
   const emit = defineEmits(['success', 'register']);
 
-  const isUpdate = ref(true);
+  const isUpdate = ref(false);
 
   // 注册表单
   const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
@@ -41,36 +31,39 @@
     showActionButtonGroup: false,
   });
 
-  // 注册抽屉
+  // 注册抽屉，接收 { record, isUpdate, courseId }
   const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
     await resetFields();
     setDrawerProps({ confirmLoading: false });
     isUpdate.value = !!data?.isUpdate;
 
     if (unref(isUpdate)) {
-      await setFieldsValue({
-        ...data.record,
-      });
+      // 编辑模式：回填记录数据
+      await setFieldsValue({ ...data.record });
+    } else {
+      // 新增模式：自动填充 courseId 隐藏字段
+      await setFieldsValue({ courseId: data?.courseId ?? '' });
     }
   });
 
-  // 标题
-  const getTitle = computed(() => (!unref(isUpdate) ? '新增教学任务' : '编辑教学任务'));
+  // 抽屉标题
+  const getTitle = computed(() => (!unref(isUpdate) ? '新增章节' : '编辑章节'));
 
-  // 提交事件
+  /**
+   * 提交表单
+   */
   async function handleSubmit() {
     try {
       const values = await validate();
       setDrawerProps({ confirmLoading: true });
-      // 提交表单
-      await saveOrUpdateTeaching(values, unref(isUpdate));
+      // 调用保存或更新接口
+      await saveOrUpdateChapter(values, unref(isUpdate));
       // 关闭抽屉
       closeDrawer();
-      // 刷新列表
+      // 通知父组件刷新
       emit('success');
     } finally {
       setDrawerProps({ confirmLoading: false });
     }
   }
 </script>
-

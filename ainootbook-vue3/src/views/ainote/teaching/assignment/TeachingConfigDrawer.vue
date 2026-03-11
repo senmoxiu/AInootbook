@@ -4,6 +4,7 @@
     @register="registerDrawer"
     title="批量配置教学任务"
     :width="600"
+    :showFooter="true"
     @ok="handleSubmit"
     destroyOnClose
   >

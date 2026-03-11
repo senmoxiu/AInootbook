@@ -19,7 +19,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '学分',
-    dataIndex: 'credit',
+    dataIndex: 'credits',
     width: 80,
   },
   {
@@ -114,7 +114,7 @@ export const formSchema: FormSchema[] = [
   },
   {
     label: '学分',
-    field: 'credit',
+    field: 'credits',
     component: 'InputNumber',
     required: true,
     componentProps: {
@@ -138,17 +138,17 @@ export const formSchema: FormSchema[] = [
     label: '状态',
     field: 'status',
     component: 'RadioButtonGroup',
-    defaultValue: '1',
+    defaultValue: 1,
     componentProps: {
       options: [
-        { label: '启用', value: '1' },
-        { label: '禁用', value: '0' },
+        { label: '启用', value: 1 },
+        { label: '禁用', value: 0 },
       ],
     },
   },
   {
     label: '课程描述',
-    field: 'description',
+    field: 'courseDesc',
     component: 'InputTextArea',
     componentProps: {
       placeholder: '请输入课程描述',
