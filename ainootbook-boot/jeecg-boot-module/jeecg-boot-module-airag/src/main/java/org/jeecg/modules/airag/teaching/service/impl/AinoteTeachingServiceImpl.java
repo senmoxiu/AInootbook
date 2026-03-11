@@ -1,6 +1,8 @@
 package org.jeecg.modules.airag.teaching.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.jeecg.modules.airag.teaching.dto.BatchUpsertDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteTeaching;
 import org.jeecg.modules.airag.teaching.mapper.AinoteTeachingMapper;
 import org.jeecg.modules.airag.teaching.service.IAinoteTeachingService;
+import org.jeecg.modules.airag.teaching.vo.AinoteTeachingVO;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.SysDepartModel;
 import org.springframework.dao.DuplicateKeyException;
@@ -170,6 +173,13 @@ public class AinoteTeachingServiceImpl extends ServiceImpl<AinoteTeachingMapper,
         }
 
         return removeByIds(ids);
+    }
+
+    @Override
+    public IPage<AinoteTeachingVO> queryTeachingVoPage(
+            Page<AinoteTeachingVO> page,
+            QueryWrapper<AinoteTeaching> wrapper) {
+        return baseMapper.queryTeachingVoPage(page, wrapper);
     }
 
     /**

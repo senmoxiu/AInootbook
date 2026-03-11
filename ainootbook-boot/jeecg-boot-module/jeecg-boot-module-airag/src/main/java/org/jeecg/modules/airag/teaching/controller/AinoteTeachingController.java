@@ -19,6 +19,7 @@ import org.jeecg.modules.airag.teaching.dto.BatchResult;
 import org.jeecg.modules.airag.teaching.dto.BatchUpsertDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteTeaching;
 import org.jeecg.modules.airag.teaching.service.IAinoteTeachingService;
+import org.jeecg.modules.airag.teaching.vo.AinoteTeachingVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
 
     @Operation(summary = "分页列表查询")
     @GetMapping(value = "/list")
-    public Result<IPage<AinoteTeaching>> queryPageList(
+    public Result<IPage<AinoteTeachingVO>> queryPageList(
             AinoteTeaching ainoteTeaching,
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
@@ -48,8 +49,8 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
         QueryWrapper<AinoteTeaching> queryWrapper = QueryGenerator.initQueryWrapper(ainoteTeaching, req.getParameterMap());
         // 应用数据权限过滤
         ainoteTeachingService.applyDataPermission(queryWrapper);
-        Page<AinoteTeaching> page = new Page<>(pageNo, pageSize);
-        IPage<AinoteTeaching> pageList = ainoteTeachingService.page(page, queryWrapper);
+        Page<AinoteTeachingVO> page = new Page<>(pageNo, pageSize);
+        IPage<AinoteTeachingVO> pageList = ainoteTeachingService.queryTeachingVoPage(page, queryWrapper);
         return Result.OK(pageList);
     }
 

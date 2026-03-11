@@ -1,8 +1,12 @@
 package org.jeecg.modules.airag.teaching.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.airag.teaching.entity.AinoteTeaching;
+import org.jeecg.modules.airag.teaching.vo.AinoteTeachingVO;
 
 import java.util.List;
 
@@ -26,4 +30,11 @@ public interface AinoteTeachingMapper extends BaseMapper<AinoteTeaching> {
             @Param("courseId") String courseId,
             @Param("departIds") List<String> departIds,
             @Param("semester") String semester);
+
+    /**
+     * 联表分页查询教学任务视图
+     */
+    IPage<AinoteTeachingVO> queryTeachingVoPage(
+            Page<AinoteTeachingVO> page,
+            @Param("ew") Wrapper<AinoteTeaching> ew);
 }

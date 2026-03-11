@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.airag.teaching.mapper.AinoteChapterMapper">
+
+    <select id="selectByCourseForTree" resultType="org.jeecg.modules.airag.teaching.entity.AinoteChapter">
+        SELECT * FROM ainote_chapter
+        WHERE course_id = #{courseId}
+          AND tenant_id = #{tenantId}
+        ORDER BY chapter_order
+    </select>
+
+</mapper>

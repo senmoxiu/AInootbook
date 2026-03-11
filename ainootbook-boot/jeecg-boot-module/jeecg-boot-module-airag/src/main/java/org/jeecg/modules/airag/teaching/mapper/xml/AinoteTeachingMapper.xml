@@ -19,4 +19,29 @@
         </foreach>
     </select>
 
+    <select id="queryTeachingVoPage" resultType="org.jeecg.modules.airag.teaching.vo.AinoteTeachingVO">
+        SELECT
+            t.id,
+            t.teacher_id    AS teacherId,
+            u.realname      AS teacherName,
+            t.course_id     AS courseId,
+            c.course_name   AS courseName,
+            c.course_code   AS courseCode,
+            t.depart_id     AS departId,
+            d.depart_name   AS departName,
+            d.org_category  AS orgCategory,
+            t.semester,
+            t.academic_year AS academicYear,
+            t.status
+        FROM (
+            SELECT * FROM ainote_teaching
+            <if test="ew != null and ew.customSqlSegment != null and ew.customSqlSegment != ''">
+                ${ew.customSqlSegment}
+            </if>
+        ) t
+        LEFT JOIN ainote_course c ON t.course_id = c.id
+        LEFT JOIN sys_user u ON t.teacher_id = u.id
+        LEFT JOIN sys_depart d ON t.depart_id = d.id
+    </select>
+
 </mapper>

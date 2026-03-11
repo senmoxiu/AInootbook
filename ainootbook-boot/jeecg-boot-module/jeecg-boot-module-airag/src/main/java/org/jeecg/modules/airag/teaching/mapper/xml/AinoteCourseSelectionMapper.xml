@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.airag.teaching.mapper.AinoteCourseSelectionMapper">
+
+    <!--
+        联表分页查询选课视图。
+        使用子查询包裹 ew.customSqlSegment，避免联表后列名歧义导致 WHERE 条件失效。
+        联表：
+          - sys_user su        -> 学生姓名
+          - ainote_teaching t  -> 教师ID
+          - sys_user tu        -> 教师姓名
+          - ainote_course c    -> 课程名称/代码
+          - sys_depart d       -> 组织名称
+    -->
+    <select id="querySelectionVoPage" resultType="org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO">
+        SELECT
+            cs.id,
+            cs.student_id      AS studentId,
+            su.realname        AS studentName,
+            cs.teaching_id     AS teachingId,
+            cs.course_id       AS courseId,
+            c.course_name      AS courseName,
+            c.course_code      AS courseCode,
+            tu.realname        AS teacherName,
+            cs.depart_id       AS departId,
+            d.depart_name      AS departName,
+            cs.semester,
+            cs.academic_year   AS academicYear,
+            cs.status,
+            cs.selected_at     AS selectedAt
+        FROM (
+            SELECT * FROM ainote_course_selection
+            <if test="ew != null and ew.customSqlSegment != null and ew.customSqlSegment != ''">
+                ${ew.customSqlSegment}
+            </if>
+        ) cs
+        LEFT JOIN sys_user su   ON cs.student_id  = su.id
+        LEFT JOIN ainote_teaching t ON cs.teaching_id = t.id
+        LEFT JOIN sys_user tu   ON t.teacher_id   = tu.id
+        LEFT JOIN ainote_course c   ON cs.course_id   = c.id
+        LEFT JOIN sys_depart d  ON cs.depart_id   = d.id
+    </select>
+
+</mapper>

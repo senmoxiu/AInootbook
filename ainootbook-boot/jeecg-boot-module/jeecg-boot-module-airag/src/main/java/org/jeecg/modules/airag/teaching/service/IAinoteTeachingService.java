@@ -1,10 +1,13 @@
 package org.jeecg.modules.airag.teaching.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.airag.teaching.dto.BatchResult;
 import org.jeecg.modules.airag.teaching.dto.BatchUpsertDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteTeaching;
+import org.jeecg.modules.airag.teaching.vo.AinoteTeachingVO;
 
 import java.util.List;
 
@@ -30,6 +33,16 @@ public interface IAinoteTeachingService extends IService<AinoteTeaching> {
      * @param semester 学期
      */
     void validateSemester(String semester);
+
+    /**
+     * 联表分页查询教学任务视图
+     * @param page    分页参数
+     * @param wrapper 动态查询条件（含数据权限）
+     * @return 分页视图结果
+     */
+    IPage<AinoteTeachingVO> queryTeachingVoPage(
+            Page<AinoteTeachingVO> page,
+            QueryWrapper<AinoteTeaching> wrapper);
 
     /**
      * 批量新增/更新教学关系
