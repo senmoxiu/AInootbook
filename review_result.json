@@ -1,0 +1,10 @@
+{
+  "module_name": "frontend-remaining-features",
+  "existing_structures": ["current UI structures in index.vue, existing patterns"],
+  "existing_conventions": ["JeecgBoot Vue3 conventions: useListPage, BasicTable, a-form patterns"],
+  "constraints_discovered": ["hard constraints: existing disabled UI elements, TypeScript types"],
+  "open_questions": ["any unclear UI behaviors or component choices"],
+  "dependencies": ["component imports needed, store dependencies"],
+  "risks": ["potential UI/UX issues"],
+  "success_criteria_hints": ["observable success: search works, config saves successfully"]
+}
