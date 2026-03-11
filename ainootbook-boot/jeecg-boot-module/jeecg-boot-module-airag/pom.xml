@@ -241,6 +241,12 @@
             <version>1.12.2</version>
         </dependency>
 
+        <!-- Caffeine 本地缓存（AinoteAiConfigService 使用） -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- 阿里 DashScope SDK - 文档识别、音视频识别 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -250,6 +256,17 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-all-deps</artifactId>
+            <version>3.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

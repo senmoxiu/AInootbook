@@ -133,6 +133,13 @@ public class EmbeddingHandler implements IEmbeddingHandler {
      */
     private static final ConcurrentHashMap<String, EmbeddingStore<TextSegment>> EMBED_STORE_CACHE = new ConcurrentHashMap<>();
 
+    private static final Set<String> RESERVED_METADATA_KEYS = Set.of(
+            EMBED_STORE_METADATA_DOCID,
+            EMBED_STORE_METADATA_KNOWLEDGEID,
+            EMBED_STORE_METADATA_DOCNAME,
+            EMBED_STORE_METADATA_USER_NAME,
+            EMBED_STORE_CREATE_TIME
+    );
 
     /**
      * 正则匹配: md图片
@@ -150,6 +157,18 @@ public class EmbeddingHandler implements IEmbeddingHandler {
      * @date 2025/2/18 11:52
      */
     public Map<String, Object> embeddingDocument(String knowId, AiragKnowledgeDoc doc) {
+        return embeddingDocument(knowId, doc, null);
+    }
+
+    /**
+     * 向量化文档（支持额外元数据）
+     *
+     * @param knowId             知识库ID
+     * @param doc                文档对象
+     * @param additionalMetadata 额外元数据，会合并到向量存储的 Metadata 中
+     * @return 元数据 Map
+     */
+    public Map<String, Object> embeddingDocument(String knowId, AiragKnowledgeDoc doc, Map<String, Object> additionalMetadata) {
         AiragKnowledge airagKnowledge = airagKnowledgeService.getById(knowId);
         AssertUtils.assertNotEmpty("知识库不存在", airagKnowledge);
         AssertUtils.assertNotEmpty("请先为知识库配置向量模型库", airagKnowledge.getEmbedId());
@@ -214,6 +233,15 @@ public class EmbeddingHandler implements IEmbeddingHandler {
             metadata.put(EMBED_STORE_METADATA_USER_NAME, username);
         }
         //update-end---author:wangshuai---date:2025-12-26---for:【QQYUN-14265】【AI】支持记忆---
+        // 合并额外元数据（ainote 笔记场景传入 userId/isPublic/courseId 等）
+        if (additionalMetadata != null) {
+            for (Map.Entry<String, Object> entry : additionalMetadata.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null
+                        && !RESERVED_METADATA_KEYS.contains(entry.getKey())) {
+                    metadata.put(entry.getKey(), String.valueOf(entry.getValue()));
+                }
+            }
+        }
         Document from = Document.from(content, metadata);
         ingestor.ingest(from);
         return metadata.toMap();
@@ -333,6 +361,60 @@ public class EmbeddingHandler implements IEmbeddingHandler {
         }
         //update-end---author:wangshuai---date:2025-12-26---for:【QQYUN-14265】【AI】支持记忆---
         
+        EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest.builder()
+                .queryEmbedding(queryEmbedding)
+                .maxResults(topNumber)
+                .minScore(similarity)
+                .filter(filter)
+                .build();
+
+        EmbeddingStore<TextSegment> embeddingStore = getEmbedStore(model);
+        List<EmbeddingMatch<TextSegment>> relevant = embeddingStore.search(embeddingSearchRequest).matches();
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (oConvertUtils.isObjectNotEmpty(relevant)) {
+            result = relevant.stream().map(matchRes -> {
+                Map<String, Object> data = new HashMap<>();
+                data.put("score", matchRes.score());
+                data.put("content", matchRes.embedded().text());
+                Metadata metadata = matchRes.embedded().metadata();
+                data.put("chunk", metadata.getInteger("index"));
+                data.put(EMBED_STORE_METADATA_DOCNAME, metadata.getString(EMBED_STORE_METADATA_DOCNAME));
+                //查询返回的时候增加创建时间，用于排序
+                String ct = metadata.getString(EMBED_STORE_CREATE_TIME);
+                data.put(EMBED_STORE_CREATE_TIME, ct);
+                return data;
+            }).collect(Collectors.toList());
+        }
+        return result;
+    }
+
+    /**
+     * 向量查询（支持额外过滤条件）
+     *
+     * @param knowId
+     * @param queryText
+     * @param topNumber
+     * @param similarity
+     * @param additionalFilter 额外过滤条件
+     * @return
+     */
+    public List<Map<String, Object>> searchEmbedding(String knowId, String queryText, Integer topNumber, Double similarity, Filter additionalFilter) {
+        AssertUtils.assertNotEmpty("请选择知识库", knowId);
+        AiragKnowledge knowledge = airagKnowledgeMapper.getByIdIgnoreTenant(knowId);
+        AssertUtils.assertNotEmpty("知识库不存在", knowledge);
+        AssertUtils.assertNotEmpty("请填写查询内容", queryText);
+        AiragModel model = getEmbedModelData(knowledge.getEmbedId());
+
+        AiModelOptions modelOp = buildModelOptions(model);
+        EmbeddingModel embeddingModel = AiModelFactory.createEmbeddingModel(modelOp);
+        Embedding queryEmbedding = embeddingModel.embed(queryText).content();
+
+        topNumber = oConvertUtils.getInteger(topNumber, modelOp.getTopNumber());
+        similarity = oConvertUtils.getDou(similarity, modelOp.getSimilarity());
+
+        Filter baseFilter = metadataKey(EMBED_STORE_METADATA_KNOWLEDGEID).isEqualTo(knowId);
+        Filter filter = additionalFilter == null ? baseFilter : new And(baseFilter, additionalFilter);
+
         EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest.builder()
                 .queryEmbedding(queryEmbedding)
                 .maxResults(topNumber)

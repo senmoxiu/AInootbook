@@ -32,8 +32,8 @@ spring:
     clean-disabled: true
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 500MB
+      max-request-size: 500MB
   mail:
     # 定时任务发送邮件
     timeJobSend: false
@@ -268,10 +268,10 @@ jeecg:
   file-view-domain: http://fileview.jeecg.com
   # minio文件上传
   minio:
-    minio_url: http://minio.jeecg.com
-    minio_name: ??
-    minio_pass: ??
-    bucketName: otatest
+    minio_url: http://127.0.0.1:9000
+    minio_name: admin
+    minio_pass: password
+    bucketName: aibook
   #大屏报表参数设置
   jmreport:
     #多租户模式，默认值为空(created:按照创建人隔离、tenant:按照租户隔离) (v1.6.2+ 新增)
@@ -355,3 +355,37 @@ justauth:
     type: default
     prefix: 'demo::'
     timeout: 1h
+
+# AInote 笔记模块配置
+ainote:
+  task:
+    executor:
+      core-pool-size: 10
+      max-pool-size: 20
+      queue-capacity: 100
+    timeout:
+      default: 300000
+      asr-poll: 600000
+    retry:
+      max-attempts: 3
+      delays: [60000, 120000, 240000]
+  material:
+    max-size:
+      audio: 157286400
+      document: 52428800
+      image: 10485760
+    allowed-types:
+      audio: [mp3, wav, m4a]
+      document: [pdf, docx, pptx, xlsx, md, txt]
+      image: [jpg, jpeg, png]
+  minio:
+    presigned-url-ttl: 900
+  share:
+    code-length: 16
+  ai:
+    summary:
+      max-length: 200
+    keywords:
+      max-count: 5
+  frontend:
+    poll-interval: 2000
