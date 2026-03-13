@@ -174,14 +174,14 @@ export const importNoteExcel = (params: FormData) => {
  * 触发 AI 生成
  */
 export const triggerGeneration = (params: { noteId: string; knowledgeId?: string }) => {
-  return defHttp.post<string>({ url: Api.triggerGeneration, params });
+  return defHttp.post<string>({ url: Api.triggerGeneration, params }, { joinParamsToUrl: true });
 };
 
 /**
  * 取消 AI 生成
  */
 export const cancelGeneration = (params: { noteId: string }) => {
-  return defHttp.post<string>({ url: Api.cancelGeneration, params });
+  return defHttp.post<string>({ url: Api.cancelGeneration, params }, { joinParamsToUrl: true });
 };
 
 /**
