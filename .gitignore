@@ -22,3 +22,6 @@ derby.log
 CLAUDE.md
 openspec/
 nul
+
+# CCG Context (local only)
+.context/

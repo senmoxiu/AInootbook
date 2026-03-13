@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.common.config.TenantContext;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.ainote.config.AinoteProperties;
 import org.jeecg.modules.ainote.entity.AinoteAiTask;
 import org.jeecg.modules.ainote.entity.AinoteMaterial;
+import org.jeecg.modules.ainote.enums.AinoteProcessingType;
+import org.jeecg.modules.ainote.service.AinoteAiRuntimeConfigResolver;
 import org.jeecg.modules.ainote.service.IAinoteAiTaskService;
 import org.jeecg.modules.ainote.service.IAinoteMaterialService;
 import org.jeecg.modules.ainote.task.AinoteAiTaskWorker;
@@ -17,7 +20,6 @@ import org.jeecg.modules.airag.llm.consts.LLMConsts;
 import org.jeecg.modules.airag.llm.entity.AiragModel;
 import org.jeecg.modules.airag.llm.handler.DashscopeAsrHandler;
 import org.jeecg.modules.airag.llm.mapper.AiragModelMapper;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -40,7 +42,7 @@ public class AsrTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
     private final AiragModelMapper airagModelMapper;
     private final IAinoteAiTaskService aiTaskService;
     private final AinoteProperties ainoteProperties;
-    private final Environment environment;
+    private final AinoteAiRuntimeConfigResolver runtimeConfigResolver;
 
     @Override
     public String getTaskType() {
@@ -111,7 +113,10 @@ public class AsrTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
     }
 
     private AiragModel resolveAsrModel() {
-        String configuredModelId = resolveConfiguredAsrModelId();
+        String tenantId = TenantContext.getTenant();
+        String configuredModelId = runtimeConfigResolver.resolveModelId(
+                AinoteProcessingType.ASR,
+                String.valueOf(tenantId));
         AiragModel model;
         if (configuredModelId != null) {
             model = airagModelMapper.getByIdIgnoreTenant(configuredModelId);
@@ -137,20 +142,6 @@ public class AsrTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
             throw new JeecgBootException("ASR模型未激活: modelId=" + model.getId());
         }
         return model;
-    }
-
-    private String resolveConfiguredAsrModelId() {
-        if (environment == null) {
-            return null;
-        }
-        String[] keys = {"ainote.ai.asr-model-id", "ainote.task.asr-model-id", "jeecg.airag.asr-model-id"};
-        for (String key : keys) {
-            String val = trimToNull(environment.getProperty(key));
-            if (val != null) {
-                return val;
-            }
-        }
-        return null;
     }
 
     private int resolveWaitTimeoutSeconds() {

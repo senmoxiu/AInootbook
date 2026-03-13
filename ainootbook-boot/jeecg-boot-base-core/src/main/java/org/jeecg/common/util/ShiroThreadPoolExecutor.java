@@ -1,6 +1,7 @@
 package org.jeecg.common.util;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -21,17 +22,57 @@ public class ShiroThreadPoolExecutor extends ThreadPoolExecutor {
 
     @Override
     public void execute(Runnable command) {
-        Subject subject = SecurityUtils.getSubject();
-        SecurityManager securityManager = SecurityUtils.getSecurityManager();
+        Subject subject = resolveSubject();
+        SecurityManager securityManager = resolveSecurityManager();
+        if (subject == null && securityManager == null) {
+            super.execute(command);
+            return;
+        }
         super.execute(() -> {
+            boolean subjectBound = false;
+            boolean securityManagerBound = false;
             try {
-                ThreadContext.bind(securityManager);
-                ThreadContext.bind(subject);
+                if (securityManager != null) {
+                    ThreadContext.bind(securityManager);
+                    securityManagerBound = true;
+                }
+                if (subject != null) {
+                    ThreadContext.bind(subject);
+                    subjectBound = true;
+                }
                 command.run();
             } finally {
-                ThreadContext.unbindSubject();
-                ThreadContext.unbindSecurityManager();
+                if (subjectBound) {
+                    ThreadContext.unbindSubject();
+                }
+                if (securityManagerBound) {
+                    ThreadContext.unbindSecurityManager();
+                }
             }
         });
+    }
+
+    private Subject resolveSubject() {
+        Subject subject = ThreadContext.getSubject();
+        if (subject != null) {
+            return subject;
+        }
+        try {
+            return SecurityUtils.getSubject();
+        } catch (UnavailableSecurityManagerException ex) {
+            return null;
+        }
+    }
+
+    private SecurityManager resolveSecurityManager() {
+        SecurityManager securityManager = ThreadContext.getSecurityManager();
+        if (securityManager != null) {
+            return securityManager;
+        }
+        try {
+            return SecurityUtils.getSecurityManager();
+        } catch (UnavailableSecurityManagerException ex) {
+            return null;
+        }
     }
 }

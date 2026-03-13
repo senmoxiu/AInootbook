@@ -1,5 +1,6 @@
 package org.jeecg.modules.ainote.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,10 +12,13 @@ import org.jeecg.common.config.TenantContext;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.ainote.entity.AinoteAiConfig;
 import org.jeecg.modules.ainote.entity.AinoteAiTask;
 import org.jeecg.modules.ainote.entity.AinoteMaterial;
 import org.jeecg.modules.ainote.entity.AinoteNote;
+import org.jeecg.modules.ainote.enums.FailureMode;
 import org.jeecg.modules.ainote.mapper.AinoteAiTaskMapper;
+import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteAiTaskService;
 import org.jeecg.modules.ainote.service.IAinoteMaterialService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -50,6 +55,7 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
     private static final int[] BACKOFF_MINUTES = {1, 2, 4};
 
     private final AinoteAiTaskMapper aiTaskMapper;
+    private final IAinoteAiConfigService aiConfigService;
 
     @Lazy
     @jakarta.annotation.Resource
@@ -219,6 +225,8 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
             wrapper.set("completed_at", completedAt);
             wrapper.set("duration", duration);
             wrapper.set("process_result", processResult);
+            wrapper.set("error_message", null);
+            wrapper.set("next_retry_at", null);
 
             int updated = aiTaskMapper.update(null, wrapper);
             if (updated <= 0) {
@@ -258,12 +266,45 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
                 return false;
             }
 
-            int currentRetry = task.getRetryCount() == null ? 0 : task.getRetryCount();
-            int nextRetry = currentRetry + 1;
+            AinoteAiConfig config = resolveAiConfig(tenantId);
+            String taskType = normalizeTaskType(task.getTaskType());
+            FailureMode failureMode = resolveFailureMode(taskType, config);
+            int currentRetry = normalizeRetryCount(task.getRetryCount());
 
-            // 检查是否超过最大重试次数
-            if (nextRetry > MAX_RETRY_COUNT) {
-                // 超过最大重试次数，标记为永久失败
+            if (failureMode == FailureMode.SKIP) {
+                boolean skipped = completeTask(taskId, buildSkippedProcessResult(taskType, errorMessage));
+                if (skipped) {
+                    log.warn("任务处理失败(按skip策略完成): taskId={}, tenantId={}, taskType={}, retryCount={}",
+                            taskId, tenantId, taskType, currentRetry);
+                }
+                return skipped;
+            }
+
+            if (failureMode == FailureMode.FAIL_ALL) {
+                UpdateWrapper<AinoteAiTask> wrapper = new UpdateWrapper<>();
+                wrapper.eq("id", taskId);
+                wrapper.eq("tenant_id", tenantId);
+                wrapper.eq("task_status", STATUS_PROCESSING);
+                wrapper.set("task_status", STATUS_FAILED);
+                wrapper.set("error_message", errorMessage);
+                wrapper.set("retry_count", currentRetry);
+                wrapper.set("next_retry_at", null);
+
+                int updated = aiTaskMapper.update(null, wrapper);
+                if (updated <= 0) {
+                    log.info("失败任务更新失败(更新未命中): taskId={}, tenantId={}", taskId, tenantId);
+                    return false;
+                }
+
+                log.error("任务处理失败(按fail_all策略终止): taskId={}, tenantId={}, taskType={}, retryCount={}",
+                        taskId, tenantId, taskType, currentRetry);
+                return true;
+            }
+
+            int maxAttempts = resolveRetryLimit(taskType, config);
+            int nextRetry = Math.min(currentRetry + 1, maxAttempts);
+
+            if (currentRetry >= maxAttempts) {
                 UpdateWrapper<AinoteAiTask> wrapper = new UpdateWrapper<>();
                 wrapper.eq("id", taskId);
                 wrapper.eq("tenant_id", tenantId);
@@ -279,15 +320,13 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
                     return false;
                 }
 
-                log.error("任务永久失败(已达最大重试次数): taskId={}, tenantId={}, retryCount={}",
-                        taskId, tenantId, nextRetry);
+                log.error("任务永久失败(已达最大重试次数): taskId={}, tenantId={}, taskType={}, retryCount={}, retryLimit={}",
+                        taskId, tenantId, taskType, nextRetry, maxAttempts);
                 return true;
             }
 
-            // 未超过最大重试次数，设置重试时间并回到 PENDING 状态
             int backoffMinutes = calcBackoffMinutes(nextRetry);
             Date nextRetryAt = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(backoffMinutes));
-
             UpdateWrapper<AinoteAiTask> wrapper = new UpdateWrapper<>();
             wrapper.eq("id", taskId);
             wrapper.eq("tenant_id", tenantId);
@@ -303,8 +342,8 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
                 return false;
             }
 
-            log.warn("任务处理失败(将重试): taskId={}, tenantId={}, retryCount={}, nextRetryAt={}",
-                    taskId, tenantId, nextRetry, nextRetryAt);
+            log.warn("任务处理失败(将重试): taskId={}, tenantId={}, taskType={}, retryCount={}, retryLimit={}, nextRetryAt={}",
+                    taskId, tenantId, taskType, nextRetry, maxAttempts, nextRetryAt);
             return true;
         } catch (JeecgBootException e) {
             throw e;
@@ -376,6 +415,83 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
             return BACKOFF_MINUTES[BACKOFF_MINUTES.length - 1];
         }
         return BACKOFF_MINUTES[index];
+    }
+
+    private AinoteAiConfig resolveAiConfig(Integer tenantId) {
+        try {
+            AinoteAiConfig config = aiConfigService.getConfig(tenantId);
+            if (config != null) {
+                return config;
+            }
+        } catch (Exception e) {
+            log.warn("读取AI失败策略配置失败，回退默认值: tenantId={}, error={}", tenantId, e.getMessage());
+        }
+        return AinoteAiConfig.defaults().setTenantId(tenantId);
+    }
+
+    private FailureMode resolveFailureMode(String taskType, AinoteAiConfig config) {
+        switch (normalizeTaskType(taskType)) {
+            case "asr":
+                return FailureMode.fromValue(config.getAsrFailureMode());
+            case "ocr":
+                return FailureMode.fromValue(config.getOcrFailureMode());
+            case "video":
+                return FailureMode.fromValue(config.getVideoFailureMode());
+            case "summary":
+                return FailureMode.fromValue(config.getSummaryFailureMode());
+            case "integrate":
+                return FailureMode.fromValue(config.getIntegrateFailureMode());
+            default:
+                return FailureMode.RETRY;
+        }
+    }
+
+    private int resolveRetryLimit(String taskType, AinoteAiConfig config) {
+        Integer configuredLimit;
+        switch (normalizeTaskType(taskType)) {
+            case "asr":
+                configuredLimit = config.getAsrRetryLimit();
+                break;
+            case "ocr":
+                configuredLimit = config.getOcrRetryLimit();
+                break;
+            case "video":
+                configuredLimit = config.getVideoRetryLimit();
+                break;
+            case "summary":
+                configuredLimit = config.getSummaryRetryLimit();
+                break;
+            case "integrate":
+                configuredLimit = config.getIntegrateRetryLimit();
+                break;
+            default:
+                configuredLimit = MAX_RETRY_COUNT;
+                break;
+        }
+        if (configuredLimit == null) {
+            return MAX_RETRY_COUNT;
+        }
+        return Math.max(0, configuredLimit);
+    }
+
+    private int normalizeRetryCount(Integer retryCount) {
+        return retryCount == null ? 0 : Math.max(0, retryCount);
+    }
+
+    private String buildSkippedProcessResult(String taskType, String errorMessage) {
+        JSONObject result = new JSONObject();
+        result.put("skipped", true);
+        result.put("skipStrategy", FailureMode.SKIP.getCode());
+        result.put("skipReason", errorMessage);
+        result.put("taskType", normalizeTaskType(taskType));
+        return result.toJSONString();
+    }
+
+    private String normalizeTaskType(String taskType) {
+        if (oConvertUtils.isEmpty(taskType) || taskType.isBlank()) {
+            return "";
+        }
+        return taskType.trim().toLowerCase(Locale.ROOT);
     }
 
     private LoginUser getCurrentUser() {

@@ -34,6 +34,18 @@ public class AinoteAiConfig implements Serializable {
     @Schema(description = "OCR Vision模型ID")
     private String ocrModelId;
 
+    @Schema(description = "ASR模型ID")
+    private String asrModelId;
+
+    @Schema(description = "视频处理模型ID")
+    private String videoModelId;
+
+    @Schema(description = "关键词模型ID")
+    private String keywordsModelId;
+
+    @Schema(description = "整合模型ID")
+    private String integrateModelId;
+
     @Schema(description = "知识库ID")
     private String knowledgeId;
 
@@ -57,6 +69,36 @@ public class AinoteAiConfig implements Serializable {
 
     @Schema(description = "是否启用Flow摘要")
     private Integer summaryFlowEnabled;
+
+    @Schema(description = "ASR失败模式: skip/retry/fail_all")
+    private String asrFailureMode;
+
+    @Schema(description = "ASR重试次数上限(0-10)")
+    private Integer asrRetryLimit;
+
+    @Schema(description = "OCR失败模式: skip/retry/fail_all")
+    private String ocrFailureMode;
+
+    @Schema(description = "OCR重试次数上限(0-10)")
+    private Integer ocrRetryLimit;
+
+    @Schema(description = "视频失败模式: skip/retry/fail_all")
+    private String videoFailureMode;
+
+    @Schema(description = "视频重试次数上限(0-10)")
+    private Integer videoRetryLimit;
+
+    @Schema(description = "摘要失败模式: skip/retry/fail_all")
+    private String summaryFailureMode;
+
+    @Schema(description = "摘要重试次数上限(0-10)")
+    private Integer summaryRetryLimit;
+
+    @Schema(description = "整合失败模式: skip/retry/fail_all")
+    private String integrateFailureMode;
+
+    @Schema(description = "整合重试次数上限(0-10)")
+    private Integer integrateRetryLimit;
 
     @Schema(description = "租户ID")
     private Integer tenantId;
@@ -87,6 +129,16 @@ public class AinoteAiConfig implements Serializable {
                 .setIntegratePromptKey("note_integrate")
                 .setMaxSummaryLength(200)
                 .setMaxKeywordsCount(5)
+                .setAsrFailureMode("retry")
+                .setAsrRetryLimit(3)
+                .setOcrFailureMode("retry")
+                .setOcrRetryLimit(3)
+                .setVideoFailureMode("retry")
+                .setVideoRetryLimit(3)
+                .setSummaryFailureMode("retry")
+                .setSummaryRetryLimit(3)
+                .setIntegrateFailureMode("skip")
+                .setIntegrateRetryLimit(0)
                 .setSummaryFlowEnabled(0);
     }
 }

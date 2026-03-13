@@ -15,10 +15,11 @@ import org.jeecg.modules.ainote.service.IAinoteNoteService;
 import org.jeecg.modules.ainote.vo.AinoteProgressVO;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Generation orchestration facade.
@@ -42,6 +43,7 @@ public class AinoteGenerationFacade {
     private static final String TASK_TYPE_TIKA = "tika";
     private static final String TASK_TYPE_OCR = "ocr";
     private static final String TASK_TYPE_VIDEO = "video";
+    private static final String TASK_TYPE_SUMMARY = "summary";
 
     private final IAinoteNoteService noteService;
     private final IAinoteMaterialService materialService;
@@ -62,9 +64,11 @@ public class AinoteGenerationFacade {
         }
 
         List<AinoteAiTask> existingTasks = aiTaskService.getTasksByNoteId(note.getId());
-        Set<String> existingMaterialTaskKeys = buildMaterialTaskKeys(existingTasks);
+        Map<String, AinoteAiTask> latestMaterialTasks = buildLatestMaterialTasks(existingTasks);
+        AinoteAiTask latestSummaryTask = findLatestSummaryTask(existingTasks);
 
         int createdCount = 0;
+        int restartedCount = 0;
         for (AinoteMaterial material : materials) {
             if (material == null || oConvertUtils.isEmpty(material.getId())) {
                 continue;
@@ -76,16 +80,45 @@ public class AinoteGenerationFacade {
             }
 
             String taskKey = buildTaskKey(material.getId(), taskType);
-            if (existingMaterialTaskKeys.contains(taskKey)) {
-                continue;
+            AinoteAiTask latestTask = latestMaterialTasks.get(taskKey);
+            if (latestTask != null) {
+                Integer taskStatus = latestTask.getTaskStatus();
+                if (taskStatus != null && (taskStatus == STATUS_PENDING || taskStatus == STATUS_PROCESSING)) {
+                    continue;
+                }
+                if (shouldRetrySourceTask(latestTask) && resetTaskForRetry(latestTask.getId(), tenantId)) {
+                    restartedCount++;
+                    continue;
+                }
+                if (taskStatus != null && taskStatus == STATUS_COMPLETED) {
+                    continue;
+                }
             }
 
-            aiTaskService.createTask(note.getId(), material.getId(), taskType);
-            existingMaterialTaskKeys.add(taskKey);
-            createdCount++;
+            try {
+                aiTaskService.createTask(note.getId(), material.getId(), taskType);
+                createdCount++;
+            } catch (JeecgBootException ex) {
+                if (isDuplicateActiveTaskError(ex)) {
+                    log.info("Skip duplicate active source task: noteId={}, materialId={}, taskType={}",
+                            note.getId(), material.getId(), taskType);
+                    continue;
+                }
+                throw ex;
+            }
         }
 
-        log.info("Trigger generation finished: noteId={}, createdTaskCount={}", note.getId(), createdCount);
+        if (createdCount == 0 && restartedCount == 0
+                && latestSummaryTask != null
+                && latestSummaryTask.getTaskStatus() != null
+                && latestSummaryTask.getTaskStatus() == STATUS_FAILED
+                && hasCompletedSourceTask(existingTasks)
+                && resetTaskForRetry(latestSummaryTask.getId(), tenantId)) {
+            restartedCount++;
+        }
+
+        log.info("Trigger generation finished: noteId={}, createdTaskCount={}, restartedTaskCount={}",
+                note.getId(), createdCount, restartedCount);
         noteAssembler.assembleIfReady(note.getId(), knowledgeId);
     }
 
@@ -180,18 +213,114 @@ public class AinoteGenerationFacade {
         return note;
     }
 
-    private Set<String> buildMaterialTaskKeys(List<AinoteAiTask> tasks) {
-        Set<String> keys = new HashSet<>();
+    private Map<String, AinoteAiTask> buildLatestMaterialTasks(List<AinoteAiTask> tasks) {
+        Map<String, AinoteAiTask> taskMap = new LinkedHashMap<>();
         if (tasks == null || tasks.isEmpty()) {
-            return keys;
+            return taskMap;
         }
         for (AinoteAiTask task : tasks) {
             if (task == null || oConvertUtils.isEmpty(task.getMaterialId()) || oConvertUtils.isEmpty(task.getTaskType())) {
                 continue;
             }
-            keys.add(buildTaskKey(task.getMaterialId(), task.getTaskType()));
+            taskMap.put(buildTaskKey(task.getMaterialId(), task.getTaskType()), task);
         }
-        return keys;
+        return taskMap;
+    }
+
+    private AinoteAiTask findLatestSummaryTask(List<AinoteAiTask> tasks) {
+        if (tasks == null || tasks.isEmpty()) {
+            return null;
+        }
+        AinoteAiTask latestSummaryTask = null;
+        for (AinoteAiTask task : tasks) {
+            if (task == null || !TASK_TYPE_SUMMARY.equals(normalizeTaskType(task.getTaskType()))) {
+                continue;
+            }
+            latestSummaryTask = task;
+        }
+        return latestSummaryTask;
+    }
+
+    private boolean shouldRetrySourceTask(AinoteAiTask task) {
+        if (task == null || !isSourceTask(task.getTaskType())) {
+            return false;
+        }
+        Integer status = task.getTaskStatus();
+        if (status == null) {
+            return true;
+        }
+        if (status == STATUS_FAILED) {
+            return true;
+        }
+        return status == STATUS_COMPLETED && !hasProcessResult(task);
+    }
+
+    private boolean hasCompletedSourceTask(List<AinoteAiTask> tasks) {
+        if (tasks == null || tasks.isEmpty()) {
+            return false;
+        }
+        for (AinoteAiTask task : tasks) {
+            if (task == null || !isSourceTask(task.getTaskType())) {
+                continue;
+            }
+            Integer status = task.getTaskStatus();
+            if (status != null && status == STATUS_COMPLETED && hasProcessResult(task)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSourceTask(String taskType) {
+        String normalized = normalizeTaskType(taskType);
+        return TASK_TYPE_ASR.equals(normalized)
+                || TASK_TYPE_TIKA.equals(normalized)
+                || TASK_TYPE_OCR.equals(normalized)
+                || TASK_TYPE_VIDEO.equals(normalized);
+    }
+
+    private boolean hasProcessResult(AinoteAiTask task) {
+        return task != null && oConvertUtils.isNotEmpty(task.getProcessResult()) && !task.getProcessResult().isBlank();
+    }
+
+    private boolean resetTaskForRetry(String taskId, Integer tenantId) {
+        if (oConvertUtils.isEmpty(taskId)) {
+            return false;
+        }
+        UpdateWrapper<AinoteAiTask> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", taskId);
+        wrapper.eq("tenant_id", tenantId);
+        wrapper.eq("task_status", STATUS_FAILED);
+        wrapper.set("task_status", STATUS_PENDING);
+        wrapper.set("error_message", null);
+        wrapper.set("process_result", null);
+        wrapper.set("retry_count", 0);
+        wrapper.set("started_at", null);
+        wrapper.set("completed_at", null);
+        wrapper.set("duration", null);
+        wrapper.set("next_retry_at", null);
+        wrapper.set("worker_id", null);
+        wrapper.set("vendor_task_id", null);
+        wrapper.set("update_time", new Date());
+        boolean reset = aiTaskService.update(null, wrapper);
+        if (reset) {
+            log.info("Reset failed AI task for retry: taskId={}, tenantId={}", taskId, tenantId);
+        }
+        return reset;
+    }
+
+    private boolean isDuplicateActiveTaskError(JeecgBootException ex) {
+        if (ex == null || oConvertUtils.isEmpty(ex.getMessage())) {
+            return false;
+        }
+        return ex.getMessage().contains("已有相同类型的任务在处理中");
+    }
+
+    private String normalizeTaskType(String taskType) {
+        if (oConvertUtils.isEmpty(taskType)) {
+            return "";
+        }
+        return taskType.trim().toLowerCase(Locale.ROOT);
     }
 
     private String routeTaskType(String fileType) {
