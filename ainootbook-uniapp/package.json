@@ -83,6 +83,7 @@
     "echarts": "^5.6.0",
     "lodash-es": "^4.17.21",
     "md5": "^2.3.0",
+    "mp-html": "^2.5.2",
     "pinia": "2.0.36",
     "pinia-plugin-persistedstate": "3.2.1",
     "qs": "6.5.3",
