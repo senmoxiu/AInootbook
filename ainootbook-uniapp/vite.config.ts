@@ -127,6 +127,7 @@ export default ({ command, mode }) => {
         enable: mode === 'development' && JSON.parse(VITE_USE_MOCK),
       }),
       UNI_PLATFORM === 'h5' && mode === 'production' && createEnvConfigPlugin(),
+      UNI_PLATFORM?.startsWith('mp-') && createSubpackageSizeMonitorPlugin(),
     ],
     define: {
       __UNI_PLATFORM__: JSON.stringify(UNI_PLATFORM),
@@ -226,6 +227,43 @@ function createEnvConfigPlugin() {
           html = html.replace('</title>', `</title> \n ${scriptTag}`)
           fs.writeFileSync(indexPath, html, 'utf-8')
         }
+      }
+    },
+  }
+}
+function createSubpackageSizeMonitorPlugin() {
+  const THRESHOLD = 1.5 * 1024 * 1024 // 1.5MB
+  return {
+    name: 'subpackage-size-monitor',
+    apply: 'build',
+    generateBundle(_, bundle) {
+      const subpackageSizes = {}
+      for (const [fileName, output] of Object.entries(bundle)) {
+        const parts = fileName.split('/')
+        if (parts.length > 1 && parts[0].startsWith('pages-')) {
+          const subpackage = parts[0]
+          const size =
+            output.type === 'asset'
+              ? typeof output.source === 'string'
+                ? Buffer.byteLength(output.source)
+                : output.source.byteLength
+              : Buffer.byteLength(output.code)
+          subpackageSizes[subpackage] = (subpackageSizes[subpackage] || 0) + size
+        }
+      }
+
+      const warnings = Object.entries(subpackageSizes)
+        .filter(([_, size]) => size > THRESHOLD)
+        .map(([name, size]) => ({
+          name,
+          size: (size / (1024 * 1024)).toFixed(2),
+        }))
+
+      if (warnings.length > 0) {
+        console.log('\x1b[33m%s\x1b[0m', '\n⚠️  Subpackage Size Warnings (Threshold: 1.5MB):')
+        warnings.forEach(({ name, size }) => {
+          console.log('\x1b[33m%s\x1b[0m', `  - ${name}: ${size}MB`)
+        })
       }
     },
   }

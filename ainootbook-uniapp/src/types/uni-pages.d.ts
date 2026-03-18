@@ -8,11 +8,6 @@ interface NavigateToOptions {
        "/pages/about/about" |
        "/pages/annotation/annotationDetail" |
        "/pages/annotation/annotationList" |
-       "/pages/demo/demo" |
-       "/pages/demo/form" |
-       "/pages/demo/indexBar" |
-       "/pages/demo/selectPicker" |
-       "/pages/demo/tree" |
        "/pages/login/login" |
        "/pages/login/loginOauth2" |
        "/pages/message/message" |
@@ -39,7 +34,13 @@ interface NavigateToOptions {
        "/pages-work/onlinePage/onlineEdit" |
        "/pages-sub/online/online" |
        "/pages-sub/online/onlineCard" |
-       "/pages-sub/online/onlineTable";
+       "/pages-sub/online/onlineTable" |
+       "/pages-study/course/courseList" |
+       "/pages-study/course/detail" |
+       "/pages-study/course/list" |
+       "/pages-study/note/detail" |
+       "/pages-study/note/list" |
+       "/pages-study/note/wizard";
 }
 interface RedirectToOptions extends NavigateToOptions {}
 

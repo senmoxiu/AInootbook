@@ -91,71 +91,6 @@
       }
     },
     {
-      "path": "pages/demo/demo",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "demo演示",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
-      "path": "pages/demo/form",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "表单",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
-      "path": "pages/demo/indexBar",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTitleText": "通讯录",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
-      "path": "pages/demo/selectPicker",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "单选多选",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
-      "path": "pages/demo/tree",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "树示例",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
       "path": "pages/login/login",
       "type": "page",
       "style": {
@@ -519,6 +454,62 @@
               "bounce": "none"
             }
           }
+        }
+      ]
+    },
+    {
+      "root": "pages-study",
+      "pages": [
+        {
+          "path": "course/courseList",
+          "type": "page"
+        },
+        {
+          "path": "course/detail",
+          "type": "page",
+          "layout": "default",
+          "style": {
+            "navigationBarTitleText": "课程详情",
+            "navigationStyle": "custom",
+            "disableScroll": true,
+            "app-plus": {
+              "bounce": "none"
+            }
+          }
+        },
+        {
+          "path": "course/list",
+          "type": "page",
+          "layout": "default",
+          "style": {
+            "navigationBarTitleText": "我的课程",
+            "navigationStyle": "custom",
+            "disableScroll": true,
+            "app-plus": {
+              "bounce": "none"
+            }
+          }
+        },
+        {
+          "path": "note/detail",
+          "type": "page"
+        },
+        {
+          "path": "note/list",
+          "type": "page",
+          "layout": "default",
+          "style": {
+            "navigationBarTitleText": "我的笔记",
+            "navigationStyle": "custom",
+            "disableScroll": true,
+            "app-plus": {
+              "bounce": "none"
+            }
+          }
+        },
+        {
+          "path": "note/wizard",
+          "type": "page"
         }
       ]
     }
