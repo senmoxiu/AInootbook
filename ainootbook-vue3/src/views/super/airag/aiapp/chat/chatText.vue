@@ -1,18 +1,18 @@
 <template>
-  <div v-if="parsedText != ''" class="textWrap" :class="[inversion === 'user' ? 'self' : (isOnlyImage ? 'chatgpt-image' : 'chatgpt')]" ref="textRef">
-    <div v-if="inversion != 'user'" :style="{ width: getIsMobile? screenWidth : 'auto' }">
+  <div v-if="parsedText != ''" class="textWrap" :class="[inversion === 'user' ? 'self' : isOnlyImage ? 'chatgpt-image' : 'chatgpt']" ref="textRef">
+    <div v-if="inversion != 'user'" :style="{ width: getIsMobile ? screenWidth : 'auto' }">
       <div ref="markdownBodyRef" class="markdown-body" :class="{ 'markdown-body-generate': loading }" v-html="parsedText" />
       <template v-if="showRefKnow">
         <a-divider orientation="left">引用</a-divider>
         <template v-for="(item, idx) in referenceKnowledge" :key="idx">
           <a-tooltip :title="item.content?.substring(0, 800)">
-            <a-tag style="min-width: 80px;background: #F7F8FA;padding-inline: 0 7px">
-              <a-space style="min-height: 30px;padding-left: 4px;padding-right: 4px;background-color: #F0F1F6;color: #788194">
-                <div>{{ 'chunk-' + item.chunk}}</div>
+            <a-tag style="min-width: 80px; background: #f7f8fa; padding-inline: 0 7px">
+              <a-space style="min-height: 30px; padding-left: 4px; padding-right: 4px; background-color: #f0f1f6; color: #788194">
+                <div>{{ 'chunk-' + item.chunk }}</div>
               </a-space>
-              <a-space style="min-height: 30px;padding-left: 4px;">
-                <img :src="knowledgePng" width="14" height="14" style="position: relative; top: -2px"/>
-                <div style="max-width: 240px; overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">
+              <a-space style="min-height: 30px; padding-left: 4px">
+                <img :src="knowledgePng" width="14" height="14" style="position: relative; top: -2px" />
+                <div style="max-width: 240px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">
                   {{ item.docName }}
                 </div>
               </a-space>
@@ -50,10 +50,10 @@
   import './style/highlight.less';
   import './style/style.less';
   import ImageViewer from '@/views/super/airag/aiapp/chat/components/ImageViewer.vue';
-  import { useAppInject } from "@/hooks/web/useAppInject";
-  import { useGlobSetting } from "@/hooks/setting";
-  import { mdPluginJeecgTag, JEECG_TAG_CLASS, jeecgTagMap } from './jeecg-tags'
-  import knowledgePng from '../../aiknowledge/icon/knowledge.png'
+  import { useAppInject } from '@/hooks/web/useAppInject';
+  import { useGlobSetting } from '@/hooks/setting';
+  import { mdPluginJeecgTag, JEECG_TAG_CLASS, jeecgTagMap } from './jeecg-tags';
+  import knowledgePng from '../../aiknowledge/icon/knowledge.png';
 
   /**
    * 屏幕宽度
@@ -74,12 +74,14 @@
   const parsedText = ref<string>('');
 
   // 解析出来的 jeecgTag 列表
-  const jeecgTagList = ref<{
-    key: string;
-    to: HTMLDivElement;
-    tag: JeecgTag;
-    data: string;
-  }[]>([]);
+  const jeecgTagList = ref<
+    {
+      key: string;
+      to: HTMLDivElement;
+      tag: JeecgTag;
+      data: string;
+    }[]
+  >([]);
 
   const mdi = new MarkdownIt({
     html: true,
@@ -115,52 +117,60 @@
       return;
     }
     // 用户消息保留换行展示
-    parsedText.value = value.replace("\n", "<br>");
+    parsedText.value = value.replace('\n', '<br>');
   }, 100);
 
   // 是否显示引用知识库
   const showRefKnow = computed(() => {
-    const {loading, referenceKnowledge} = props
+    const { loading, referenceKnowledge } = props;
     if (loading) {
       return false;
     }
     return Array.isArray(referenceKnowledge) && referenceKnowledge.length > 0;
-  })
+  });
 
   // 判断是否只有图片
   const isOnlyImage = computed(() => {
-    if (showRefKnow.value){
+    if (showRefKnow.value) {
       return false;
     }
-    
+
     const content = props.text || '';
-    if (!content){
+    if (!content) {
       return false;
     }
-    
-    //匹配![图片1](url1) 
+
+    //匹配![图片1](url1)
     const imageRegex = /!\[.*?\]\(.*?\)/g;
     if (!imageRegex.test(content)) {
       return false;
     }
-    
+
     //替换之后是否存在文本
     const remaining = content.replace(imageRegex, '').trim();
     return remaining.length === 0;
   });
 
   // 监听文本变化，触发界面更新
-  watch(() => props.text, () => updateTextContent(), {immediate: true});
+  watch(
+    () => props.text,
+    () => updateTextContent(),
+    { immediate: true }
+  );
 
   // 监听 当前调用的工具 变化，追加渲染内容
-  watch(() => props.currentToolTag, () => {
-    const {isLast, inversion, currentToolTag, loading} = props;
-    if (isLast && inversion != 'user' && currentToolTag && loading) {
-      parsedText.value += mdi.render(currentToolTag);
-      // 解析 jeecgTag 标签
-      parseJeecgTag();
-    }
-  }, {immediate: true});
+  watch(
+    () => props.currentToolTag,
+    () => {
+      const { isLast, inversion, currentToolTag, loading } = props;
+      if (isLast && inversion != 'user' && currentToolTag && loading) {
+        parsedText.value += mdi.render(currentToolTag);
+        // 解析 jeecgTag 标签
+        parseJeecgTag();
+      }
+    },
+    { immediate: true }
+  );
 
   //替换图片宽度
   function replaceImageWith(markdownContent) {
@@ -170,7 +180,7 @@
     const regex = /!\[([^\]]*)\]\(([^)]+)\s=([0-9]+)\)/g;
     markdownContent = markdownContent.replace(regex, (match, alt, src, width) => {
       let reg = /#\s*{\s*domainURL\s*}/g;
-      src = src.replace(reg,domainUrl);
+      src = src.replace(reg, domainUrl);
       return `<div class="chat-image-custom"><img src='${src}' alt='${alt}' width='${width}' /></div>`;
     });
 
@@ -179,14 +189,14 @@
     const regexStandard = /!\[([^\]]*)\]\(([^)]+)\)/g;
     const matches = markdownContent.match(regexStandard);
     const count = matches ? matches.length : 0;
-    
+
     if (count > 0) {
       markdownContent = markdownContent.replace(regexStandard, (match, alt, src) => {
         let reg = /#\s*{\s*domainURL\s*}/g;
         src = src.replace(reg, domainUrl);
         // 如果有多张图片，使用Grid布局（一行4个）
         if (count > 1) {
-             return `<div class="chat-image-grid-item"><img src='${src}' alt='${alt}' /></div>`;
+          return `<div class="chat-image-grid-item"><img src='${src}' alt='${alt}' /></div>`;
         }
         // 单张图片保持默认（或包裹以便控制）
         return `<div class="chat-image-single"><img src='${src}' alt='${alt}' /></div>`;
@@ -194,15 +204,15 @@
     }
     return markdownContent;
     //update-end---author:wangshuai---date:2026-01-08---for: 兼容返回多张图片集图片默认宽度调整---
-  };
+  }
 
   //替换domainURL
   function replaceDomainUrl(markdownContent) {
     const regex = /!\[([^\]]*)\]\(.*?#\s*{\s*domainURL\s*}.*?\)/g;
     return markdownContent.replace(regex, (match) => {
       let reg = /#\s*{\s*domainURL\s*}/g;
-      return match.replace(reg,domainUrl);
-    })
+      return match.replace(reg, domainUrl);
+    });
   }
 
   function highlightBlock(str: string, lang?: string) {
@@ -236,7 +246,6 @@
     }
   }
 
-
   /**
    * 添加图片点击事件
    */
@@ -247,20 +256,19 @@
         img.addEventListener('click', () => {
           imageUrl.value = img.src;
           amplifyImage.value = true;
-        })
+        });
       });
     }
   }
 
-
   /**
    * 移出图片点击事件
    */
-  function removeImageClickEvent(){
+  function removeImageClickEvent() {
     if (textRef.value) {
       const image = textRef.value.querySelectorAll('img');
       image.forEach((img) => {
-        img.removeEventListener('click', () => { })
+        img.removeEventListener('click', () => {});
       });
     }
   }
@@ -268,21 +276,20 @@
   /**
    * 图片隐藏
    */
-  function pictureHide(){
+  function pictureHide() {
     amplifyImage.value = false;
-    imageUrl.value = ""
+    imageUrl.value = '';
   }
-
 
   /**
    * 设置markdown body整体宽度
    */
   function setMarkdownBodyWidth() {
     //平板
-    console.log("window.innerWidth::",window.innerWidth)
-    if(window.innerWidth>600 && window.innerWidth<1024){
+    console.log('window.innerWidth::', window.innerWidth);
+    if (window.innerWidth > 600 && window.innerWidth < 1024) {
       screenWidth.value = window.innerWidth - 120 + 'px';
-    }else if(window.innerWidth < 600){
+    } else if (window.innerWidth < 600) {
       //手机
       screenWidth.value = window.innerWidth - 60 + 'px';
     }
@@ -380,7 +387,7 @@
   }
 
   .error {
-    background: linear-gradient(135deg, #FF4444, #FF914D) !important;
+    background: linear-gradient(135deg, #ff4444, #ff914d) !important;
     border-radius: 0.375rem;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
@@ -391,7 +398,7 @@
   }
 
   .error-message {
-    color: #FF4444 !important
+    color: #ff4444 !important;
   }
 
   .self {
@@ -409,13 +416,13 @@
     line-height: 1.25rem;
   }
   .chatgpt-image {
-    .markdown-body{
+    .markdown-body {
       background-color: transparent !important;
     }
   }
   @media (max-width: 1024px) {
     //手机和平板下的样式
-    .textWrap{
+    .textWrap {
       margin-left: -40px;
       margin-top: 10px;
     }
@@ -462,5 +469,4 @@
       }
     }
   }
-
 </style>

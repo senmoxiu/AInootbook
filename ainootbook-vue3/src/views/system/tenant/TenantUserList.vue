@@ -5,18 +5,14 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" preIcon="ant-design:plus-outlined" @click="handleCreate">新增</a-button>
-        <a-button
-            preIcon="ant-design:user-add-outlined"
-            type="primary"
-            @click="handleInvitation"
-            style="margin-right: 5px">
-            邀请用户加入
-        </a-button>
+        <a-button preIcon="ant-design:user-add-outlined" type="primary" @click="handleInvitation" style="margin-right: 5px"> 邀请用户加入 </a-button>
         <JThirdAppButton biz-type="user" :selected-row-keys="selectedRowKeys" syncToApp syncToLocal @sync-finally="onSyncFinally" />
         <a-button type="primary" @click="openQuitModal(true, {})" preIcon="ant-design:user-delete-outlined">离职人员</a-button>
-        <div style="margin-left: 10px;margin-top: 5px"> 当前登录租户: <span class="tenant-name">{{loginTenantName}}</span> </div>
+        <div style="margin-left: 10px; margin-top: 5px">
+          当前登录租户: <span class="tenant-name">{{ loginTenantName }}</span>
+        </div>
         <a-tooltip title="租户用户更多操作说明">
-          <a-icon type="question-circle" style="margin-left: 8px; cursor: pointer " @click="tipShow = true"/>
+          <a-icon type="question-circle" style="margin-left: 8px; cursor: pointer" @click="tipShow = true" />
         </a-tooltip>
       </template>
       <!--操作栏-->
@@ -58,19 +54,28 @@
   import { useModal } from '/@/components/Modal';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { columns, searchFormSchema } from '../user/user.data';
-  import { list , deleteUser, batchDeleteUser, getImportUrl, getExportUrl, frozenBatch, getUserTenantPageList, updateUserTenantStatus } from '../user/user.api';
+  import {
+    list,
+    deleteUser,
+    batchDeleteUser,
+    getImportUrl,
+    getExportUrl,
+    frozenBatch,
+    getUserTenantPageList,
+    updateUserTenantStatus,
+  } from '../user/user.api';
   // import { usePermission } from '/@/hooks/web/usePermission'
   // const { hasPermission } = usePermission();
   import { userTenantColumns, userTenantFormSchema } from '../user/user.data';
   import { useUserStore } from '/@/store/modules/user';
   import UserSelectModal from '/@/components/Form/src/jeecg/components/modal/UserSelectModal.vue';
-  import { getTenantId } from "/@/utils/auth";
-  import { changeOwenUserTenant } from "/@/views/system/usersetting/UserSetting.api";
-  import {getLoginTenantName, invitationUserJoin, leaveTenant} from "/@/views/system/tenant/tenant.api";
+  import { getTenantId } from '/@/utils/auth';
+  import { changeOwenUserTenant } from '/@/views/system/usersetting/UserSetting.api';
+  import { getLoginTenantName, invitationUserJoin, leaveTenant } from '/@/views/system/tenant/tenant.api';
   import TenantUserDrawer from './components/TenantUserDrawer.vue';
-  import { sameDay, tenantSaasMessage } from "@/utils/common/compUtils";
-  import TenantPackAllotModal from './components/TenantPackAllotModal.vue'
-  import TenantInviteUserModal from "@/views/system/tenant/components/TenantInviteUserModal.vue";
+  import { sameDay, tenantSaasMessage } from '@/utils/common/compUtils';
+  import TenantPackAllotModal from './components/TenantPackAllotModal.vue';
+  import TenantInviteUserModal from '@/views/system/tenant/components/TenantInviteUserModal.vue';
 
   const { createMessage, createConfirm } = useMessage();
 
@@ -192,14 +197,14 @@
           title: '是否确认删除该用户',
           confirm: handleDeleteUser.bind(null, record),
         },
-        ifShow: () => record.username!== userStore.getUserInfo?.username && sameDay(record.createTime),
+        ifShow: () => record.username !== userStore.getUserInfo?.username && sameDay(record.createTime),
       },
       {
         label: '变更拥有者',
         onClick: handleHandover.bind(null, record),
-        ifShow: () =>{
+        ifShow: () => {
           return record.username === record.createBy;
-        }
+        },
       },
       {
         label: '同意',
@@ -221,7 +226,7 @@
       {
         label: '用户套餐',
         onClick: handleAllotPack.bind(null, record),
-      }
+      },
     ];
   }
 
@@ -254,7 +259,7 @@
   //邀请用户加入弹窗
   const [registerSelUserModal, { openModal: userOpenModal }] = useModal();
   const handOverUserName = ref<string>('');
-  
+
   /**
    * 人员交接
    */
@@ -263,7 +268,7 @@
     excludeUserIdList.value = [record.id];
     //记录一下当前需要交接的用户名
     handOverUserName.value = record.createBy;
-    openUserModal(true)
+    openUserModal(true);
   }
 
   /**
@@ -271,48 +276,46 @@
    * @param options
    * @param values
    */
-  function selectResult(options,values) {
-    console.log(values)
-    if(values && values.length>0){
+  function selectResult(options, values) {
+    console.log(values);
+    if (values && values.length > 0) {
       let userId = values[0];
-      changeOwenUserTenant({ userId:userId, tenantId:unref(tenantId) }).then((res) =>{
-        if(res.success){
-          createMessage.success("交接成功");
+      changeOwenUserTenant({ userId: userId, tenantId: unref(tenantId) }).then((res) => {
+        if (res.success) {
+          createMessage.success('交接成功');
           let username = userStore.getUserInfo?.username;
-          if(username == handOverUserName.value){
+          if (username == handOverUserName.value) {
             userStore.logout(true);
-          }else{
+          } else {
             reload();
           }
         } else {
           createMessage.warning(res.message);
         }
-      })
+      });
     }
   }
   //============================================  租户离职交接  ============================================
-
 
   // 代码逻辑说明: 【QQYUN-5723】4、显示当前登录租户------------
   const loginTenantName = ref<string>('');
 
   getTenantName();
 
-  async function getTenantName(){
+  async function getTenantName() {
     loginTenantName.value = await getLoginTenantName();
   }
   //update-end---author:wangshuai ---date:20230710  for：【QQYUN-5723】4、显示当前登录租户------------
-  
 
   /**
    * 分配套餐
-   * 
+   *
    * @param record
    */
   function handleAllotPack(record) {
-    openPackAllotModal(true,{
-      record
-    })
+    openPackAllotModal(true, {
+      record,
+    });
   }
 
   /**
@@ -328,7 +331,7 @@
   function handleInvitation() {
     userOpenModal(true, {});
   }
-  
+
   /**
    * 用户选择回调事件
    * @param username
@@ -352,22 +355,21 @@
    * @param id
    */
   async function handleLeave(id) {
-    await leaveTenant({ userIds: id, tenantId: getTenantId() }, reload)
+    await leaveTenant({ userIds: id, tenantId: getTenantId() }, reload);
   }
-  
-  
-  onMounted(()=>{
-    tenantSaasMessage('租户用户')
-  })
+
+  onMounted(() => {
+    tenantSaasMessage('租户用户');
+  });
 </script>
 
 <style scoped>
-  .tenant-name{
-    text-decoration:underline;
+  .tenant-name {
+    text-decoration: underline;
     margin: 5px;
     font-size: 15px;
   }
-  .user-tenant-tip{
+  .user-tenant-tip {
     margin: 20px;
     background-color: #f8f9fb;
     color: #99a1a9;

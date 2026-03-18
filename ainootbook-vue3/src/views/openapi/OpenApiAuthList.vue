@@ -7,14 +7,19 @@
           <a-col :lg="6">
             <a-form-item name="name">
               <template #label><span title="授权名称">授权名称</span></template>
-              <a-input placeholder="请输入授权名称" v-model:value="queryParam.name" allow-clear ></a-input>
+              <a-input placeholder="请输入授权名称" v-model:value="queryParam.name" allow-clear></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
             <a-form-item name="createBy">
               <template #label><span title="关联系统用户名">关联系统用户名</span></template>
-              <JSearchSelect dict="sys_user,username,username" v-model:value="queryParam.createBy" placeholder="请输入关联系统用户名"  allow-clear ></JSearchSelect>
-<!--              <a-input placeholder="请输入关联系统用户名" v-model:value="queryParam.systemUserId" allow-clear ></a-input>-->
+              <JSearchSelect
+                dict="sys_user,username,username"
+                v-model:value="queryParam.createBy"
+                placeholder="请输入关联系统用户名"
+                allow-clear
+              ></JSearchSelect>
+              <!--              <a-input placeholder="请输入关联系统用户名" v-model:value="queryParam.systemUserId" allow-clear ></a-input>-->
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -36,9 +41,11 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'openapi:open_api_auth:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'openapi:open_api_auth:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'openapi:open_api_auth:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <a-button type="primary" v-auth="'openapi:open_api_auth:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
+        <a-button type="primary" v-auth="'openapi:open_api_auth:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <j-upload-button type="primary" v-auth="'openapi:open_api_auth:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
+          >导入</j-upload-button
+        >
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -48,7 +55,8 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'openapi:open_api_auth:deleteBatch'">批量操作
+          <a-button v-auth="'openapi:open_api_auth:deleteBatch'"
+            >批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
         </a-dropdown>
@@ -57,10 +65,9 @@
       </template>
       <!--操作栏-->
       <template #action="{ record }">
-        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
+        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }">
-      </template>
+      <template v-slot:bodyCell="{ column, record, index, text }"> </template>
     </BasicTable>
 
     <!-- 表单区域 -->
@@ -74,18 +81,11 @@
   import { BasicTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './OpenApiAuth.data';
-  import {
-    list,
-    deleteOne,
-    batchDelete,
-    getImportUrl,
-    getExportUrl,
-    getGenAKSK, saveOrUpdate
-  } from "./OpenApiAuth.api";
-  import OpenApiAuthModal from './components/OpenApiAuthModal.vue'
-  import AuthModal from './components/AuthModal.vue'
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, getGenAKSK, saveOrUpdate } from './OpenApiAuth.api';
+  import OpenApiAuthModal from './components/OpenApiAuthModal.vue';
+  import AuthModal from './components/AuthModal.vue';
   import { useUserStore } from '/@/store/modules/user';
-  import JSearchSelect from "../../components/Form/src/jeecg/components/JSearchSelect.vue";
+  import JSearchSelect from '../../components/Form/src/jeecg/components/JSearchSelect.vue';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
@@ -99,7 +99,7 @@
       title: '授权管理',
       api: list,
       columns,
-      canResize:false,
+      canResize: false,
       useSearchForm: false,
       actionColumn: {
         width: 200,
@@ -110,21 +110,21 @@
       },
     },
     exportConfig: {
-      name: "授权管理",
+      name: '授权管理',
       url: getExportUrl,
       params: queryParam,
     },
-	  importConfig: {
-	    url: getImportUrl,
-	    success: handleSuccess
-	  },
+    importConfig: {
+      url: getImportUrl,
+      success: handleSuccess,
+    },
   });
   const [registerTable, { reload, updateTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
   const labelCol = reactive({
-    xs:24,
-    sm:10,
-    xl:6,
-    xxl:10
+    xs: 24,
+    sm: 10,
+    xl: 6,
+    xxl: 10,
   });
   const wrapperCol = reactive({
     xs: 24,
@@ -151,7 +151,7 @@
     registerModal.value.disableSubmit = false;
     registerModal.value.add();
   }
-  
+
   /**
    * 编辑事件
    */
@@ -177,11 +177,10 @@
     const AKSKObj = await getGenAKSK({});
     record.ak = AKSKObj[0];
     record.sk = AKSKObj[1];
-    saveOrUpdate(record,true);
+    saveOrUpdate(record, true);
     // handleSuccess;
-
   }
-   
+
   /**
    * 详情
    */
@@ -189,28 +188,28 @@
     registerModal.value.disableSubmit = true;
     registerModal.value.edit(record);
   }
-   
+
   /**
    * 删除事件
    */
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
   }
-   
+
   /**
    * 批量删除事件
    */
   async function batchHandleDelete() {
     await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
   }
-   
+
   /**
    * 成功回调
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
   }
-   
+
   /**
    * 操作栏
    */
@@ -219,7 +218,7 @@
       {
         label: '授权',
         onClick: handleAuth.bind(null, record),
-        auth: 'openapi:open_api_auth:edit'
+        auth: 'openapi:open_api_auth:edit',
       },
       {
         label: '重置',
@@ -228,11 +227,11 @@
           confirm: handleReset.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'openapi:open_api_auth:edit'
+        auth: 'openapi:open_api_auth:edit',
       },
     ];
   }
-   
+
   /**
    * 下拉操作栏
    */
@@ -241,16 +240,17 @@
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
-      }, {
+      },
+      {
         label: '删除',
         popConfirm: {
           title: '是否确认删除',
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'openapi:open_api_auth:delete'
-      }
-    ]
+        auth: 'openapi:open_api_auth:delete',
+      },
+    ];
   }
 
   /**
@@ -259,7 +259,7 @@
   function searchQuery() {
     reload();
   }
-  
+
   /**
    * 重置
    */
@@ -269,11 +269,6 @@
     //刷新数据
     reload();
   }
-  
-
-
-
-
 </script>
 
 <style lang="less" scoped>
@@ -284,19 +279,20 @@
       margin-bottom: 24px;
       white-space: nowrap;
     }
-    .query-group-cust{
+    .query-group-cust {
       min-width: 100px !important;
     }
-    .query-group-split-cust{
+    .query-group-split-cust {
       width: 30px;
       display: inline-block;
-      text-align: center
+      text-align: center;
     }
-    .ant-form-item:not(.ant-form-item-with-help){
+    .ant-form-item:not(.ant-form-item-with-help) {
       margin-bottom: 16px;
       height: 32px;
     }
-    :deep(.ant-picker),:deep(.ant-input-number){
+    :deep(.ant-picker),
+    :deep(.ant-input-number) {
       width: 100%;
     }
   }

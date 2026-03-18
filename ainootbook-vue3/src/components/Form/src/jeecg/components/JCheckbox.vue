@@ -1,6 +1,6 @@
 <template>
   <a-checkbox-group v-bind="attrs" v-model:value="checkboxArray" :options="checkOptions" @change="handleChange">
-    <template #label="{label, value}">
+    <template #label="{ label, value }">
       <span :class="[useDicColor && getDicColor(value) ? 'colorText' : '']" :style="{ backgroundColor: `${getDicColor(value)}` }">{{ label }}</span>
     </template>
   </a-checkbox-group>
@@ -10,12 +10,12 @@
   import { defineComponent, computed, watch, watchEffect, ref, unref } from 'vue';
   import { propTypes } from '/@/utils/propTypes';
   import { useAttrs } from '/@/hooks/core/useAttrs';
-  import {getDictItems} from "@/api/common/api";
+  import { getDictItems } from '@/api/common/api';
 
   export default defineComponent({
     name: 'JCheckbox',
     props: {
-      value:propTypes.oneOfType([propTypes.string, propTypes.number]),
+      value: propTypes.oneOfType([propTypes.string, propTypes.number]),
       dictCode: propTypes.string,
       useDicColor: propTypes.bool.def(false),
       options: {
@@ -36,11 +36,11 @@
       watchEffect(() => {
         // 代码逻辑说明: issues/I5E7YX AUTO在线表单进入功能测试之后一直卡在功能测试界面
         let temp = props.value;
-        if(!temp && temp!==0){
-          checkboxArray.value = []
-        }else{
+        if (!temp && temp !== 0) {
+          checkboxArray.value = [];
+        } else {
           temp = temp + '';
-          checkboxArray.value = temp.split(',')
+          checkboxArray.value = temp.split(',');
         }
         // 代码逻辑说明: 调用表单的 resetFields不会清空当前信息，界面显示上一次的数据
         if (props.value === '' || props.value === undefined) {
@@ -65,7 +65,7 @@
         }
         //根据字典Code, 初始化选项
         if (props.dictCode) {
-          loadDictOptions()
+          loadDictOptions();
         }
       }
 
@@ -79,7 +79,7 @@
         }
         getDictItems(temp).then((res) => {
           if (res) {
-            checkOptions.value = res.map((item) => ({value: item.value, label: item.text, color: item.color}));
+            checkOptions.value = res.map((item) => ({ value: item.value, label: item.text, color: item.color }));
             //console.info('res', dictOptions.value);
           } else {
             console.error('getDictItems error: : ', res);

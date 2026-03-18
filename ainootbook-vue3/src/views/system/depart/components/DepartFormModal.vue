@@ -1,13 +1,13 @@
 <template>
   <BasicModal :title="title" :width="800" v-bind="$attrs" @ok="handleOk" @register="registerModal">
-    <BasicForm @register="registerForm" >
+    <BasicForm @register="registerForm">
       <template #depPostParentId="{ model, field }">
         <a-tree-select v-model:value="depPostValue" :treeData="treeData" allowClear treeCheckable @select="treeSelect">
           <template #title="{ orgCategory, title }">
             <TreeIcon :orgCategory="orgCategory" :title="title"></TreeIcon>
           </template>
-          <template #tagRender="{option}">
-            <span style="margin-left: 10px" v-if="orgNameMap[option.id]">{{orgNameMap[option.id]}}</span>
+          <template #tagRender="{ option }">
+            <span style="margin-left: 10px" v-if="orgNameMap[option.id]">{{ orgNameMap[option.id] }}</span>
           </template>
         </a-tree-select>
       </template>
@@ -23,8 +23,8 @@
 
   import { saveOrUpdateDepart } from '../depart.api';
   import { useBasicFormSchema, orgCategoryOptions } from '../depart.data';
-  import TreeIcon from "@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue";
-  import { getDepartPathNameByOrgCode } from "@/utils/common/compUtils";
+  import TreeIcon from '@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue';
+  import { getDepartPathNameByOrgCode } from '@/utils/common/compUtils';
 
   const emit = defineEmits(['success', 'register']);
   const props = defineProps({
@@ -55,14 +55,14 @@
     // 当前是否为添加子级
     let isChild = unref(data?.isChild);
     let categoryOptions = isChild ? orgCategoryOptions.child : orgCategoryOptions.root;
-    
-    if(data.record?.orgCategory && data.record?.orgCategory === '2'){
-      categoryOptions = orgCategoryOptions.childDepartPost; 
+
+    if (data.record?.orgCategory && data.record?.orgCategory === '2') {
+      categoryOptions = orgCategoryOptions.childDepartPost;
     }
-    if(data.record?.orgCategory && data.record?.orgCategory === '3'){
-      categoryOptions = orgCategoryOptions.childPost; 
+    if (data.record?.orgCategory && data.record?.orgCategory === '3') {
+      categoryOptions = orgCategoryOptions.childPost;
     }
-    if(data.record?.depPostParentId){
+    if (data.record?.depPostParentId) {
       orgNameMap.value[data.record.depPostParentId] = await getDepartPathNameByOrgCode('', '', data.record.depPostParentId);
       depPostValue.value = [data.record.depPostParentId];
     }
@@ -98,7 +98,7 @@
     record = Object.assign(
       {
         departOrder: 0,
-        orgCategory: company?categoryOptions[1].value:categoryOptions[0].value,
+        orgCategory: company ? categoryOptions[1].value : categoryOptions[0].value,
       },
       record
     );
@@ -111,10 +111,10 @@
     try {
       setModalProps({ confirmLoading: true });
       let values = await validate();
-      if(depPostValue.value && depPostValue.value.length > 0){
+      if (depPostValue.value && depPostValue.value.length > 0) {
         values.depPostParentId = depPostValue.value[0];
-      }else{
-        values.depPostParentId = "";
+      } else {
+        values.depPostParentId = '';
       }
       //提交表单
       await saveOrUpdateDepart(values, isUpdate.value);
@@ -133,12 +133,12 @@
    * @param info
    * @param keys
    */
-  async function treeSelect(keys,info) {
+  async function treeSelect(keys, info) {
     if (info.checkable) {
       //解决闪动问题
-      orgNameMap.value[info.id] = "";
+      orgNameMap.value[info.id] = '';
       depPostValue.value = [info.value];
-      orgNameMap.value[info.id] = await getDepartPathNameByOrgCode(info.orgCode,info.label,info.id);
+      orgNameMap.value[info.id] = await getDepartPathNameByOrgCode(info.orgCode, info.label, info.id);
     } else {
       depPostValue.value = [];
     }
@@ -146,7 +146,7 @@
 </script>
 
 <style lang="less" scoped>
-  :deep(.ant-select-selector .ant-select-selection-item){
+  :deep(.ant-select-selector .ant-select-selection-item) {
     svg {
       display: none !important;
     }

@@ -2,7 +2,7 @@
   <BasicModal v-bind="$attrs" @register="registerModal" title="注销" @ok="handleSubmit" destroyOnClose :width="400">
     <a-form class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
       <div class="cancellation-tip">
-        <p style="color: red;margin-bottom: 10px !important;">注销后账号会保留10天，如需恢复请QQ管理员 </p>
+        <p style="color: red; margin-bottom: 10px !important">注销后账号会保留10天，如需恢复请QQ管理员 </p>
       </div>
       <a-form-item label="" name="phone" class="cancellation-tip">
         <div class="black font-size-13" style="margin-bottom: 6px">验证方式</div>
@@ -81,7 +81,7 @@
    */
   function sendCodeApi() {
     return new Promise((resolve, reject) => {
-      if(!formState.phone){
+      if (!formState.phone) {
         createErrorModal({ title: '错误提示', content: '请输入手机号！' });
         reject();
         return;

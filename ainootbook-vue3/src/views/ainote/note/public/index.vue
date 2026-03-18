@@ -1,14 +1,7 @@
 <template>
   <PageWrapper title="公开笔记广场">
     <div class="public-notes">
-      <a-input-search
-        v-model:value="keyword"
-        placeholder="搜索公开笔记"
-        enter-button
-        allow-clear
-        class="public-notes__search"
-        @search="onSearch"
-      />
+      <a-input-search v-model:value="keyword" placeholder="搜索公开笔记" enter-button allow-clear class="public-notes__search" @search="onSearch" />
 
       <a-spin :spinning="loading">
         <template v-if="noteList.length > 0">
@@ -39,13 +32,7 @@
           </a-row>
 
           <div class="public-notes__pagination">
-            <a-pagination
-              v-model:current="pageNo"
-              :total="total"
-              :page-size="PAGE_SIZE"
-              show-less-items
-              @change="onPageChange"
-            />
+            <a-pagination v-model:current="pageNo" :total="total" :page-size="PAGE_SIZE" show-less-items @change="onPageChange" />
           </div>
         </template>
 
@@ -111,7 +98,10 @@
 
   function splitKeywords(keywords: string | undefined): string[] {
     if (!keywords) return [];
-    return keywords.split(',').map((s) => s.trim()).filter(Boolean);
+    return keywords
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
   }
 
   onMounted(fetchNotes);

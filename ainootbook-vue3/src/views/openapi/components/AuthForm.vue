@@ -2,13 +2,18 @@
   <a-spin :spinning="confirmLoading">
     <a-row :span="24" style="margin-bottom: 10px">
       <a-col :span="12" v-for="item in apiList" @click="handleSelect(item)">
-        <a-card :style="item.checked ? { border: '1px solid #3370ff' } : {}" hoverable class="checkbox-card" :body-style="{ width: '100%', padding: '10px' }">
+        <a-card
+          :style="item.checked ? { border: '1px solid #3370ff' } : {}"
+          hoverable
+          class="checkbox-card"
+          :body-style="{ width: '100%', padding: '10px' }"
+        >
           <div class="checkbox-name" style="display: flex; width: 100%; justify-content: space-between">
             <span>接口名称: {{ item.name }}</span>
             <a-checkbox v-model:checked="item.checked" @click.stop class="quantum-checker" @change="(e) => handleChange(e, item)"> </a-checkbox>
           </div>
           <div class="checkbox-name" style="margin-top: 4px">
-            请求方式: <span>{{item.requestMethod}}</span>
+            请求方式: <span>{{ item.requestMethod }}</span>
           </div>
         </a-card>
       </a-col>
@@ -29,12 +34,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineExpose, defineProps, nextTick, reactive, ref } from "vue";
-import { useMessage } from '/@/hooks/web/useMessage';
-import { getApiList, getPermissionList, permissionAddFunction } from '../OpenApiAuth.api';
-import { Form, Pagination } from 'ant-design-vue';
+  import { computed, defineExpose, defineProps, nextTick, reactive, ref } from 'vue';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { getApiList, getPermissionList, permissionAddFunction } from '../OpenApiAuth.api';
+  import { Form, Pagination } from 'ant-design-vue';
 
-const props = defineProps({
+  const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({}) },
     formBpm: { type: Boolean, default: true },
@@ -78,7 +83,7 @@ const props = defineProps({
    * 加载数据
    */
   function reload() {
-    getApiList({ pageNo: pageNo.value, pageSize: pageSize.value, column: 'createTime', order: 'desc'}).then((res)=>{
+    getApiList({ pageNo: pageNo.value, pageSize: pageSize.value, column: 'createTime', order: 'desc' }).then((res) => {
       if (res.success) {
         for (const item of res.result.records) {
           item.checked = false;
@@ -92,7 +97,7 @@ const props = defineProps({
       }
     });
   }
-  
+
   /**
    * 新增
    */
@@ -114,7 +119,7 @@ const props = defineProps({
       getPermissionList({ apiAuthId: record.id }).then((res) => {
         if (res.length > 0) {
           res.forEach((item) => {
-            if(item.ifCheckBox == "1"){
+            if (item.ifCheckBox == '1') {
               selectedRowKeys.value.push(item.id);
               selectedRows.value.push(item);
             }
@@ -134,10 +139,10 @@ const props = defineProps({
     confirmLoading.value = true;
     //时间格式化
     let model = {};
-    let apiId = ""
+    let apiId = '';
     selectedRowKeys.value.forEach((item) => {
-      apiId += item +",";
-    })
+      apiId += item + ',';
+    });
     model['apiId'] = apiId;
     model['apiAuthId'] = apiAuthId.value;
     await permissionAddFunction(model)
@@ -145,7 +150,7 @@ const props = defineProps({
         if (res.success) {
           createMessage.success(res.message);
           emit('ok');
-          cleanData()
+          cleanData();
         } else {
           createMessage.warning(res.message);
         }
@@ -155,8 +160,8 @@ const props = defineProps({
       });
   }
   const cleanData = () => {
-    selectedRows.value = []
-    selectedRowKeys.value = []
+    selectedRows.value = [];
+    selectedRowKeys.value = [];
   };
 
   /**
@@ -219,7 +224,7 @@ const props = defineProps({
    * 设置选装状态
    */
   function setChecked() {
-    if (apiList.value && apiList.value.length > 0){
+    if (apiList.value && apiList.value.length > 0) {
       let value = selectedRowKeys.value.join(',');
       apiList.value = apiList.value.map((item) => {
         if (value.indexOf(item.id) !== -1) {
@@ -236,7 +241,7 @@ const props = defineProps({
     add,
     edit,
     submitForm,
-    cleanData
+    cleanData,
   });
 </script>
 

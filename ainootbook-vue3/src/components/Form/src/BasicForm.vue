@@ -112,7 +112,7 @@
           prefixCls,
           {
             [`${prefixCls}--compact`]: unref(getProps).compact,
-            'jeecg-form-detail-effect': unref(getProps).disabled
+            'jeecg-form-detail-effect': unref(getProps).disabled,
           },
         ];
       });
@@ -142,38 +142,37 @@
           // handle date type
           if (defaultValue && dateItemType.includes(component)) {
             // 代码逻辑说明: 【issues/435】代码生成的日期控件赋默认值报错------------
-            let valueFormat:string = "";
+            let valueFormat: string = '';
             // 代码逻辑说明: 【issues/8683】DatePicker组件的componentProps使用函数形式时初始值获取不对
-            if(isObject(componentProps)) {
+            if (isObject(componentProps)) {
               valueFormat = componentProps?.valueFormat;
             } else if (isFunction(componentProps)) {
               try {
                 // @ts-ignore
-                valueFormat = componentProps({schema, tableAction: props.tableAction, formModel})?.valueFormat;
-              } catch (error) {
-              }
+                valueFormat = componentProps({ schema, tableAction: props.tableAction, formModel })?.valueFormat;
+              } catch (error) {}
             }
             // update-end--author:liaozhiyang---date:20250818---for【issues/8683】DatePicker组件的componentProps使用函数形式时初始值获取不对
-            if(!valueFormat){
-              console.warn("未配置valueFormat,可能导致格式化错误！");
+            if (!valueFormat) {
+              console.warn('未配置valueFormat,可能导致格式化错误！');
             }
             if (!Array.isArray(defaultValue)) {
               // 代码逻辑说明: [issues/215]列表页查询框（日期选择框）设置初始时间，一进入页面时，后台报日期转换类型错误的------------
-              if(valueFormat){
+              if (valueFormat) {
                 // schema.defaultValue = dateUtil(defaultValue).format(valueFormat);
                 // 代码逻辑说明: 【TV360X-346 】时间组件填写默认值有问题
                 schema.defaultValue = dateUtil(defaultValue, valueFormat).format(valueFormat);
-              }else{
+              } else {
                 schema.defaultValue = dateUtil(defaultValue);
               }
             } else {
               const def: dayjs.Dayjs[] = [];
               defaultValue.forEach((item) => {
                 // 代码逻辑说明: [issues/215]列表页查询框（日期选择框）设置初始时间，一进入页面时，后台报日期转换类型错误的------------
-                if(valueFormat){
+                if (valueFormat) {
                   // 代码逻辑说明: 【TV360X-346 】时间组件填写默认值有问题
                   def.push(dateUtil(item, valueFormat).format(valueFormat));
-                }else{
+                } else {
                   def.push(dateUtil(item));
                 }
               });
@@ -292,7 +291,7 @@
         // if (!validateTrigger || validateTrigger === 'change') {
         //   validateFields([key]).catch((_) => {});
         // }
-        if(props.autoSearch === true){
+        if (props.autoSearch === true) {
           onFormSubmitWhenChange();
         }
       }
@@ -319,9 +318,9 @@
             tableAction: props.tableAction,
             formActionType,
             formModel,
-          })
+          });
         }
-        return schema.componentProps
+        return schema.componentProps;
       }
 
       const formActionType: Partial<FormActionType> = {
@@ -391,7 +390,7 @@
       // 表单组件中间件样式
       .j-form-item-middleware {
         flex: 1;
-        width: 100%
+        width: 100%;
       }
 
       &.suffix-item {
@@ -419,7 +418,7 @@
       }
     }
     /*【美化表单】form的字体改小一号*/
-/*    .ant-form-item-label > label{
+    /*    .ant-form-item-label > label{
       font-size: 13px;
     }
     .ant-form-item .ant-select {
@@ -435,7 +434,7 @@
       font-size: 13px;
     }*/
     /*【美化表单】form的字体改小一号*/
-    
+
     .ant-form-explain {
       font-size: 14px;
     }
@@ -448,7 +447,9 @@
     // 代码逻辑说明: 【QQYUN-6566】BasicForm支持一行显示(inline)
     &.ant-form-inline {
       & > .ant-row {
-        .ant-col { width:auto !important; }
+        .ant-col {
+          width: auto !important;
+        }
       }
     }
   }

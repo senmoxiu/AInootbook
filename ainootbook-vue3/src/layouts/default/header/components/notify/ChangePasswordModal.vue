@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, } from 'vue';
+  import { ref, computed } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -38,7 +38,7 @@
   const oldPassword = ref('');
 
   // 判断密码是否为连续的数字或字母
-  function lxStr (password) {
+  function lxStr(password) {
     let arr = password.split('');
     let flag = true;
     for (let i = 1; i < arr.length - 1; i++) {
@@ -47,16 +47,16 @@
       let thirdIndex = arr[i + 1].charCodeAt();
       thirdIndex - secondIndex == 1;
       secondIndex - firstIndex == 1;
-      if ((thirdIndex - secondIndex === 1) && (secondIndex - firstIndex === 1)) {
+      if (thirdIndex - secondIndex === 1 && secondIndex - firstIndex === 1) {
         flag = false;
       }
     }
     if (!flag) {
-      return flag
+      return flag;
     }
-    return flag
+    return flag;
   }
-  
+
   // 表单配置
   const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
     labelWidth: 100,
@@ -74,21 +74,21 @@
             message: t('layout.changePassword.pleaseEnterNewPassword'),
           },
           {
-            validator:(_, value)=>{
-              if(!value){
+            validator: (_, value) => {
+              if (!value) {
                 return Promise.resolve();
               }
               //不能使用系统密码作为新密码
-              if(value === oldPassword.value){
+              if (value === oldPassword.value) {
                 return Promise.reject('不能使用系统密码作为新密码!');
               }
               //密码由8位数字、大小写字母和特殊符号组成
               let reg = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/;
-              if(!reg.test(value)){
+              if (!reg.test(value)) {
                 return Promise.reject('密码由 8 位及以上数字、大小写字母和特殊符号组成！');
               }
               return Promise.resolve();
-            }
+            },
           },
           /* {
              // 使用一个函数来自定义验证逻辑，客户使用这个
@@ -145,15 +145,13 @@
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     resetFields();
     setModalProps({ confirmLoading: false });
-    oldPassword.value = decodeURIComponent(data.oldPassword)
+    oldPassword.value = decodeURIComponent(data.oldPassword);
   });
 
   const getTitle = computed(() => '修改密码');
   const userStore = useUserStore();
   const { createMessage: $message } = useMessage();
 
-  
-  
   // 提交处理
   async function handleSubmit() {
     try {
@@ -163,16 +161,16 @@
       let params = Object.assign({ username: userStore.getUserInfo.username, oldpassword: oldPassword.value }, values);
       defHttp.put({ url: '/sys/user/updatePassword', params }, { isTransformResponse: false }).then((res) => {
         if (res.success) {
-            $message.info({
-              content:'密码修改成功，请重新登录！2s后自动退出登录',
-              duration: 2
-            })
-            //3s后返回登录页面
-            setTimeout(()=>{
-              userStore.logout(true);
-            },2000)
-            //关闭弹窗
-            closeModal();
+          $message.info({
+            content: '密码修改成功，请重新登录！2s后自动退出登录',
+            duration: 2,
+          });
+          //3s后返回登录页面
+          setTimeout(() => {
+            userStore.logout(true);
+          }, 2000);
+          //关闭弹窗
+          closeModal();
           //关闭弹窗
           closeModal();
         } else {
@@ -189,7 +187,7 @@
   :deep(.ant-form-item) {
     margin-bottom: 20px;
   }
-  .pwd-topbar{
+  .pwd-topbar {
     width: 400px;
     display: flex;
     align-items: center;

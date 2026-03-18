@@ -26,9 +26,11 @@
           @click="!disabled && openModal(false)"
           v-bind="attrs"
         >
-          <template v-if="isCustomRenderTag" #tagRender="{ label, value, option}">
+          <template v-if="isCustomRenderTag" #tagRender="{ label, value, option }">
             <a-tag class="ant-select-selection-item" style="margin-right: 4px">
-              <span class="ant-select-selection-item-content" style="font-size: 14px;max-width: 300px" :title="tagRender(label, value, false)">{{ tagRender(label, value, true) }}</span>
+              <span class="ant-select-selection-item-content" style="font-size: 14px; max-width: 300px" :title="tagRender(label, value, false)">{{
+                tagRender(label, value, true)
+              }}</span>
               <span class="ant-select-selection-item-remove">
                 <Icon icon="ant-design:close-outlined" size="12" @click="handleRemoveClick(value)"></Icon>
               </span>
@@ -52,7 +54,7 @@
   import { propTypes } from '/@/utils/propTypes';
   import { useAttrs } from '/@/hooks/core/useAttrs';
   import { LoadingOutlined } from '@ant-design/icons-vue';
-  import { getDepartPathNameByOrgCode } from "@/utils/common/compUtils";
+  import { getDepartPathNameByOrgCode } from '@/utils/common/compUtils';
 
   export default defineComponent({
     name: 'JSelectBiz',
@@ -94,7 +96,7 @@
 
       //存放部门名称
       const departNamePath = ref<Record<string, string>>({});
-      
+
       /**
        * 打开弹出框
        */
@@ -115,7 +117,7 @@
         selectValues.change = true;
         emit('change', value);
       }
-      
+
       /**
        * 多选tag自定义渲染
        *
@@ -125,22 +127,22 @@
        */
       function tagRender(label, value, isEllipsis) {
         if (departNamePath.value[value]) {
-           //是否需要省略显示
-           if(!isEllipsis){
-             return departNamePath.value[value];
-           } else {
-             let departName = departNamePath.value[value];
-             //超过20则截取后20位的字符，前面加省略号
-             if(departName && departName.length >= 20){
-               const name:any = departName.substring(departName.length - 20);
-               return '...' + name;
-             } else {
-               return departName;
-             }
-           }
+          //是否需要省略显示
+          if (!isEllipsis) {
+            return departNamePath.value[value];
+          } else {
+            let departName = departNamePath.value[value];
+            //超过20则截取后20位的字符，前面加省略号
+            if (departName && departName.length >= 20) {
+              const name: any = departName.substring(departName.length - 20);
+              return '...' + name;
+            } else {
+              return departName;
+            }
+          }
         }
         //判断rowKey是否为orgCode
-        if(props?.rowKey && props?.rowKey === 'orgCode'){
+        if (props?.rowKey && props?.rowKey === 'orgCode') {
           getDepartPathNameByOrgCode(value, label, '').then((data) => {
             departNamePath.value[value] = data;
           });
@@ -154,12 +156,12 @@
 
       /**
        * tag删除
-       * 
+       *
        * @param value
        */
       function handleRemoveClick(value) {
-        if(selectValues?.value){
-          let values = selectValues?.value.filter(item => item !== value);
+        if (selectValues?.value) {
+          let values = selectValues?.value.filter((item) => item !== value);
           handleChange(values);
         }
       }

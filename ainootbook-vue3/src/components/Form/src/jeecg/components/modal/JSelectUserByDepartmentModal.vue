@@ -370,7 +370,7 @@
               }
             });
           }
-          currentDepartUsers.value = result.sort((a, b) => a.sort - b.sort );
+          currentDepartUsers.value = result.sort((a, b) => a.sort - b.sort);
         });
     } else {
       // 没有子节点，则显示用户
@@ -391,7 +391,7 @@
             }
           });
           currentDepartAllUsers.value = checked;
-          currentDepartUsers.value = res.records.sort((a, b) => a.sort - b.sort );
+          currentDepartUsers.value = res.records.sort((a, b) => a.sort - b.sort);
         }
       });
     }

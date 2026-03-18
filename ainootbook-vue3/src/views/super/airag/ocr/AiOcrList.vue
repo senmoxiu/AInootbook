@@ -1,7 +1,7 @@
 <template>
   <div class="ocr-page p-2">
     <AiOcrAnalysisModal />
-<!--    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <!--    <BasicTable @register="registerTable" :rowSelection="rowSelection">
       &lt;!&ndash;插槽:table标题&ndash;&gt;
       <template #tableTitle>
         <a-button type="primary" preIcon="ant-design:plus-outlined" @click="handleCreate">新增</a-button>
@@ -10,7 +10,7 @@
         <TableAction :actions="getTableAction(record)" />
       </template>
     </BasicTable>-->
-<!--    <AiOcrModal @register="registerModal" @success="reload()"></AiOcrModal>-->
+    <!--    <AiOcrModal @register="registerModal" @success="reload()"></AiOcrModal>-->
   </div>
 </template>
 <script lang="ts" name="site-list" setup>
@@ -25,7 +25,7 @@
 
   const [registerModal, { openModal }] = useModal();
   const [registerAnalysisModal, { openModal: openAnalysisModal }] = useModal();
-  
+
   // 列表页面公共参数、方法
   const { prefixCls, tableContext } = useListPage({
     tableProps: {
@@ -71,13 +71,13 @@
    * 解析
    * @param record
    */
-  function handleAnalysis(record){
-    openAnalysisModal(true,{
+  function handleAnalysis(record) {
+    openAnalysisModal(true, {
       isUpdate: true,
-      record
-    })
+      record,
+    });
   }
-  
+
   /**
    * 操作栏
    */
@@ -103,7 +103,7 @@
   }
 </script>
 <style lang="less" scoped>
-  .ocr-page{
+  .ocr-page {
     height: 100%;
     display: flex;
     flex-direction: column;

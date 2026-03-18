@@ -37,7 +37,7 @@
                     </template>
                     <div class="card-content">
                       <p class="description" :title="item.description || item.desc">{{ item.description || item.desc }}</p>
-                      <div class="card-footer" >
+                      <div class="card-footer">
                         <span class="create-time">
                           {{ formatTime(item.createTime) }}
                         </span>
@@ -234,131 +234,131 @@
 </script>
 
 <style scoped lang="less">
-.prompt-market-content {
-  min-height: 400px;
-  padding: 16px;
+  .prompt-market-content {
+    min-height: 400px;
+    padding: 16px;
 
-  .search-section {
-    margin-bottom: 24px;
-    display: flex;
-    justify-content: flex-start;
+    .search-section {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: flex-start;
 
-    .ant-input-search {
-      max-width: 400px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      border-radius: 6px;
+      .ant-input-search {
+        max-width: 400px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border-radius: 6px;
+      }
     }
-  }
 
-  .prompt-list-section {
-    .prompt-card {
-      transition:
+    .prompt-list-section {
+      .prompt-card {
+        transition:
           transform 0.2s ease,
           box-shadow 0.2s ease;
 
-      &:hover {
-        transform: translateY(-4px);
-      }
-
-      .prompt-item-card {
-        border-radius: 8px;
-        overflow: hidden;
-        height: 150px; // 增加卡片高度
-        transition: all 0.3s ease;
-        border: 1px solid #e8e8e8;
-
-        .ant-card-head {
-          border-bottom: 1px solid #f0f0f0;
-          padding: 12px 16px;
+        &:hover {
+          transform: translateY(-4px);
         }
 
-        .ant-card-body {
-          padding: 12px 16px;
-          height: calc(100% - 48px); // 调整内容区域高度
-          display: flex;
-          flex-direction: column;
-        }
+        .prompt-item-card {
+          border-radius: 8px;
+          overflow: hidden;
+          height: 150px; // 增加卡片高度
+          transition: all 0.3s ease;
+          border: 1px solid #e8e8e8;
 
-        &.selected {
-          border-color: #1890ff;
-          background-color: #e6f7ff; // 添加选中背景色
-          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-
-          .card-title .title-text {
-            color: #1890ff;
-          }
-        }
-
-        .card-title {
-          display: flex;
-          align-items: center;
-
-          .title-text {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-        }
-
-        .card-content {
-          flex: 1; // 使用flex让内容区域自适应
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between; // 让内容和时间信息在垂直方向上分布
-
-          .description {
-            color: #666;
-            font-size: 13px;
-            line-height: 1.5;
-            margin: 8px 0;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            flex: 1; // 让描述区域自适应
+          .ant-card-head {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 16px;
           }
 
-          .card-footer {
-            margin-top: 8px; // 调整间距
-            padding-top: 8px;
-            border-top: 1px solid #f5f5f5;
+          .ant-card-body {
+            padding: 12px 16px;
+            height: calc(100% - 48px); // 调整内容区域高度
             display: flex;
-            justify-content: flex-end;
+            flex-direction: column;
+          }
 
-            .create-time {
-              font-size: 12px;
-              color: #999;
+          &.selected {
+            border-color: #1890ff;
+            background-color: #e6f7ff; // 添加选中背景色
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+
+            .card-title .title-text {
+              color: #1890ff;
+            }
+          }
+
+          .card-title {
+            display: flex;
+            align-items: center;
+
+            .title-text {
+              font-weight: 600;
+              font-size: 16px;
+              color: #333;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+
+          .card-content {
+            flex: 1; // 使用flex让内容区域自适应
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; // 让内容和时间信息在垂直方向上分布
+
+            .description {
+              color: #666;
+              font-size: 13px;
+              line-height: 1.5;
+              margin: 8px 0;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              flex: 1; // 让描述区域自适应
+            }
+
+            .card-footer {
+              margin-top: 8px; // 调整间距
+              padding-top: 8px;
+              border-top: 1px solid #f5f5f5;
+              display: flex;
+              justify-content: flex-end;
+
+              .create-time {
+                font-size: 12px;
+                color: #999;
+              }
             }
           }
         }
       }
     }
+
+    .pagination-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      margin-top: 40px;
+    }
   }
 
-  .pagination-section {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f0;
-    display: flex;
-    justify-content: flex-end;
-  }
+  // 模态框整体样式
+  .ai-rag-generate-prompt-modal {
+    .ant-modal-body {
+      padding: 0 !important;
+    }
 
-  .empty-state {
-    margin-top: 40px;
+    .ant-modal-header {
+      border-radius: 8px 8px 0 0;
+    }
   }
-}
-
-// 模态框整体样式
-.ai-rag-generate-prompt-modal {
-  .ant-modal-body {
-    padding: 0 !important;
-  }
-
-  .ant-modal-header {
-    border-radius: 8px 8px 0 0;
-  }
-}
 </style>

@@ -2,7 +2,7 @@
 <template>
   <BasicModal v-bind="$attrs" @register="register" :title="modalTitle" width="1200px" @ok="handleOk" destroyOnClose @visible-change="visibleChange">
     <a-row :gutter="10">
-      <a-col :md="7" :sm="24" style="height: 613px;overflow: auto ">
+      <a-col :md="7" :sm="24" style="height: 613px; overflow: auto">
         <a-card :style="{ minHeight: '613px', overflow: 'auto' }">
           <!--组织机构-->
           <BasicTree
@@ -25,7 +25,14 @@
       <a-col :md="17" :sm="24">
         <a-card :style="{ minHeight: '613px', overflow: 'auto' }">
           <!--用户列表-->
-          <BasicTable ref="tableRef" v-bind="getBindValue" :searchInfo="searchInfo" :api="getTableList" :rowSelection="rowSelection" :defSort="{ column: '', order: '' }"></BasicTable>
+          <BasicTable
+            ref="tableRef"
+            v-bind="getBindValue"
+            :searchInfo="searchInfo"
+            :api="getTableList"
+            :rowSelection="rowSelection"
+            :defSort="{ column: '', order: '' }"
+          ></BasicTable>
         </a-card>
       </a-col>
     </a-row>
@@ -97,12 +104,12 @@
           {
             title: '手机号码',
             dataIndex: 'phone',
-            customRender:( { record, text })=>{
-              if(record.izHideContact && record.izHideContact === '1'){
+            customRender: ({ record, text }) => {
+              if (record.izHideContact && record.izHideContact === '1') {
                 return '/';
               }
               return text;
-            }
+            },
             // width: 50,
           },
         ],
@@ -124,12 +131,12 @@
           },
           // 代码逻辑说明: [issues/5514]组件页面显示错位
           actionColOptions: {
-              xs: 24,
-              sm: 12,
-              md: 12,
-              lg: 12,
-              xl: 8,
-              xxl: 8,
+            xs: 24,
+            sm: 12,
+            md: 12,
+            lg: 12,
+            xl: 8,
+            xxl: 8,
           },
           schemas: [
             {
@@ -151,12 +158,12 @@
 
       function getTableList(params) {
         params = parseParams(params);
-        return getTableListOrigin({...params});
+        return getTableListOrigin({ ...params });
       }
 
       function queryDepartTreeSync(params) {
         params = parseParams(params);
-        return queryDepartTreeSyncOrigin({...params});
+        return queryDepartTreeSyncOrigin({ ...params });
       }
 
       /**
@@ -168,7 +175,7 @@
           return {
             ...params,
             ...props.params,
-          }
+          };
         }
         return params;
       }

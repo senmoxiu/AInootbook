@@ -114,7 +114,7 @@
       }
 
       function onChange() {
-        validate()
+        validate();
       }
 
       /** 提交表单 */
@@ -160,17 +160,17 @@
 </script>
 
 <style lang="less">
-.j-prompt-content-body {
-  padding: 20px;
+  .j-prompt-content-body {
+    padding: 20px;
 
-  .ant-form-item-control-input-content {
-    & > div {
-      width: 100%;
-
-      & > .j-form-item-middleware {
+    .ant-form-item-control-input-content {
+      & > div {
         width: 100%;
+
+        & > .j-form-item-middleware {
+          width: 100%;
+        }
       }
     }
   }
-}
 </style>

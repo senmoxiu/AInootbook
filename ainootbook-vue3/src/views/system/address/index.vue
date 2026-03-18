@@ -4,7 +4,7 @@
       <DepartLeftTree ref="leftTree" @select="onTreeSelect" />
     </a-col>
     <a-col :xl="18" :lg="24" :md="24" style="margin-bottom: 10px">
-      <div style="height: 100%;" class="address-book">
+      <div style="height: 100%" class="address-book">
         <!--引用表格-->
         <BasicTable @register="registerTable">
           <template #post="{ text }">
@@ -32,8 +32,8 @@
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, searchFormSchema } from './address.data';
   import { list, positionList } from './address.api';
-  import { getCacheByDynKey } from "@/utils/auth";
-  import { JEECG_CHAT_UID } from "@/enums/cacheEnum";
+  import { getCacheByDynKey } from '@/utils/auth';
+  import { JEECG_CHAT_UID } from '@/enums/cacheEnum';
 
   const { prefixCls } = useDesign('address-list');
   provide('prefixCls', prefixCls);
@@ -58,8 +58,8 @@
       },
       canResize: false,
       showTableSetting: false,
-      actionColumn:{
-        width: 80
+      actionColumn: {
+        width: 80,
       },
       // 请求之前对参数做处理
       beforeFetch(params) {
@@ -78,7 +78,7 @@
 
   /**
    * 操作栏
-   * 
+   *
    * @param record
    */
   function getTableAction(record) {
@@ -89,7 +89,7 @@
       },
     ];
   }
-  
+
   // 查询职务信息
   async function queryPositionInfo() {
     const result = await positionList({ pageSize: 99999 });
@@ -102,7 +102,7 @@
     }
   }
   queryPositionInfo();
-  
+
   /**
    * 聊天
    *
@@ -111,14 +111,17 @@
   function handleSendChat(record) {
     //获取messageId
     let cacheByDynKey = getCacheByDynKey(JEECG_CHAT_UID);
-    let iframes:any = document.getElementById("jChatOnline");
+    let iframes: any = document.getElementById('jChatOnline');
     let id = record.id;
     //发送打开聊天窗口的请求
-    iframes.contentWindow.postMessage({
-      type: "open-chat",
-      messageId: cacheByDynKey,
-      data: { id: id, type: "friend", groupName: "", avatar: record.avatar, username: record.realname }
-    }, "*");
+    iframes.contentWindow.postMessage(
+      {
+        type: 'open-chat',
+        messageId: cacheByDynKey,
+        data: { id: id, type: 'friend', groupName: '', avatar: record.avatar, username: record.realname },
+      },
+      '*'
+    );
   }
 </script>
 

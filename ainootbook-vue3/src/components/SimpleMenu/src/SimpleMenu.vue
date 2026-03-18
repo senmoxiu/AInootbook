@@ -132,7 +132,7 @@
         if (isUrl(key)) {
           // 代码逻辑说明: 【VUEN-656】配置外部网址打不开，原因是带了#号，需要替换一下
           let url = key.replace(URL_HASH_TAB, '#');
-          window.open(url)
+          window.open(url);
           //openWindow(url);
           // 代码逻辑说明: 【VUEN-656】配置外部网址打不开，原因是带了#号，需要替换一下
           return;
@@ -175,7 +175,7 @@
           }
         }
         return '';
-      }
+      };
 
       return {
         prefixCls,

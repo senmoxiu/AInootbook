@@ -10,7 +10,7 @@
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { formSchema } from './fill.rule.data';
   import { saveFillRule, updateFillRule } from './fill.rule.api';
-  import {useMessage} from "@/hooks/web/useMessage";
+  import { useMessage } from '@/hooks/web/useMessage';
 
   const { createMessage: $message } = useMessage();
 
@@ -55,7 +55,7 @@
           // online 保留字检查
           if (key === 'onl_watch') {
             $message.error('参数名称不能是onl_watch');
-            return
+            return;
           }
         }
       }

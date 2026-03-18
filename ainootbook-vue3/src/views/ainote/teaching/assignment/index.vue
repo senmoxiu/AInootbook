@@ -3,11 +3,7 @@
     <!-- 左侧组织树 -->
     <a-col :xl="6" :lg="8" :md="10" :sm="24" style="min-height: 600px">
       <a-card :bordered="false" style="height: 100%">
-        <a-input-search
-          placeholder="按组织名称搜索..."
-          style="margin-bottom: 10px"
-          @search="onSearch"
-        />
+        <a-input-search placeholder="按组织名称搜索..." style="margin-bottom: 10px" @search="onSearch" />
         <a-spin :spinning="treeLoading">
           <a-tree
             v-if="treeData.length > 0"

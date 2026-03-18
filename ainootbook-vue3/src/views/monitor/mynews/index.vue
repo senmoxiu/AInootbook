@@ -29,7 +29,7 @@
   </div>
 </template>
 <script lang="ts" name="monitor-mynews" setup>
-import {ref, onMounted, unref} from 'vue';
+  import { ref, onMounted, unref } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import DetailModal from './DetailModal.vue';
   import { getMyNewsList, editCementSend, syncNotic, readAllMsg, getOne, deleteAnnSend, deleteBatchAnnSend } from './mynews.api';
@@ -58,11 +58,11 @@ import {ref, onMounted, unref} from 'vue';
   const findItem: any = searchFormSchema.find((item: any) => item.field === 'msgCategory');
   if (findItem) {
     if (querystring?.msgCategory) {
-      findItem.componentProps.defaultValue = querystring.msgCategory
+      findItem.componentProps.defaultValue = querystring.msgCategory;
     } else if (querystring.noticeType) {
       findItem.componentProps.defaultValue = querystring.noticeType;
     } else {
-      findItem.componentProps.defaultValue = null
+      findItem.componentProps.defaultValue = null;
     }
   }
   const { prefixCls, tableContext } = useListPage({
@@ -113,8 +113,8 @@ import {ref, onMounted, unref} from 'vue';
           title: '是否确认删除',
           confirm: handleDelete.bind(null, record.id),
         },
-        ifShow: record.readFlag === 1
-      }
+        ifShow: record.readFlag === 1,
+      },
     ];
   }
 
@@ -127,14 +127,13 @@ import {ref, onMounted, unref} from 'vue';
       reload();
       syncNotic({ anntId: anntId });
     });
-    const openModalFun = ()=>{
+    const openModalFun = () => {
       openDetail(true, {
         record,
         isUpdate: true,
       });
-    }
+    };
     goPage(record, openModalFun);
-
   }
   // 日志类型
   function callback(key) {
@@ -155,29 +154,29 @@ import {ref, onMounted, unref} from 'vue';
   }
 
   // 代码逻辑说明: 消息跳转，打开详情表单
-  onMounted(()=>{
+  onMounted(() => {
     initHrefModal();
   });
-  function initHrefModal(){
+  function initHrefModal() {
     let params = appStore.getMessageHrefParams;
-    if(params){
+    if (params) {
       let anntId = params.id;
-      if(anntId){
+      if (anntId) {
         editCementSend({ anntId: anntId }).then(() => {
           reload();
           syncNotic({ anntId: anntId });
         });
       }
       let detailId = params.detailId;
-      if(detailId){
-        getOne(detailId).then(data=>{
-          console.log('getOne', data)
+      if (detailId) {
+        getOne(detailId).then((data) => {
+          console.log('getOne', data);
           openDetail(true, {
             record: data,
             isUpdate: true,
           });
-          appStore.setMessageHrefParams('')
-        })
+          appStore.setMessageHrefParams('');
+        });
       }
     }
   }
@@ -186,10 +185,10 @@ import {ref, onMounted, unref} from 'vue';
     selectedRowKeys.value = [];
     reload();
   }
-  
+
   /**
    * 删除我的消息
-   * 
+   *
    * @param id
    */
   async function handleDelete(id) {

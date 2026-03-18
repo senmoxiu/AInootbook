@@ -9,11 +9,11 @@
   import { BasicDrawer, useDrawerInner } from '@/components/Drawer';
   import { BasicForm, FormSchema, useForm } from '@/components/Form';
 
-  let emit = defineEmits(['register','ok']);
-  
+  let emit = defineEmits(['register', 'ok']);
+
   const schemas: FormSchema[] = [
     {
-      label:'上边距',
+      label: '上边距',
       field: 'marginTop',
       component: 'InputNumber',
       componentProps: {
@@ -22,7 +22,7 @@
       rules: [{ required: true, message: '请填写上边距' }],
     },
     {
-      label:'下边距',
+      label: '下边距',
       field: 'marginBottom',
       component: 'InputNumber',
       componentProps: {
@@ -31,7 +31,7 @@
       rules: [{ required: true, message: '请填写下边距' }],
     },
     {
-      label:'左边距',
+      label: '左边距',
       field: 'marginLeft',
       component: 'InputNumber',
       componentProps: {
@@ -40,7 +40,7 @@
       rules: [{ required: true, message: '请填写左边距' }],
     },
     {
-      label:'右边距',
+      label: '右边距',
       field: 'marginRight',
       component: 'InputNumber',
       componentProps: {
@@ -76,7 +76,7 @@
 </script>
 
 <style scoped lang="less">
-  :deep(.ant-input-number){
+  :deep(.ant-input-number) {
     width: 100%;
   }
 </style>

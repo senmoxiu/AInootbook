@@ -156,7 +156,7 @@
       }
 
       async function setModalHeight(option?) {
-        console.log("---------性能监控--------setModalHeight----------")
+        console.log('---------性能监控--------setModalHeight----------');
         const options = option || {};
         const source = options.source;
         const callBack = options.callBack;
@@ -201,7 +201,7 @@
           if (source == 'muob') {
             callBack(realHeightRef.value);
           }
-          
+
           emit('height-change', unref(realHeightRef));
         } catch (error) {
           console.log(error);

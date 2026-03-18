@@ -69,16 +69,14 @@
           <div class="card-footer">
             <a-tooltip title="演示">
               <div class="card-footer-icon" @click.prevent.stop="handleViewClick(item.id)">
-                <Icon class="operation" icon="ant-design:youtube-outlined" size="18" 
-                      color="#1F2329"></Icon>
+                <Icon class="operation" icon="ant-design:youtube-outlined" size="18" color="#1F2329"></Icon>
               </div>
             </a-tooltip>
             <template v-if="item.status !== 'release'">
               <a-divider type="vertical" style="float: left" />
               <a-tooltip title="删除">
                 <div class="card-footer-icon" @click.prevent.stop="handleDeleteClick(item)">
-                  <Icon icon="ant-design:delete-outlined" class="operation" size="16" 
-                        color="#1F2329"></Icon>
+                  <Icon icon="ant-design:delete-outlined" class="operation" size="16" color="#1F2329"></Icon>
                 </div>
               </a-tooltip>
             </template>
@@ -86,30 +84,29 @@
             <a-tooltip title="发布">
               <a-dropdown class="card-footer-icon" placement="bottomRight" :trigger="['click']">
                 <div @click.prevent.stop>
-                  <Icon style="position: relative;top: 1px" icon="ant-design:send-outlined" 
-                        size="14" color="#1F2329"></Icon>
+                  <Icon style="position: relative; top: 1px" icon="ant-design:send-outlined" size="14" color="#1F2329"></Icon>
                 </div>
                 <template #overlay>
                   <a-menu>
                     <template v-if="item.status === 'enable'">
-                      <a-menu-item key="release" @click.prevent.stop="handleSendClick(item,'release')">
+                      <a-menu-item key="release" @click.prevent.stop="handleSendClick(item, 'release')">
                         <Icon icon="lineicons:rocket-5" size="14"></Icon>
                         发布
                       </a-menu-item>
-                      <a-menu-divider/>
+                      <a-menu-divider />
                     </template>
                     <template v-else-if="item.status === 'release'">
-                      <a-menu-item key="un-release" @click.prevent.stop="handleSendClick(item,'un-release')">
+                      <a-menu-item key="un-release" @click.prevent.stop="handleSendClick(item, 'un-release')">
                         <Icon icon="tabler:rocket-off" size="14"></Icon>
                         取消发布
                       </a-menu-item>
-                      <a-menu-divider/>
+                      <a-menu-divider />
                     </template>
-                    <a-menu-item key="web" @click.prevent.stop="handleSendClick(item,'web')">
+                    <a-menu-item key="web" @click.prevent.stop="handleSendClick(item, 'web')">
                       <Icon icon="ant-design:dribbble-outlined" size="16"></Icon>
                       嵌入网站
                     </a-menu-item>
-                    <a-menu-item v-if="isShowMenu" key="menu" @click.prevent.stop="handleSendClick(item,'menu')">
+                    <a-menu-item v-if="isShowMenu" key="menu" @click.prevent.stop="handleSendClick(item, 'menu')">
                       <Icon icon="ant-design:menu-outlined" size="16"></Icon> 配置菜单
                     </a-menu-item>
                   </a-menu>
@@ -131,14 +128,14 @@
       @change="handlePageChange"
       class="list-footer"
       size="small"
-      :show-total="() => `共${total}条` "
+      :show-total="() => `共${total}条`"
     />
     <!-- Ai新增弹窗  -->
     <AiAppModal @register="registerModal" @success="handleSuccess"></AiAppModal>
     <!-- Ai设置弹窗 -->
     <AiAppSettingModal @register="registerSettingModal" @success="reload"></AiAppSettingModal>
     <!-- 发布弹窗 -->
-    <AiAppSendModal @register="registerAiAppSendModal"/>
+    <AiAppSendModal @register="registerAiAppSendModal" />
   </div>
 </template>
 
@@ -154,12 +151,12 @@
   import AiAppSettingModal from './components/AiAppSettingModal.vue';
   import AiAppSendModal from './components/AiAppSendModal.vue';
   import Icon from '@/components/Icon';
-  import { $electron } from "@/electron";
+  import { $electron } from '@/electron';
   import { appList, deleteApp, releaseApp } from './AiApp.api';
   import { useMessage } from '@/hooks/web/useMessage';
   import JInput from '@/components/Form/src/jeecg/components/JInput.vue';
   import JDictSelectTag from '@/components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import { useRouter } from "vue-router";
+  import { useRouter } from 'vue-router';
 
   export default {
     name: 'AiAppList',
@@ -295,7 +292,7 @@
         if ($electron.isElectron()) {
           url = $electron.resolveRoutePath(url);
           window.open(url, '_blank', 'width=1200,height=800');
-          return
+          return;
         }
         // update-end----author:sunjianlei---date:20250411---for：【QQYUN-9685】构建 electron 桌面应用
 
@@ -306,7 +303,7 @@
        * 删除
        */
       function handleDeleteClick(item) {
-        if(knowledgeAppDataList.value.length == 1 && pageNo.value > 1) {
+        if (knowledgeAppDataList.value.length == 1 && pageNo.value > 1) {
           pageNo.value = pageNo.value - 1;
         }
         deleteApp({ id: item.id, name: item.name }, reload);
@@ -317,15 +314,15 @@
        * @param item 数据
        * @param type 类别
        */
-      function handleSendClick(item,type) {
+      function handleSendClick(item, type) {
         if (type === 'release' || type === 'un-release') {
           return onRelease(item);
         }
 
-        openAiAppSendModal(true,{
+        openAiAppSendModal(true, {
           type: type,
-          data: item
-        })
+          data: item,
+        });
       }
 
       async function onRelease(item) {
@@ -337,7 +334,7 @@
           cancelText: '取消',
         });
         if (!flag) {
-          return
+          return;
         }
         doRelease(item, item.status === 'enable');
       }
@@ -350,9 +347,9 @@
         if (success) {
           // 发布成功
           if (release) {
-            item.status = 'release'
+            item.status = 'release';
           } else {
-            item.status = 'enable'
+            item.status = 'enable';
           }
         }
       }
@@ -371,8 +368,8 @@
       /**
        * 查询
        */
-      function searchQuery(){
-        pageNo.value = 1; 
+      function searchQuery() {
+        pageNo.value = 1;
         //刷新数据
         reload();
       }
@@ -380,15 +377,15 @@
       const router = useRouter();
       //是否显示菜单配置选项
       const isShowMenu = ref<boolean>(false);
-      onMounted((()=>{
+      onMounted(() => {
         let fullPath = router.currentRoute.value.fullPath;
-        console.log(fullPath)
-        if(fullPath === '/myapps/ai/app'){
+        console.log(fullPath);
+        if (fullPath === '/myapps/ai/app') {
           isShowMenu.value = false;
         } else {
           isShowMenu.value = true;
         }
-      }))
+      });
 
       return {
         handleCreateApp,
@@ -451,7 +448,7 @@
     }
     .add-knowledge-card-title {
       font-size: 16px;
-      color:#1f2329;
+      color: #1f2329;
       font-weight: 400;
       align-self: center;
     }
@@ -576,7 +573,7 @@
   :deep(.ant-card .ant-card-body) {
     padding: 16px;
   }
-  .ellipsis{
+  .ellipsis {
     overflow: hidden;
     text-wrap: nowrap;
     text-overflow: ellipsis;

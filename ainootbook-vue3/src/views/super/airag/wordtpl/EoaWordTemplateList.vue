@@ -48,23 +48,24 @@
       <DocDesign :content="wordDesignContent" :upload-file-url="parseFileUrl" @save="handleDesignSave" @download="handleDesignDownload" />
     </BasicModal>
 
-    <BasicModal
-      v-bind="$attrs"
-      :canFullscreen="false"
-      @register="generateModal"
-      title="测试模版生成"
-      :width="528"
-      destroyOnClose
-      @ok="handleGenOk"
-    >
+    <BasicModal v-bind="$attrs" :canFullscreen="false" @register="generateModal" title="测试模版生成" :width="528" destroyOnClose @ok="handleGenOk">
       <a-form :model="genWordData" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
         <a-form-item class="field-clos" :label="field" :name="field" v-for="field in tplFieldList">
-          <a-input v-model:value="genWordData[field]" style="width:90%" :placeholder="'请输入'+field"></a-input>
+          <a-input v-model:value="genWordData[field]" style="width: 90%" :placeholder="'请输入' + field"></a-input>
         </a-form-item>
       </a-form>
     </BasicModal>
 
-    <BasicModal :loading="resumeLoading" v-bind="$attrs" :canFullscreen="false" @register="resumeModal" title="生成简历" :width="628" destroyOnClose @ok="handleGenResumeOk">
+    <BasicModal
+      :loading="resumeLoading"
+      v-bind="$attrs"
+      :canFullscreen="false"
+      @register="resumeModal"
+      title="生成简历"
+      :width="628"
+      destroyOnClose
+      @ok="handleGenResumeOk"
+    >
       <a-form :model="genResumeData" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
         <a-form-item class="field-clos" label="基础信息" name="content">
           <a-input v-model:value="genResumeData.content" style="width: 90%" placeholder="请输入基础信息" />
@@ -211,7 +212,7 @@
 
   function handleGenWord(record: Recordable) {
     extractTplFields(record);
-    if(tplFieldList.length > 0){
+    if (tplFieldList.length > 0) {
       // 如果有字段需要填写，则打开生成模版的弹窗
       currentTpl.id = record.id;
       currentTpl.name = record.name;
@@ -247,11 +248,11 @@
     };
     resumeLoading.value = true;
     generateResume(params, (resp) => {
-      if(resp && resp.success){
+      if (resp && resp.success) {
         closeResumeModal();
         resumeLoading.value = false;
         reload();
-      }else{
+      } else {
         createMessage.error('生成简历失败: ' + resp.message);
         resumeLoading.value = false;
       }

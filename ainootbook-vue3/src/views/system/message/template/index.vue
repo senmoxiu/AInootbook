@@ -96,7 +96,7 @@
   function onDelete(record) {
     if (record) {
       // 代码逻辑说明: VUEN-1652【bug】应用状态下不允许删除
-      if(record.useStatus == '1'){
+      if (record.useStatus == '1') {
         createMessage.warning('该模板已被应用禁止删除!');
         return;
       }
@@ -126,8 +126,8 @@
     try {
       // 代码逻辑说明: VUEN-1652【bug】应用状态下不允许删除
       let arr = toRaw(selectedRows.value);
-      let temp = arr.filter(item=>item.useStatus=='1')
-      if(temp.length>0){
+      let temp = arr.filter((item) => item.useStatus == '1');
+      if (temp.length > 0) {
         createMessage.warning('选中的模板已被应用禁止删除!');
         return;
       }
@@ -147,7 +147,10 @@
    */
   function getTableAction(record): ActionItem[] {
     // 代码逻辑说明: [VUEN-2807]消息模板加一个查看功能------------
-    return [{ label: '查看', onClick: handleDetail.bind(null, record)}, { label: '编辑', onClick: onEdit.bind(null, record) }];
+    return [
+      { label: '查看', onClick: handleDetail.bind(null, record) },
+      { label: '编辑', onClick: onEdit.bind(null, record) },
+    ];
   }
 
   /**
@@ -192,12 +195,12 @@
    * @param record
    */
   function handleDetail(record) {
-    openModal(true,{
-      title: "消息模板详情",
+    openModal(true, {
+      title: '消息模板详情',
       isUpdate: true,
       showFooter: false,
-      record:record
-    })
+      record: record,
+    });
   }
 </script>
 

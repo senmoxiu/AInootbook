@@ -62,16 +62,16 @@
     <a-form ref="manageNameRef" :model="updateInfo" :rules="getManageNameRules">
       <a-form-item name="name" class="form-item-padding">
         <div class="form-group">
-              <span class="form-label">
-                组织名称
-                <span class="txt-middle red">*</span>
-              </span>
+          <span class="form-label">
+            组织名称
+            <span class="txt-middle red">*</span>
+          </span>
           <a-input v-model:value="updateInfo.name" />
         </div>
       </a-form-item>
     </a-form>
   </a-modal>
-  
+
   <!-- 组织所在地弹窗 -->
   <a-modal v-model:open="modalVisible.companyAddress" title="所在地" width="500" destroy-on-close @ok="doUpdate('companyAddress')">
     <a-form :model="updateInfo">
@@ -108,17 +108,17 @@
 <script lang="ts" name="tenant-my-tenant-list" setup>
   import { onMounted, reactive, ref } from 'vue';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import {getFileAccessHttpUrl, tenantSaasMessage} from '@/utils/common/compUtils';
+  import { getFileAccessHttpUrl, tenantSaasMessage } from '@/utils/common/compUtils';
   import { getTenantById, saveOrUpdateTenant } from '@/views/system/tenant/tenant.api';
   import { getTenantId } from '@/utils/auth';
   import { getDataByCode, getRealCode, provinceOptions } from '@/components/Form/src/utils/areaDataUtil';
   import { initDictOptions } from '@/utils/dict';
-  import {createImgPreview} from "@/components/Preview";
-  import { JImageUpload } from "@/components/Form";
+  import { createImgPreview } from '@/components/Preview';
+  import { JImageUpload } from '@/components/Form';
   // import {updateTenantInfo} from "@/views/super/myapps/organization/organization.api";
-  import { defHttp } from "/@/utils/http/axios";
-  import JAreaSelect from "/@/components/Form/src/jeecg/components/JAreaSelect.vue";
-  import JDictSelectTag from "/@/components/Form/src/jeecg/components/JDictSelectTag.vue";
+  import { defHttp } from '/@/utils/http/axios';
+  import JAreaSelect from '/@/components/Form/src/jeecg/components/JAreaSelect.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
 
   const { createMessage } = useMessage();
   const formState = reactive({
@@ -133,27 +133,27 @@
   });
   let tradeOptions: any[] = [];
   //组织名称ref
-  const manageNameRef= ref();
+  const manageNameRef = ref();
   // modal显示
   const modalVisible = reactive<any>({
     name: false,
     trade: false,
-    companyAddress: false
+    companyAddress: false,
   });
 
   // 组织名称检验规则
-  const getManageNameRules =  {
+  const getManageNameRules = {
     name: [{ required: true, message: '组织名称不能为空', trigger: 'blur' }],
   };
 
   //修改对象
   const updateInfo = reactive<any>({
     name: '',
-    trade:'',
+    trade: '',
     companyAddress: '',
     workPlace: '',
   });
-  
+
   /**
    * 初始化租户信息
    */
@@ -180,7 +180,7 @@
    */
   function getPcaText(code) {
     let arr = getRealCode(code, 3);
-    console.log("arr:::",arr)
+    console.log('arr:::', arr);
     let provinces: any = provinceOptions.filter((item) => item.value == arr[0]);
     let cities: any[] = getDataByCode(arr[0]);
     let areas: any[] = getDataByCode(arr[1]);
@@ -218,21 +218,21 @@
 
   /**
    * 公司logo上传成功事件
-   * 
+   *
    * @param val
    */
   function handleCompanyLogoChange(val) {
-    if(val){
-      saveOrUpdateTenant({ id: formState.id, companyLogo: val }, true)
+    if (val) {
+      saveOrUpdateTenant({ id: formState.id, companyLogo: val }, true);
     }
   }
 
   /**
    * 更新打开弹窗
-   * 
+   *
    * @param key
    */
-  function goUpdate(key){
+  function goUpdate(key) {
     modalVisible[key] = true;
     updateInfo[key] = formState[key];
   }
@@ -241,7 +241,7 @@
    * 编辑租户信息
    * @param params
    */
-  async function updateTenantInfo(params){
+  async function updateTenantInfo(params) {
     return defHttp.put({ url: '/sys/tenant/editOwnTenant', params });
   }
 
@@ -250,22 +250,22 @@
    * @param key
    */
   async function doUpdate(key) {
-    if(key=='name'){
+    if (key == 'name') {
       await manageNameRef.value.validateFields();
     }
     //所在地为空报错
-    if(key == 'companyAddress'){
-      if(updateInfo[key] instanceof Array){
+    if (key == 'companyAddress') {
+      if (updateInfo[key] instanceof Array) {
         updateInfo[key] = '';
       }
     }
     let params = {
       id: formState.id,
-      [key]: updateInfo[key]
+      [key]: updateInfo[key],
     };
     await updateTenantInfo(params);
     initTenant();
-    modalVisible[key] = false
+    modalVisible[key] = false;
   }
 
   onMounted(() => {
@@ -407,12 +407,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  :deep(.ant-upload.ant-upload-select){
+  :deep(.ant-upload.ant-upload-select) {
     width: 80px !important;
     height: 80px !important;
     border: unset !important;
   }
-  :deep(.ant-upload-list-item-container){
+  :deep(.ant-upload-list-item-container) {
     width: 80px !important;
     height: 80px !important;
     border: unset !important;

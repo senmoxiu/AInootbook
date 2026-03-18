@@ -15,7 +15,7 @@
   });
   // 当前部门id
   const departId = computed(() => props.data?.id);
- 
+
   // 列表页面公共参数、方法
   const { tableContext } = useListPage({
     tableProps: {

@@ -1,7 +1,12 @@
 <!--职务选择组件-->
 <template>
   <div class="JSelectPosition">
-    <JSelectBiz @handleOpen="handleOpen" :loading="loadingEcho" v-bind="attrs" @change="(changeValue) => $emit('update:value', changeValue)"></JSelectBiz>
+    <JSelectBiz
+      @handleOpen="handleOpen"
+      :loading="loadingEcho"
+      v-bind="attrs"
+      @change="(changeValue) => $emit('update:value', changeValue)"
+    ></JSelectBiz>
     <a-form-item>
       <PositionSelectModal @register="regModal" @getSelectResult="setValue" v-bind="getBindValue"></PositionSelectModal>
     </a-form-item>
@@ -124,7 +129,6 @@
         selectValues.value = values;
         // 代码逻辑说明: 选择职务组件v-model方式绑定值不生效
         emit('update:value', values.join(','));
-
       }
 
       const getBindValue = Object.assign({}, unref(props), unref(attrs));

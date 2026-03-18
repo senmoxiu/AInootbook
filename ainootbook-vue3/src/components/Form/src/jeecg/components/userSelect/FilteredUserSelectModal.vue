@@ -9,15 +9,8 @@
     wrapClassName="j-filtered-user-select-modal"
   >
     <!-- 节点说明 -->
-    <a-select 
-      value="系统角色会签，请筛选参与人员" 
-      disabled 
-      style="width: 100%" 
-      class="node-label-select"
-    >
-      <a-select-option value="系统角色会签，请筛选参与人员">
-        系统角色会签，请筛选参与人员
-      </a-select-option>
+    <a-select value="系统角色会签，请筛选参与人员" disabled style="width: 100%" class="node-label-select">
+      <a-select-option value="系统角色会签，请筛选参与人员"> 系统角色会签，请筛选参与人员 </a-select-option>
     </a-select>
 
     <div class="modal-content">
@@ -27,11 +20,7 @@
           <SearchOutlined />
         </span>
         <div v-show="searchInputStatus" class="search-input">
-          <a-input 
-            v-model:value="searchText" 
-            placeholder="请输入用户名按回车搜索"
-            @pressEnter="onSearchUser"
-          >
+          <a-input v-model:value="searchText" placeholder="请输入用户名按回车搜索" @pressEnter="onSearchUser">
             <template #prefix>
               <SearchOutlined />
             </template>
@@ -44,45 +33,21 @@
 
       <!-- 用户列表 -->
       <div class="user-list-wrapper">
-        <user-list 
-          :multi="multi" 
-          :dataList="userDataList" 
-          :selectedIdList="selectedIdList" 
-          @selected="onSelectUser" 
-          @unSelect="unSelectUser" 
-        />
+        <user-list :multi="multi" :dataList="userDataList" :selectedIdList="selectedIdList" @selected="onSelectUser" @unSelect="unSelectUser" />
       </div>
 
       <!-- 已选用户标签 -->
       <div v-if="selectedUserList.length > 0" class="selected-users">
-        <SelectedUserItem 
-          v-for="item in selectedUserList" 
-          :key="item.id" 
-          :info="item" 
-          @unSelect="unSelectUser" 
-        />
+        <SelectedUserItem v-for="item in selectedUserList" :key="item.id" :info="item" @unSelect="unSelectUser" />
       </div>
     </div>
 
     <template #footer>
       <div class="modal-footer">
         <div class="pagination-wrapper">
-          <a-pagination
-            v-model:current="pageNo"
-            size="small"
-            :total="totalRecord"
-            :pageSize="PAGE_SIZE"
-            show-quick-jumper
-            @change="onPageChange"
-          />
+          <a-pagination v-model:current="pageNo" size="small" :total="totalRecord" :pageSize="PAGE_SIZE" show-quick-jumper @change="onPageChange" />
         </div>
-        <a-button 
-          type="primary" 
-          :disabled="!hasSelectedUser" 
-          @click="handleOk"
-        >
-          确认提交
-        </a-button>
+        <a-button type="primary" :disabled="!hasSelectedUser" @click="handleOk"> 确认提交 </a-button>
       </div>
     </template>
   </BasicModal>
@@ -154,13 +119,9 @@
       const userDataList = ref<UserInfo[]>([]);
 
       // ==================== 计算属性 ====================
-      const selectedIdList = computed(() => 
-        selectedUserList.value.map((item) => item.id)
-      );
+      const selectedIdList = computed(() => selectedUserList.value.map((item) => item.id));
 
-      const hasSelectedUser = computed(() => 
-        selectedUserList.value.length > 0
-      );
+      const hasSelectedUser = computed(() => selectedUserList.value.length > 0);
 
       // ==================== 弹窗事件 ====================
       const [register] = useModalInner((data: ModalData) => {
@@ -216,7 +177,7 @@
           selectedUserList.value = [{ ...info }];
           return;
         }
-        
+
         if (!selectedIdList.value.includes(info.id)) {
           selectedUserList.value.push({ ...info });
         }
@@ -287,16 +248,13 @@
             pageSize: PAGE_SIZE,
             includeUsernameList: actualUsernames.value.join(','),
           };
-          
+
           if (searchText.value.trim()) {
             params.keyword = searchText.value.trim();
           }
 
-          const { success, result } = await defHttp.get(
-            { url: API_URL, params }, 
-            { isTransformResponse: false }
-          );
-          
+          const { success, result } = await defHttp.get({ url: API_URL, params }, { isTransformResponse: false });
+
           if (success && result) {
             userDataList.value = result.records || [];
             totalRecord.value = result.total || 0;
@@ -346,14 +304,14 @@
     // 节点说明标签
     .node-label-select {
       margin-bottom: 10px;
-      
+
       :deep(.ant-select-selector) {
         color: #fff !important;
         background-color: #409eff !important;
         border-radius: 5px !important;
         cursor: not-allowed !important;
       }
-      
+
       :deep(.ant-select-selection-item),
       :deep(.ant-select-arrow) {
         color: #fff !important;
@@ -371,7 +329,7 @@
       position: absolute;
       top: 14px;
       z-index: 1;
-      
+
       &.search-expanded {
         width: 100%;
       }
@@ -381,7 +339,7 @@
         color: #c0c0c0;
         cursor: pointer;
         transition: color 0.3s;
-        
+
         &:hover {
           color: #0a8fe9;
         }
@@ -389,12 +347,12 @@
 
       .search-input {
         width: 100%;
-        
+
         :deep(.anticon) {
           color: #c0c0c0;
           cursor: pointer;
           transition: color 0.3s;
-          
+
           &:hover {
             color: #0a8fe9;
           }
@@ -424,17 +382,17 @@
       align-items: center;
       width: 100%;
       gap: 16px;
-      
+
       .pagination-wrapper {
         flex: 1;
         min-width: 0;
-        
+
         :deep(.ant-pagination) {
           display: flex;
           justify-content: flex-start;
         }
       }
-      
+
       .ant-btn {
         flex-shrink: 0;
       }

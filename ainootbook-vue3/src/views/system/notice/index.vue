@@ -3,8 +3,8 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <template #tableTitle>
         <a-button preIcon="ant-design:plus-outlined" type="primary" @click="handleAdd">新建</a-button>
-<!--        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>-->
-<!--        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>-->
+        <!--        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>-->
+        <!--        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>-->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -38,7 +38,7 @@
   import { useGlobSetting } from '/@/hooks/setting';
   import { getToken } from '/@/utils/auth';
   import { columns, searchFormSchema } from './notice.data';
-  import { getList, deleteNotice, batchDeleteNotice,editIzTop, getExportUrl, getImportUrl, doReleaseData, doReovkeData } from './notice.api';
+  import { getList, deleteNotice, batchDeleteNotice, editIzTop, getExportUrl, getImportUrl, doReleaseData, doReovkeData } from './notice.api';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { useAppStore } from '/@/store/modules/app';
 
@@ -57,8 +57,8 @@
       columns: columns,
       formConfig: {
         schemas: searchFormSchema,
-        fieldMapToTime: [['sendTime', ['sendTime_begin', 'sendTime_end'], 'YYYY-MM-DD']]
-      }
+        fieldMapToTime: [['sendTime', ['sendTime_begin', 'sendTime_end'], 'YYYY-MM-DD']],
+      },
     },
     exportConfig: {
       name: '消息通知列表',
@@ -102,7 +102,7 @@
    * 置顶操作
    */
   async function handleTop(record, izTop) {
-     await editIzTop({ id: record.id, izTop }, reload);
+    await editIzTop({ id: record.id, izTop }, reload);
   }
 
   /**

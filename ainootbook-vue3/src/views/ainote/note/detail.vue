@@ -39,13 +39,7 @@
           <a-button type="primary" :loading="uploading">上传素材</a-button>
         </a-upload>
       </template>
-      <a-table
-        :dataSource="materialList"
-        :columns="materialColumns"
-        :pagination="false"
-        rowKey="id"
-        size="small"
-      >
+      <a-table :dataSource="materialList" :columns="materialColumns" :pagination="false" rowKey="id" size="small">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'fileType'">
             <a-space>
@@ -58,9 +52,7 @@
           </template>
           <template v-if="column.key === 'action'">
             <a-space>
-              <a-button v-if="isImage(record.fileType)" type="link" size="small" @click="handlePreview(record)">
-                预览
-              </a-button>
+              <a-button v-if="isImage(record.fileType)" type="link" size="small" @click="handlePreview(record)"> 预览 </a-button>
               <a-button type="link" size="small" @click="handleDownload(record)">下载</a-button>
               <a-popconfirm title="确定要删除吗？" @confirm="handleDeleteMaterial(record)">
                 <a-button type="link" size="small" danger>删除</a-button>
@@ -73,11 +65,7 @@
 
     <!-- AI 生成 -->
     <a-card title="AI生成" :bordered="false" class="!mb-4">
-      <AiProcessProgress
-        :noteId="noteId"
-        knowledgeId=""
-        @completed="loadNoteData"
-      />
+      <AiProcessProgress :noteId="noteId" knowledgeId="" @completed="loadNoteData" />
     </a-card>
 
     <!-- 分享 -->
@@ -128,7 +116,10 @@
   const keywordList = computed(() => {
     const kw = noteData.value.keywords;
     if (!kw || typeof kw !== 'string') return [];
-    return kw.split(',').map((s: string) => s.trim()).filter(Boolean);
+    return kw
+      .split(',')
+      .map((s: string) => s.trim())
+      .filter(Boolean);
   });
 
   const sanitizedContent = computed(() => {

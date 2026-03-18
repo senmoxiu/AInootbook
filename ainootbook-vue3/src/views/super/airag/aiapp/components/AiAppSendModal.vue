@@ -5,55 +5,46 @@
       <div v-if="type === 'menu'">
         <a-form layout="vertical" :model="appData">
           <a-form-item label="菜单名称">
-            <a-input v-model:value="appData.name" readonly/>
-          </a-form-item>  
-          <a-form-item label="菜单地址">
-            <a-input v-model:value="appData.menu" readonly/>
+            <a-input v-model:value="appData.name" readonly />
           </a-form-item>
-          <a-form-item style="text-align:right">
+          <a-form-item label="菜单地址">
+            <a-input v-model:value="appData.menu" readonly />
+          </a-form-item>
+          <a-form-item style="text-align: right">
             <a-button @click.prevent="copyMenu">复制菜单</a-button>
-            <a-button  type="primary" style="margin-left: 10px" @click="copySql">复制SQL</a-button>
+            <a-button type="primary" style="margin-left: 10px" @click="copySql">复制SQL</a-button>
           </a-form-item>
         </a-form>
       </div>
       <!--   嵌入网站   -->
       <div v-else-if="type === 'web'" class="web">
-    
-        <div style="display: flex;margin: 0 auto">
-          <div :class="activeKey===1?'active':''" class="web-img" @click="handleImageClick(1)">
-            <img  src="../img/webEmbedded.png" />
+        <div style="display: flex; margin: 0 auto">
+          <div :class="activeKey === 1 ? 'active' : ''" class="web-img" @click="handleImageClick(1)">
+            <img src="../img/webEmbedded.png" />
           </div>
-          <div style="margin-left: 10px" :class="activeKey===2?'active':''" class="web-img" @click="handleImageClick(2)">
-            <img  src="../img/iconWebEmbedded.png" />
+          <div style="margin-left: 10px" :class="activeKey === 2 ? 'active' : ''" class="web-img" @click="handleImageClick(2)">
+            <img src="../img/iconWebEmbedded.png" />
           </div>
-        </div>    
-        <div class="web-title" v-if="activeKey === 1">
-          将以下 iframe 嵌入到你的网站中的目标位置
-        </div>  
-        <div class="web-title" v-else>
-          将以下 script 添加到网页的body区域中
         </div>
+        <div class="web-title" v-if="activeKey === 1"> 将以下 iframe 嵌入到你的网站中的目标位置 </div>
+        <div class="web-title" v-else> 将以下 script 添加到网页的body区域中 </div>
         <div class="web-code" v-if="activeKey === 1">
           <div class="web-code-title">
-            <div class="web-code-desc">
-              html
-            </div>
+            <div class="web-code-desc"> html </div>
             <Icon class="pointer" icon="ant-design:copy-outlined" @click="copyIframe(1)"></Icon>
           </div>
           <div class="web-code-iframe">
-              <pre> {{getIframeText(1)}} </pre>
+            <pre> {{ getIframeText(1) }} </pre>
           </div>
         </div>
-        
+
         <div class="web-code" v-if="activeKey === 2">
           <div class="web-code-title">
-            <div class="web-code-desc">
-              html
-            </div>
+            <div class="web-code-desc"> html </div>
             <Icon class="pointer" icon="ant-design:copy-outlined" @click="copyIframe(2)"></Icon>
           </div>
           <div class="web-code-iframe">
-            <pre> {{getIframeText(2)}} </pre>
+            <pre> {{ getIframeText(2) }} </pre>
           </div>
         </div>
       </div>
@@ -88,21 +79,21 @@
       //应用信息
       const appData = ref<any>({});
       //弹窗宽度
-      const width = ref<string>("800px");
+      const width = ref<string>('800px');
       //选中的key
       const activeKey = ref<number>(1);
       //注册modal
       const [registerModal, { closeModal, setModalProps }] = useModalInner(async (data) => {
         type.value = data.type;
         appData.value = data.data;
-        appData.value.menu = "/ai/chat/"+ data.data.id
+        appData.value.menu = '/ai/chat/' + data.data.id;
         activeKey.value = 1;
         let minHeight = 220;
-        if(data.type === 'web'){
+        if (data.type === 'web') {
           title.value = '嵌入网站';
           width.value = '640px';
-          minHeight = 500
-        }else{
+          minHeight = 500;
+        } else {
           title.value = '配置菜单';
           width.value = '500px';
         }
@@ -115,7 +106,7 @@
       function copyMenu() {
         copyText(appData.value.menu);
       }
-      
+
       /**
        * 复制sql
        */
@@ -129,29 +120,34 @@
        * 获取当前文本
        */
       function getIframeText(value) {
-        let locationUrl = document.location.protocol +"//" + window.location.host;
+        let locationUrl = document.location.protocol + '//' + window.location.host;
         //update-begin---author:wangshuai---date:2025-03-20---for:【QQYUN-11649】【AI】应用嵌入，支持一个小图标点击出聊天---
-        if(value === 1){
-          return '<iframe\n' +
-              '   src="'+locationUrl+'/ai/app/chat/'+appData.value.id+'"\n' +
-              '   style="width: 100%; height: 100%;">\n' +
-              '</iframe>';
-        }else{
-            //update-begin---author:wangshuai---date:2025-03-28---for:【QQYUN-11649】应用嵌入，支持一个小图标点击出聊天---
-            let path = "/src/views/super/airag/aiapp/chat/js/chat.js"
-            if(!isDevMode()){
-              path = "/chat/chat.js";
-            }
-            let text ='<script src=' + locationUrl + path +' id="e7e007dd52f67fe36365eff636bbffbd">'+'<'+'/script>';
-            text += '\n <'+'script>\n';
-            text += '    createAiChat({\n' +
-                    '       appId:"'+ appData.value.id +'",\n';
-            text += '       // 支持top-left左上, top-right右上, bottom-left左下, bottom-right右下\n';
-            text += '       iconPosition:"bottom-right"\n';
-            text += '    })\n';
-            text += ' <'+'/script>';
-            return text;
-            //update-end---author:wangshuai---date:2025-03-28---for:【QQYUN-11649】应用嵌入，支持一个小图标点击出聊天---
+        if (value === 1) {
+          return (
+            '<iframe\n' +
+            '   src="' +
+            locationUrl +
+            '/ai/app/chat/' +
+            appData.value.id +
+            '"\n' +
+            '   style="width: 100%; height: 100%;">\n' +
+            '</iframe>'
+          );
+        } else {
+          //update-begin---author:wangshuai---date:2025-03-28---for:【QQYUN-11649】应用嵌入，支持一个小图标点击出聊天---
+          let path = '/src/views/super/airag/aiapp/chat/js/chat.js';
+          if (!isDevMode()) {
+            path = '/chat/chat.js';
+          }
+          let text = '<script src=' + locationUrl + path + ' id="e7e007dd52f67fe36365eff636bbffbd">' + '<' + '/script>';
+          text += '\n <' + 'script>\n';
+          text += '    createAiChat({\n' + '       appId:"' + appData.value.id + '",\n';
+          text += '       // 支持top-left左上, top-right右上, bottom-left左下, bottom-right右下\n';
+          text += '       iconPosition:"bottom-right"\n';
+          text += '    })\n';
+          text += ' <' + '/script>';
+          return text;
+          //update-end---author:wangshuai---date:2025-03-28---for:【QQYUN-11649】应用嵌入，支持一个小图标点击出聊天---
         }
         //update-end---author:wangshuai---date:2025-03-20---for:【QQYUN-11649】【AI】应用嵌入，支持一个小图标点击出聊天---
       }
@@ -176,13 +172,13 @@
 
       /**
        * 图片点击事件
-       * 
+       *
        * @param value
        */
       function handleImageClick(value) {
         activeKey.value = value;
       }
-      
+
       return {
         registerModal,
         title,
@@ -214,52 +210,52 @@
     color: #8f959e;
     font-weight: 400;
   }
-  
-  .web{
-   padding: 0 10px;
+
+  .web {
+    padding: 0 10px;
   }
-  .web-title{
+  .web-title {
     font-size: 13px;
     font-weight: bold;
     line-height: 16px;
   }
-  .web-img{
+  .web-img {
     border-width: 1.5px;
     width: 240px;
     margin-top: 20px;
     border-radius: 6px;
-    img{
+    img {
       border-radius: 6px;
       width: 240px;
       height: 150px;
     }
     margin-bottom: 10px;
   }
-  .active{
+  .active {
     border-color: rgb(41 112 255);
   }
-  .web-code{
+  .web-code {
     border-width: 1.5px;
     margin-top: 20px;
     background-color: #f9fafb;
     border-color: #10182814;
     width: 100%;
     border-radius: 5px;
-    .web-code-title{
+    .web-code-title {
       width: 100%;
-      padding:10px;
+      padding: 10px;
       background-color: #f2f4f7;
       display: inline-flex;
       justify-content: space-between;
       align-items: center;
     }
-    .web-code-desc{
+    .web-code-desc {
       color: #354052;
       font-size: 13px;
       font-weight: 500;
       line-height: 16px;
     }
-    .web-code-iframe{
+    .web-code-iframe {
       padding: 15px;
       line-height: 1.5;
       font-size: 13px;
@@ -268,7 +264,7 @@
       color: #354052;
     }
   }
-  .pointer{
+  .pointer {
     cursor: pointer;
   }
 </style>

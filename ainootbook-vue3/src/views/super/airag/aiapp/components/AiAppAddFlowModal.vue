@@ -2,34 +2,28 @@
   <div class="p-2">
     <BasicModal destroyOnClose @register="registerModal" :canFullscreen="false" width="600px" :title="title" @ok="handleOk" @cancel="handleCancel">
       <div class="flex header">
-        <JInput
-          @pressEnter="loadFlowData"
-          class="header-search"
-          size="small"
-          v-model:value="searchText"
-          placeholder="请输入流程名称，回车搜索"
-        />
+        <JInput @pressEnter="loadFlowData" class="header-search" size="small" v-model:value="searchText" placeholder="请输入流程名称，回车搜索" />
       </div>
       <a-row :span="24">
         <a-col :span="12" v-for="item in flowList" @click="handleSelect(item)">
           <!-- begin 流程选择支持单选和多选 -->
           <a-card :style="getCardStyle(item)" hoverable class="checkbox-card" :body-style="{ width: '100%' }">
-            <div style="display: flex; width: 100%;align-items:center; justify-content: space-between">
-              <div style="display: flex; align-items:center; flex: 1; overflow: hidden; margin-right: 10px;">
-                <img :src="getImage(item.icon)" class="flow-icon"/>
-                <div style="display: grid;margin-left: 5px;align-items: center">
+            <div style="display: flex; width: 100%; align-items: center; justify-content: space-between">
+              <div style="display: flex; align-items: center; flex: 1; overflow: hidden; margin-right: 10px">
+                <img :src="getImage(item.icon)" class="flow-icon" />
+                <div style="display: grid; margin-left: 5px; align-items: center">
                   <span class="checkbox-name ellipsis">{{ item.name }}</span>
-                  <div class="flex text-status" v-if="item.metadata && item.metadata.length>0">
+                  <div class="flex text-status" v-if="item.metadata && item.metadata.length > 0">
                     <span class="tag-input">输入</span>
                     <div v-for="(metaItem, index) in item.metadata">
                       <a-tag color="#f2f3f8" class="tags-meadata">
-                        <span v-if="index<3" class="tag-text">{{ metaItem.field }}</span>
+                        <span v-if="index < 3" class="tag-text">{{ metaItem.field }}</span>
                       </a-tag>
                     </div>
                   </div>
                 </div>
               </div>
-              <a-checkbox v-if="multiple" v-model:checked="item.checked" @click.stop @change="(e)=>handleChange(e,item)"></a-checkbox>
+              <a-checkbox v-if="multiple" v-model:checked="item.checked" @click.stop @change="(e) => handleChange(e, item)"></a-checkbox>
               <!-- end 流程选择支持单选和多选 -->
             </div>
             <div class="text-desc mt-10">
@@ -40,11 +34,9 @@
       </a-row>
       <div v-if="showFooterSelection" class="use-select">
         <template v-if="!multiple">
-          已选择 <span class="ellipsis" style="max-width: 100px">{{flowData.name}}</span>
+          已选择 <span class="ellipsis" style="max-width: 100px">{{ flowData.name }}</span>
         </template>
-        <template v-else>
-          已选择 {{ flowId.length }} 个流程
-        </template>
+        <template v-else> 已选择 {{ flowId.length }} 个流程 </template>
         <span style="margin-left: 8px; color: #3d79fb; cursor: pointer" @click="handleClearClick">清空</span>
       </div>
       <Pagination
@@ -68,14 +60,14 @@
   import BasicModal from '@/components/Modal/src/BasicModal.vue';
   import { useModal, useModalInner } from '@/components/Modal';
   import { Pagination } from 'ant-design-vue';
-  import {JInput} from "@/components/Form";
+  import { JInput } from '@/components/Form';
   import { list } from '@/views/super/airag/aiknowledge/AiKnowledgeBase.api';
   import knowledge from '/@/views/super/airag/aiknowledge/icon/knowledge.png';
   import { cloneDeep } from 'lodash-es';
   // import {pageApi} from "@/views/super/airag/aiflow/pages/api";
-  import { defHttp } from "@/utils/http/axios";
-  import { getFileAccessHttpUrl } from "@/utils/common/compUtils";
-  import defaultFlowImg from "@/assets/images/ai/aiflow.png";
+  import { defHttp } from '@/utils/http/axios';
+  import { getFileAccessHttpUrl } from '@/utils/common/compUtils';
+  import defaultFlowImg from '@/assets/images/ai/aiflow.png';
 
   export default {
     name: 'AiAppAddFlowModal',
@@ -86,7 +78,7 @@
     },
     emits: ['success', 'register'],
     props: {
-      multiple:{ type: Boolean, default: false },
+      multiple: { type: Boolean, default: false },
       // 排除的流程ID，多个逗号分隔
       excludedIds: { type: String, default: '' },
     },
@@ -97,7 +89,7 @@
       //流程数据
       const flowList = ref<any>([]);
       //选中的数据
-      const flowData = ref<any>({})
+      const flowData = ref<any>({});
       //当前页数
       const pageNo = ref<number>(1);
       //每页条数
@@ -127,7 +119,7 @@
        * 保存
        */
       async function handleOk() {
-        emit('success',{ flowId: flowId.value, flowData: flowData.value });
+        emit('success', { flowId: flowId.value, flowData: flowData.value });
         handleCancel();
       }
 
@@ -141,9 +133,9 @@
       //复选框选中事件
       const handleSelect = (item) => {
         //update-begin---author:wangshuai---date:2025-12-24---for: 流程选择支持单选和多选 ---
-        if(!props.multiple) {
+        if (!props.multiple) {
           if (flowId.value === item.id) {
-            flowId.value = "";
+            flowId.value = '';
             flowData.value = null;
             return;
           }
@@ -166,7 +158,7 @@
           column: 'createTime',
           order: 'desc',
           name: searchText.value,
-          status: 'enable,release'
+          status: 'enable,release',
         };
 
         // 排除的流程ID，多个逗号分隔
@@ -174,8 +166,8 @@
           params.excludedIds = props.excludedIds;
         }
 
-        getAiFlowList(params).then((res) =>{
-          if(res){
+        getAiFlowList(params).then((res) => {
+          if (res) {
             for (const data of res.records) {
               data.metadata = getMetadata(data.metadata);
               //update-begin---author:wangshuai---date:2025-12-24---for: 流程选择支持单选和多选 ---
@@ -194,9 +186,9 @@
       }
 
       async function getAiFlowList(params?: any) {
-        return defHttp.get({url: '/airag/flow/list', params});
+        return defHttp.get({ url: '/airag/flow/list', params });
       }
-      
+
       /**
        * 分页改变事件
        * @param page
@@ -214,13 +206,13 @@
       function handleClearClick() {
         //update-begin---author:wangshuai---date:2025-12-24---for: 流程选择支持单选和多选 ---
         if (!props.multiple) {
-          flowId.value = "";
+          flowId.value = '';
           flowData.value = null;
         } else {
           flowId.value = [];
           flowData.value = [];
           if (flowList.value && Array.isArray(flowList.value)) {
-            flowList.value.forEach(item => item.checked = false);
+            flowList.value.forEach((item) => (item.checked = false));
           }
         }
         //update-end---author:wangshuai---date:2025-12-24---for: 流程选择支持单选和多选 ---
@@ -232,7 +224,7 @@
       function getImage(icon) {
         return icon ? getFileAccessHttpUrl(icon) : defaultFlowImg;
       }
-      
+
       /**
        * 获取输入输出参入
        *
@@ -266,7 +258,7 @@
           }
         }
       }
-      
+
       const showFooterSelection = computed(() => {
         if (props.multiple) {
           return flowId.value && flowId.value.length > 0;
@@ -281,7 +273,7 @@
         return item.id === flowId.value ? { border: '1px solid #3370ff' } : {};
       }
       /*===========end 流程选择支持多选 ===========*/
-      
+
       return {
         registerModal,
         title,
@@ -363,15 +355,15 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .flow-icon{
+  .flow-icon {
     width: 34px;
     height: 34px;
     border-radius: 10px;
   }
-  :deep(.ant-card .ant-card-body){
-    padding:16px !important;
+  :deep(.ant-card .ant-card-body) {
+    padding: 16px !important;
   }
-  .header-create-by{
+  .header-create-by {
     font-size: 12px;
     color: #646a73;
   }
@@ -383,17 +375,17 @@
     overflow: hidden;
     text-wrap: nowrap;
     font-size: 12px;
-    color: #676F83;
+    color: #676f83;
   }
-  .mt-10{
+  .mt-10 {
     margin-top: 10px;
   }
-  .flex{
+  .flex {
     display: flex;
   }
-  .text-status{
+  .text-status {
     font-size: 12px;
-    color: #676F83;
+    color: #676f83;
   }
   .tag-text {
     display: flow;
@@ -405,7 +397,7 @@
     font-size: 12px;
     color: #3a3f4f;
   }
-  .tag-input{
+  .tag-input {
     align-self: center;
     color: #707a97;
     font-size: 12px;
@@ -416,7 +408,7 @@
     text-align: right;
     white-space: nowrap;
   }
-  .tags-meadata{
+  .tags-meadata {
     padding-inline: 2px;
     border-radius: 4px;
     display: flex;
@@ -424,7 +416,7 @@
     max-width: 100%;
   }
 
-  :deep(.jeecg-modal-wrapper){
+  :deep(.jeecg-modal-wrapper) {
     height: calc(100% - 20px);
   }
 

@@ -145,7 +145,7 @@ export function useCustomSelection(
     },
     {
       immediate: true,
-      deep: true
+      deep: true,
     }
   );
   // 编辑时selectedRows可能会回填
@@ -163,10 +163,10 @@ export function useCustomSelection(
     }
   );
   /**
-  * 2024-03-06
-  * liaozhiyang
-  * 判断是否同一个数组 (引用地址，长度，元素位置信息相同才是同一个数组。数组元素只有字符串)
-  */
+   * 2024-03-06
+   * liaozhiyang
+   * 判断是否同一个数组 (引用地址，长度，元素位置信息相同才是同一个数组。数组元素只有字符串)
+   */
   function sameArray(a, b) {
     if (a === b) {
       if (a.length === b.length) {
@@ -232,7 +232,7 @@ export function useCustomSelection(
     const el = bodyEl.value?.querySelector('tbody.ant-table-tbody tr.ant-table-row') as HTMLDivElement;
     if (el) {
       // 代码逻辑说明: 【issues/7442】basicTable从默认切换到宽松紧凑时多选框显示异常
-      nextTick(() => rowHeight.value = el.offsetHeight);
+      nextTick(() => (rowHeight.value = el.offsetHeight));
     }
   }
 
@@ -318,7 +318,7 @@ export function useCustomSelection(
             setTimeout(() => {
               emitChange('all');
               // 代码逻辑说明: 【QQYUN-5687】批量选择，提示成功后，又来一个提示
-              setTimeout(() =>resolve(), 0);
+              setTimeout(() => resolve(), 0);
             }, 500);
           }
         }, 300);
@@ -727,4 +727,3 @@ function flattenData<RecordType>(data: RecordType[] | undefined, childrenColumnN
 
   return list;
 }
-

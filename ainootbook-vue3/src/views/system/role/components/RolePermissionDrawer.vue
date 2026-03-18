@@ -5,7 +5,7 @@
       <a-dropdown>
         <a-button class="more-icon">
           更多操作
-          <Icon icon="ant-design:down-outlined" size="14px" style="position: relative;top: 1px;right: 5px"></Icon>
+          <Icon icon="ant-design:down-outlined" size="14px" style="position: relative; top: 1px; right: 5px"></Icon>
         </a-button>
         <template #overlay>
           <a-menu @click="treeMenuClick">
@@ -56,7 +56,7 @@
   import { PopConfirmButton } from '/@/components/Button';
   import RoleDataRuleDrawer from './RoleDataRuleDrawer.vue';
   import { queryTreeListForRole, queryRolePermission, saveRolePermission } from '../role.api';
-  import { useI18n } from "/@/hooks/web/useI18n";
+  import { useI18n } from '/@/hooks/web/useI18n';
   import { ROLE_AUTH_CONFIG_KEY } from '/@/enums/cacheEnum';
   const emit = defineEmits(['register']);
   //树的信息
@@ -102,9 +102,9 @@
     setDrawerProps({ loading: false });
   });
   /**
-  * 2024-02-28
-  * liaozhiyang
-  * 翻译菜单名称
+   * 2024-02-28
+   * liaozhiyang
+   * 翻译菜单名称
    */
   function translateTitle(data) {
     if (data?.length) {
@@ -216,15 +216,15 @@
       lastpermissionIds: unref(defaultCheckedKeys).join(','),
     };
     // 代码逻辑说明: issues/352 VUE角色授权重复保存
-    if(loading.value===false){
-      await doSave(params)
-    }else{
+    if (loading.value === false) {
+      await doSave(params);
+    } else {
       console.log('请等待上次执行完毕!');
     }
-    if(exit){
+    if (exit) {
       // 如果关闭
       closeDrawer();
-    }else{
+    } else {
       // 没有关闭需要重新获取选中数据
       const permResult = await queryRolePermission({ roleId: unref(roleId) });
       defaultCheckedKeys.value = permResult;
@@ -239,9 +239,9 @@
     } catch (e) {
       loading.value = false;
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       loading.value = false;
-    }, 500)
+    }, 500);
   }
 
   /**
@@ -276,7 +276,7 @@
     const localData = localStorage.getItem(ROLE_AUTH_CONFIG_KEY);
     const obj = localData ? JSON.parse(localData) : {};
     obj[key] = value;
-    localStorage.setItem(ROLE_AUTH_CONFIG_KEY, JSON.stringify(obj))
+    localStorage.setItem(ROLE_AUTH_CONFIG_KEY, JSON.stringify(obj));
   };
 </script>
 
@@ -293,7 +293,7 @@
     border-bottom: 1px solid #f0f0f0;
   }
   .more-icon {
-/*    font-size: 20px !important;
+    /*    font-size: 20px !important;
     color: black;
     display: inline-flex;*/
     float: right;

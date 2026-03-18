@@ -143,12 +143,12 @@
       }
 
       function onWebSocketMessage(data) {
-        console.log('---onWebSocketMessage---', data)
+        console.log('---onWebSocketMessage---', data);
         if (data.cmd === 'topic' || data.cmd === 'user') {
           //后台保存数据太慢 前端延迟刷新消息
-          setTimeout(()=>{
+          setTimeout(() => {
             loadData();
-          }, 1000)
+          }, 1000);
         }
       }
 

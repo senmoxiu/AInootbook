@@ -1,14 +1,15 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" :title="getTitle" @ok="handleSubmit" width="800px">
-    <BasicForm @register="registerForm" >
+    <BasicForm @register="registerForm">
       <template #itemColor="{ model, field }">
         <div class="item-tool">
           <div
-              v-for="(item,index) in Colors"
-              :style="{ color: item[0] }"
-              :class="model.itemColor===item[0]?'item-active':''"
-              class="item-color"
-              @click="itemColorClick(item)">
+            v-for="(item, index) in Colors"
+            :style="{ color: item[0] }"
+            :class="model.itemColor === item[0] ? 'item-active' : ''"
+            class="item-color"
+            @click="itemColorClick(item)"
+          >
             <div class="item-color-border"></div>
             <div class="item-back" :style="{ background: item[0] }"></div>
           </div>
@@ -23,8 +24,8 @@
   import { BasicForm, useForm } from '/src/components/Form';
   import { itemFormSchema } from '../dict.data';
   import { saveOrUpdateDictItem } from '../dict.api';
-  import { Colors } from '/@/utils/dict/DictColors.js'
-  
+  import { Colors } from '/@/utils/dict/DictColors.js';
+
   // 声明Emits
   const emit = defineEmits(['success', 'register']);
   const props = defineProps({ dictId: String });
@@ -76,26 +77,25 @@
       setModalProps({ confirmLoading: false });
     }
   }
-  
+
   /**
    * 字典颜色点击事件
-   * 
+   *
    * @param index
    * @param item
    * @param model
    */
   function itemColorClick(item) {
-    console.log(item)
-    setFieldsValue({ itemColor: item[0] })
+    console.log(item);
+    setFieldsValue({ itemColor: item[0] });
   }
-  
 </script>
 <style lang="less" scoped>
-   /*begin 字典颜色配置样式*/
-  .item-tool{
+  /*begin 字典颜色配置样式*/
+  .item-tool {
     display: flex;
     flex-wrap: wrap;
-    .item-color{
+    .item-color {
       width: 18px;
       display: flex;
       justify-content: center;
@@ -103,16 +103,16 @@
       align-items: center;
       margin-right: 10px;
     }
-    .item-back{
+    .item-back {
       width: 18px;
       height: 18px;
       border-radius: 50%;
     }
   }
-  .item-color-border{
+  .item-color-border {
     visibility: hidden;
   }
-  .item-active .item-color-border{
+  .item-active .item-color-border {
     visibility: visible;
     position: absolute;
     border: 1px solid;
@@ -120,5 +120,5 @@
     height: 24px;
     border-radius: 50%;
   }
-   /*end 字典颜色配置样式*/
+  /*end 字典颜色配置样式*/
 </style>

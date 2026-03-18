@@ -27,17 +27,17 @@
   const router = useRouter();
   //判断是否为初始化
   const isInit = ref<boolean>(false);
-  
+
   /**
    * chat图标点击事件
    */
   function chatClick() {
     showChat.value = !showChat.value;
-    if(showChat.value && !isInit.value){
-      setTimeout(()=>{
+    if (showChat.value && !isInit.value) {
+      setTimeout(() => {
         isInit.value = true;
         aiChatRef.value.initChat(appId.value);
-      },100)
+      }, 100);
     }
   }
 

@@ -33,8 +33,8 @@ export default class signMd5Utils {
     let urlParams = this.parseQueryString(url);
     let jsonObj = this.mergeObject(urlParams, requestParams);
     // 代码逻辑说明: 【QQYUN-9005】发送短信加签---
-    if(requestBodyParams){
-      jsonObj = this.mergeObject(jsonObj, requestBodyParams)
+    if (requestBodyParams) {
+      jsonObj = this.mergeObject(jsonObj, requestBodyParams);
     }
     let requestBody = this.sortAsc(jsonObj);
     delete requestBody._t;

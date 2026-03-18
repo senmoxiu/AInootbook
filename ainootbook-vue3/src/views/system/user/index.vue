@@ -5,8 +5,8 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" preIcon="ant-design:plus-outlined" @click="handleCreate"> 新增</a-button>
-        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls" > 导出</a-button>
-<!--        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls" v-auth="'system:user:import'">导入</j-upload-button>-->
+        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <!--        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls" v-auth="'system:user:import'">导入</j-upload-button>-->
         <import-excel-progress :upload-url="getImportUrl" @success="reload"></import-excel-progress>
         <a-button type="primary" @click="openModal(true, {})" preIcon="ant-design:hdd-outlined"> 回收站</a-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -31,7 +31,7 @@
             </a-menu>
           </template>
           <a-button
-          >批量操作
+            >批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
         </a-dropdown>
@@ -72,7 +72,7 @@
 
   const { createMessage, createConfirm } = useMessage();
   const { isDisabledAuth, hasPermission } = usePermission();
-  
+
   //注册drawer
   const [registerDrawer, { openDrawer }] = useDrawer();
   //回收站model
@@ -106,8 +106,8 @@
         return Object.assign({ column: 'createTime', order: 'desc' }, params);
       },
       defSort: {
-        column: "",
-        order: ""
+        column: '',
+        order: '',
       },
     },
     exportConfig: {
@@ -235,12 +235,14 @@
         content: '是否重置选中的账号密码?',
         onOk: async () => {
           const usernames = selectedRows.value.map((item) => item.username).join(',');
-          await resetPassword({ usernames: usernames }, ()=>{reload();clearSelectedRowKeys();});
+          await resetPassword({ usernames: usernames }, () => {
+            reload();
+            clearSelectedRowKeys();
+          });
         },
       });
     }
   }
-
 
   /**
    *同步钉钉和微信回调
@@ -303,7 +305,6 @@
       },
     ];
   }
-
 </script>
 
 <style scoped></style>

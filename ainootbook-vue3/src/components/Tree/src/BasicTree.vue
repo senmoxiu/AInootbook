@@ -1,26 +1,8 @@
 <script lang="tsx">
   import type { CSSProperties } from 'vue';
-  import type {
-    FieldNames,
-    TreeState,
-    TreeItem,
-    KeyType,
-    CheckKeys,
-    TreeActionType,
-  } from './types/tree';
+  import type { FieldNames, TreeState, TreeItem, KeyType, CheckKeys, TreeActionType } from './types/tree';
 
-  import {
-    defineComponent,
-    reactive,
-    computed,
-    unref,
-    ref,
-    watchEffect,
-    toRaw,
-    watch,
-    onMounted,
-    nextTick,
-  } from 'vue';
+  import { defineComponent, reactive, computed, unref, ref, watchEffect, toRaw, watch, onMounted, nextTick } from 'vue';
   import TreeHeader from './components/TreeHeader.vue';
   import { Tree, Spin, Empty } from 'ant-design-vue';
   import { TreeIcon } from './TreeIcon';
@@ -119,9 +101,7 @@
         emit('check', rawVal, e);
       };
 
-      const getTreeData = computed((): TreeItem[] =>
-        searchState.startSearch ? searchState.searchData : unref(treeDataRef),
-      );
+      const getTreeData = computed((): TreeItem[] => (searchState.startSearch ? searchState.searchData : unref(treeDataRef)));
 
       const getNotFound = computed((): boolean => {
         return !getTreeData.value || getTreeData.value.length === 0;
@@ -211,7 +191,7 @@
         },
         {
           immediate: true,
-        },
+        }
       );
 
       watch(
@@ -220,7 +200,7 @@
           if (val) {
             handleSearch(searchState.searchText);
           }
-        },
+        }
       );
 
       function handleSearch(searchValue: string) {
@@ -230,8 +210,7 @@
           searchState.startSearch = false;
           return;
         }
-        const { filterFn, checkable, expandOnSearch, checkOnSearch, selectedOnSearch } =
-          unref(props);
+        const { filterFn, checkable, expandOnSearch, checkOnSearch, selectedOnSearch } = unref(props);
         searchState.startSearch = true;
         const { title: titleField, key: keyField } = unref(getFieldNames);
 
@@ -239,15 +218,13 @@
         searchState.searchData = filter(
           unref(treeDataRef),
           (node) => {
-            const result = filterFn
-              ? filterFn(searchValue, node, unref(getFieldNames))
-              : node[titleField]?.includes(searchValue) ?? false;
+            const result = filterFn ? filterFn(searchValue, node, unref(getFieldNames)) : (node[titleField]?.includes(searchValue) ?? false);
             if (result) {
               matchedKeys.push(node[keyField]);
             }
             return result;
           },
-          unref(getFieldNames),
+          unref(getFieldNames)
         );
 
         if (expandOnSearch) {
@@ -312,7 +289,7 @@
         () => {
           state.checkedKeys = toRaw(props.value || props.checkedKeys || []);
         },
-        { immediate: true },
+        { immediate: true }
       );
 
       watch(
@@ -321,7 +298,7 @@
           const v = toRaw(state.checkedKeys);
           emit('update:value', v);
           emit('change', v);
-        },
+        }
       );
       // 代码逻辑说明: 【issues/1151】层级独立时勾选了父级，然后点击层级关联子级视觉上勾选了，但是保存子级没存上
       watch(
@@ -386,18 +363,13 @@
         eachTree(data, (item, _parent) => {
           const searchText = searchState.searchText;
           const { highlight } = unref(props);
-          const {
-            title: titleField,
-            key: keyField,
-            children: childrenField,
-          } = unref(getFieldNames);
+          const { title: titleField, key: keyField, children: childrenField } = unref(getFieldNames);
 
           const icon = getIcon(item, item.icon);
           const title = get(item, titleField);
 
           const searchIdx = searchText ? title.indexOf(searchText) : -1;
-          const isHighlight =
-            searchState.startSearch && !isEmpty(searchText) && highlight && searchIdx !== -1;
+          const isHighlight = searchState.startSearch && !isEmpty(searchText) && highlight && searchIdx !== -1;
           const highlightStyle = `color: ${isBoolean(highlight) ? '#f50' : highlight}`;
 
           const titleDom = isHighlight ? (
@@ -410,10 +382,7 @@
             title
           );
           item[titleField] = (
-            <span
-              class={`${bem('title')} pl-2`}
-              onClick={handleClickNode.bind(null, item[keyField], item[childrenField])}
-            >
+            <span class={`${bem('title')} pl-2`} onClick={handleClickNode.bind(null, item[keyField], item[childrenField])}>
               {slots?.title ? (
                 getSlot(slots, 'title', item)
               ) : (
@@ -437,7 +406,7 @@
         const showTitle = title || toolbar || search || slots.headerTitle;
         const scrollStyle: CSSProperties = { height: 'calc(100% - 38px)' };
         return (
-          <div class={[bem(), 'h-full',unref(getBindValues).multiple === false ? 'custom-radio':'' , attrs.class]}>
+          <div class={[bem(), 'h-full', unref(getBindValues).multiple === false ? 'custom-radio' : '', attrs.class]}>
             {showTitle && (
               <TreeHeader
                 checkable={checkable}
@@ -459,11 +428,7 @@
               <ScrollContainer style={scrollStyle} v-show={!unref(getNotFound)}>
                 <Tree ref={treeRef} {...unref(getBindValues)} showIcon={false} treeData={treeData.value} />
               </ScrollContainer>
-              <Empty
-                v-show={unref(getNotFound)}
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                class="!mt-4"
-              />
+              <Empty v-show={unref(getNotFound)} image={Empty.PRESENTED_IMAGE_SIMPLE} class="!mt-4" />
             </Spin>
           </div>
         );
@@ -472,25 +437,25 @@
   });
 </script>
 <style lang="less" scoped>
-// 代码逻辑说明: 【JHHB-192】主职务选择，多选框改成单选
-.custom-radio {
-  :deep(.ant-tree) {
-    .ant-tree-checkbox {
-      .ant-tree-checkbox-inner {
+  // 代码逻辑说明: 【JHHB-192】主职务选择，多选框改成单选
+  .custom-radio {
+    :deep(.ant-tree) {
+      .ant-tree-checkbox {
+        .ant-tree-checkbox-inner {
           border-style: solid;
           border-width: 1px;
           border-radius: 50%;
-        &::after {
-          width: 0;
-          height: 0;
-          left: 50%;
-          border-width: 6px;
-          border-radius: 50%;
-          margin-left: -3px;
-          margin-top: 1px;
+          &::after {
+            width: 0;
+            height: 0;
+            left: 50%;
+            border-width: 6px;
+            border-radius: 50%;
+            margin-left: -3px;
+            margin-top: 1px;
+          }
         }
       }
     }
   }
-}
 </style>

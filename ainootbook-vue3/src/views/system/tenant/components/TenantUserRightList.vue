@@ -11,7 +11,9 @@
       </template>
     </template>
     <template #tableTitle>
-      <a-button preIcon="ant-design:usergroup-add-outlined" type="primary" @click="addUser" :disabled="tenantPackData.izSysn == '1'">邀请成员</a-button>
+      <a-button preIcon="ant-design:usergroup-add-outlined" type="primary" @click="addUser" :disabled="tenantPackData.izSysn == '1'"
+        >邀请成员</a-button
+      >
       <a-button preIcon="ant-design:rollback-outlined" @click="cancel">关闭</a-button>
     </template>
     <!--操作栏-->
@@ -92,7 +94,7 @@
               title: '是否确认移除',
               confirm: handleDelete.bind(null, record),
             },
-            ifShow:() => tenantPackData.izSysn != '1'
+            ifShow: () => tenantPackData.izSysn != '1',
           },
         ];
       }

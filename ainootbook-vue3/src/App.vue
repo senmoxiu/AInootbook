@@ -97,7 +97,6 @@
   setTimeout(() => {
     appStore.getProjectConfig?.themeColor && changeTheme(appStore.getProjectConfig.themeColor);
   }, 300);
-
 </script>
 <style lang="less">
   // 代码逻辑说明: 【QQYUN-5839】windi会影响到html2canvas绘制的图片样式

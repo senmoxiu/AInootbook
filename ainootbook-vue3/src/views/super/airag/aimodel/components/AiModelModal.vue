@@ -3,11 +3,15 @@
     <div class="modal">
       <div class="header">
         <span class="header-title">
-          <span v-if="dataIndex ==='list' || dataIndex ==='add'" :class="dataIndex === 'list' ? '' : 'add-header-title pointer'" @click="goToList">
+          <span v-if="dataIndex === 'list' || dataIndex === 'add'" :class="dataIndex === 'list' ? '' : 'add-header-title pointer'" @click="goToList">
             选择供应商
-            <a-tooltip title="供应商文档" v-if="dataIndex ==='list'">
-              <a style="color: #333333" href="https://help.jeecg.com/aigc/guide/model/#2-%E4%BE%9B%E5%BA%94%E5%95%86%E9%80%89%E6%8B%A9" target="_blank">
-                <Icon style="position:relative;left: -2px;top:1px" icon="ant-design:question-circle-outlined"></Icon>
+            <a-tooltip title="供应商文档" v-if="dataIndex === 'list'">
+              <a
+                style="color: #333333"
+                href="https://help.jeecg.com/aigc/guide/model/#2-%E4%BE%9B%E5%BA%94%E5%95%86%E9%80%89%E6%8B%A9"
+                target="_blank"
+              >
+                <Icon style="position: relative; left: -2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
               </a>
             </a-tooltip>
           </span>
@@ -37,13 +41,18 @@
         <a-tab-pane :key="1">
           <template #tab>
             <span style="display: flex">
-            基础信息
-            <a-tooltip title="基础信息文档">
-              <a @click.stop style="color: unset" href="https://help.jeecg.com/aigc/guide/model/#31-%E5%A1%AB%E5%86%99%E5%9F%BA%E7%A1%80%E4%BF%A1%E6%81%AF" target="_blank">
-                <Icon style="position:relative;left:2px;top:1px" icon="ant-design:question-circle-outlined"></Icon>
-              </a>
-            </a-tooltip>
-          </span>
+              基础信息
+              <a-tooltip title="基础信息文档">
+                <a
+                  @click.stop
+                  style="color: unset"
+                  href="https://help.jeecg.com/aigc/guide/model/#31-%E5%A1%AB%E5%86%99%E5%9F%BA%E7%A1%80%E4%BF%A1%E6%81%AF"
+                  target="_blank"
+                >
+                  <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
+                </a>
+              </a-tooltip>
+            </span>
           </template>
           <div class="model-content">
             <BasicForm @register="registerForm">
@@ -61,12 +70,12 @@
               <template #modelName="{ model, field }">
                 <AutoComplete v-model:value="model[field]" :options="modelNameAddOption" :filter-option="filterOption">
                   <template #option="{ value, label, descr, type }">
-                    <a-tooltip placement="right" color="#ffffff" :overlayInnerStyle="{ color:'#646a73' }">
+                    <a-tooltip placement="right" color="#ffffff" :overlayInnerStyle="{ color: '#646a73' }">
                       <template #title>
                         <div v-html="getTitle(descr)"></div>
                       </template>
-                      <div style="display: flex;justify-content: space-between;">
-                        <span>{{label}}</span>
+                      <div style="display: flex; justify-content: space-between">
+                        <span>{{ label }}</span>
                         <div>
                           <a-tag v-if="type && type.split(',').includes('text')" color="#E8D7C3">文本</a-tag>
                           <a-tag v-if="type && type.split(',').includes('imageGen')" color="#FFEBD3">图像生成</a-tag>
@@ -84,27 +93,31 @@
             <a-alert v-if="!modelActivate" message="模型未激活，请通过下方「保存并激活」按钮激活当前模型" type="warning" show-icon />
           </div>
         </a-tab-pane>
-        <a-tab-pane :key="2"  v-if="modelParamsShow">
+        <a-tab-pane :key="2" v-if="modelParamsShow">
           <template #tab>
             <span style="display: flex">
-            高级配置
-            <a-tooltip title="高级配置文档">
-              <a @click.stop style="color: unset" href="https://help.jeecg.com/aigc/guide/model/#32-%E9%85%8D%E7%BD%AE%E9%AB%98%E7%BA%A7%E5%8F%82%E6%95%B0" target="_blank">
-                <Icon style="position:relative;left:2px;top:1px" icon="ant-design:question-circle-outlined"></Icon>
-              </a>
-            </a-tooltip>
-          </span>
+              高级配置
+              <a-tooltip title="高级配置文档">
+                <a
+                  @click.stop
+                  style="color: unset"
+                  href="https://help.jeecg.com/aigc/guide/model/#32-%E9%85%8D%E7%BD%AE%E9%AB%98%E7%BA%A7%E5%8F%82%E6%95%B0"
+                  target="_blank"
+                >
+                  <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
+                </a>
+              </a-tooltip>
+            </span>
           </template>
           <AiModelSeniorForm ref="modelParamsRef" :modelParams="modelParams" :type="currentSeniorType"></AiModelSeniorForm>
         </a-tab-pane>
       </a-tabs>
-
     </div>
     <template v-if="dataIndex === 'add' || dataIndex === 'edit'" #footer>
       <a-button @click="cancel">关闭</a-button>
       <a-button @click="test" v-if="modelActivate" :loading="testLoading" type="default">测试连接</a-button>
       <a-button @click="save" type="primary" ghost="true">保存</a-button>
-      <a-button @click="test(false)" v-if="!modelActivate" :loading="testLoading" type="primary" >保存并激活</a-button>
+      <a-button @click="test(false)" v-if="!modelActivate" :loading="testLoading" type="primary">保存并激活</a-button>
     </template>
     <template v-else #footer> </template>
   </BasicModal>
@@ -123,9 +136,9 @@
   import { formSchema, imageList } from '../model.data';
   import { editModel, queryById, saveModel, testConn } from '../model.api';
   import { useMessage } from '/@/hooks/web/useMessage';
-  const {createMessage: $message, createConfirm} = useMessage();
+  const { createMessage: $message, createConfirm } = useMessage();
   import AiModelSeniorForm from './AiModelSeniorForm.vue';
-  import { cloneDeep } from "lodash-es";
+  import { cloneDeep } from 'lodash-es';
   export default {
     name: 'AddModelModal',
     components: {
@@ -175,9 +188,9 @@
         return imageList.value[name];
       };
       //自动填充文本搜索事件
-      const filterOption = (input: string, option: any)=>{
+      const filterOption = (input: string, option: any) => {
         return option.value.toUpperCase().indexOf(input.toUpperCase()) >= 0;
-      }
+      };
 
       //表单配置
       const [registerForm, { resetFields, setFieldsValue, validate, clearValidate }] = useForm({
@@ -191,7 +204,7 @@
       const [registerModal, { closeModal, setModalProps }] = useModalInner(async (data) => {
         activeKey.value = 1;
         modelParamsShow.value = false;
-        if(dataIndex.value !== 'list') {
+        if (dataIndex.value !== 'list') {
           //重置表单
           await resetFields();
         }
@@ -200,12 +213,12 @@
           dataIndex.value = 'edit';
           let values = await queryById({ id: data.id });
           if (values) {
-            if(values.result.credential){
+            if (values.result.credential) {
               let credential = JSON.parse(values.result.credential);
-              if(credential.secretKey){
+              if (credential.secretKey) {
                 values.result.secretKey = credential.secretKey;
               }
-              if(credential.apiKey){
+              if (credential.apiKey) {
                 values.result.apiKey = credential.apiKey;
               }
             }
@@ -217,7 +230,7 @@
               modelTypeAddOption.value = data[0].type;
               modelNameAddOption.value = data[0][values.result.modelType];
             }
-            if(values.result.modelType && values.result.modelType === 'LLM'){
+            if (values.result.modelType && values.result.modelType === 'LLM') {
               modelParamsShow.value = true;
               currentSeniorType.value = 'model';
             } else if (values.result.modelType && values.result.modelType === 'AUDIO') {
@@ -226,11 +239,11 @@
             }
             if (values.result.activateFlag) {
               modelActivate.value = true;
-            }else{
+            } else {
               modelActivate.value = false;
             }
-            if(values.result.modelParams){
-              modelParams.value = JSON.parse(values.result.modelParams)
+            if (values.result.modelParams) {
+              modelParams.value = JSON.parse(values.result.modelParams);
             }
             modelTypeDisabled.value = true;
             //表单赋值
@@ -252,7 +265,7 @@
 
       //初始化模型类型
       initModelTypeOption();
-      
+
       /**
        * 初始化 模型类型字典
        */
@@ -260,7 +273,7 @@
         initDictOptions('model_type').then((data) => {
           modelTypeOption.value = cloneDeep(data);
           //update-begin---author:wangshuai---date:2025-03-04---for: 解决页面tab刷新一次就多一个全部类型的选项---
-          if(data[0].value != 'all'){
+          if (data[0].value != 'all') {
             modelTypeOption.value.unshift({
               text: '全部类型',
               value: 'all',
@@ -302,9 +315,9 @@
         modelData.value = item;
         providerName.value = item.title;
         modelTypeAddOption.value = item.type;
-        setTimeout(()=>{
-          setFieldsValue({ 'provider': item.value, 'baseUrl': item.baseUrl })
-        },100)
+        setTimeout(() => {
+          setFieldsValue({ provider: item.value, baseUrl: item.baseUrl });
+        }, 100);
       }
 
       /**
@@ -316,17 +329,17 @@
           let values = await validate();
           let credential = {
             apiKey: values.apiKey,
-            secretKey: values.secretKey
-          }
-          if(modelParamsRef.value){
+            secretKey: values.secretKey,
+          };
+          if (modelParamsRef.value) {
             let modelParams = modelParamsRef.value.emitChange();
-            if(modelParams){
+            if (modelParams) {
               values.modelParams = JSON.stringify(modelParams);
             }
           }
-          if(modelActivate.value){
-            values.activateFlag = 1
-          }else{
+          if (modelActivate.value) {
+            values.activateFlag = 1;
+          } else {
             values.activateFlag = 0;
           }
           values.credential = JSON.stringify(credential);
@@ -341,8 +354,8 @@
             closeModal();
             emit('success');
           }
-        }catch(e){
-          if(e.hasOwnProperty('errorFields')){
+        } catch (e) {
+          if (e.hasOwnProperty('errorFields')) {
             activeKey.value = 1;
           }
         } finally {
@@ -382,7 +395,7 @@
           }
           //测试
           await testConn(values).then(async (result) => {
-            if(onlyTest){
+            if (onlyTest) {
               $message.success('测试连接成功');
               return true;
             }
@@ -406,24 +419,24 @@
         await setFieldsValue({ modelName: '' });
         await clearValidate('modelName');
         await setFieldsValue({
-          modelName: modelData.value[value+'DefaultValue']
-        })
+          modelName: modelData.value[value + 'DefaultValue'],
+        });
         modelNameAddOption.value = modelData.value[value];
-        if(value === 'LLM'){
+        if (value === 'LLM') {
           modelParamsShow.value = true;
           currentSeniorType.value = 'model';
-        }else if(value === 'AUDIO'){
+        } else if (value === 'AUDIO') {
           modelParamsShow.value = true;
           currentSeniorType.value = 'audio';
-        }else{
+        } else {
           modelParamsShow.value = false;
         }
-        if(value === "IMAGE" && modelData.value.baseImageUrl){
-          setFieldsValue({ 'baseUrl': modelData.value.baseImageUrl })
-        } else if (value === "AUDIO" && modelData.value.baseAudioUrl) {
-          setFieldsValue({ 'baseUrl': modelData.value.baseAudioUrl })
-        } else if(modelData.value.baseUrl) {
-          setFieldsValue({ 'baseUrl': modelData.value.baseUrl })
+        if (value === 'IMAGE' && modelData.value.baseImageUrl) {
+          setFieldsValue({ baseUrl: modelData.value.baseImageUrl });
+        } else if (value === 'AUDIO' && modelData.value.baseAudioUrl) {
+          setFieldsValue({ baseUrl: modelData.value.baseAudioUrl });
+        } else if (modelData.value.baseUrl) {
+          setFieldsValue({ baseUrl: modelData.value.baseUrl });
         }
       }
 
@@ -441,12 +454,12 @@
        * @param title
        */
       function getTitle(title) {
-        if(!title){
-          return "暂无描述内容";
+        if (!title) {
+          return '暂无描述内容';
         }
-        return title.replaceAll("\n","<br>")
+        return title.replaceAll('\n', '<br>');
       }
-      
+
       return {
         registerModal,
         modelTypeData,
@@ -527,17 +540,17 @@
   .pointer {
     cursor: pointer;
   }
-  
-  :deep(.jeecg-basic-modal-close){
-    span{
+
+  :deep(.jeecg-basic-modal-close) {
+    span {
       margin-left: 0 !important;
     }
   }
 </style>
 <style lang="less">
-.ai-model-modal{
-  .jeecg-basic-modal-close > span{
-    margin-left: 0 !important;
+  .ai-model-modal {
+    .jeecg-basic-modal-close > span {
+      margin-left: 0 !important;
+    }
   }
-}
 </style>

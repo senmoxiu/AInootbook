@@ -11,7 +11,7 @@
   import 'vditor/dist/index.css';
   import { useRootSetting } from '/@/hooks/setting/useRootSetting';
   import { ThemeEnum } from '/@/enums/appEnum';
-  
+
   const converter = new showdown.Converter();
   converter.setOption('tables', true);
   converter.setOption('emoji', true);
@@ -37,7 +37,7 @@
   .markdown-viewer {
     width: 100%;
   }
-  
+
   .preview {
     width: 100%;
   }

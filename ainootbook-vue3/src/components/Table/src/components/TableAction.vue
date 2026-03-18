@@ -227,7 +227,17 @@
       const dropdownGetPopupContainer = () => {
         return (table as any)?.wrapRef?.value ?? document.body;
       };
-      return { prefixCls, getActions, getDropdownList, getDropdownSlotList, getAlign, onCellClick, getTooltip, dropdownCls, dropdownGetPopupContainer };
+      return {
+        prefixCls,
+        getActions,
+        getDropdownList,
+        getDropdownSlotList,
+        getAlign,
+        onCellClick,
+        getTooltip,
+        dropdownCls,
+        dropdownGetPopupContainer,
+      };
     },
   });
 </script>

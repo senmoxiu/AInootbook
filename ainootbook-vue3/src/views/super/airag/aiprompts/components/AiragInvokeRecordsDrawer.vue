@@ -2,8 +2,7 @@
   <BasicDrawer v-bind="getProps">
     <BasicTable @register="registerTable">
       <!--操作栏-->
-      <template #action="{ record }">
-        <TableAction :actions="getTableAction(record)" /> </template
+      <template #action="{ record }"> <TableAction :actions="getTableAction(record)" /> </template
     ></BasicTable>
   </BasicDrawer>
   <AiragTrackDetailModal @register="registerTrackDetailModal" />
@@ -17,7 +16,7 @@
   import { BasicTable, TableAction } from '@/components/Table';
   import { useModal } from '@/components/Modal';
   import { getTrackList, deleteOne } from '@/views/super/airag/aiprompts/AiragExtData.api';
-  import {useListPage} from "@/hooks/system/useListPage";
+  import { useListPage } from '@/hooks/system/useListPage';
   import AiragTrackDetailModal from './AiragTrackDetailModal.vue';
   // Emits声明
   const attrs = useAttrs();
@@ -89,7 +88,7 @@
    */
   function handleDelete(record) {
     console.log(record, 'record');
-    deleteOne({ id: record.id},reload)
+    deleteOne({ id: record.id }, reload);
   }
 
   /**

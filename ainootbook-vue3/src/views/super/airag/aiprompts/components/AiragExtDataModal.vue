@@ -55,7 +55,7 @@
       //刷新列表
       emit('success');
     } catch (e) {
-      console.log("e", e)
+      console.log('e', e);
       return Promise.reject(e);
     } finally {
       setModalProps({ confirmLoading: false });

@@ -27,7 +27,7 @@
     setModalProps({ confirmLoading: false });
     isUpdate.value = !!data?.isUpdate;
     if (unref(isUpdate)) {
-      const record = {...data.values}
+      const record = { ...data.values };
       //表单赋值
       if (record.relationType == 'USER') {
         record.userCode = record.roleCode;
@@ -48,10 +48,10 @@
       let values = await validate();
       setModalProps({ confirmLoading: true });
       //提交表单
-      if(values.relationType == 'USER'){
+      if (values.relationType == 'USER') {
         values.roleCode = values.userCode;
       }
-      if(values.relationType == 'DEFAULT'){
+      if (values.relationType == 'DEFAULT') {
         values.roleCode = 'DEF_INDEX_ALL';
       }
       await saveOrUpdate(values, isUpdate.value);

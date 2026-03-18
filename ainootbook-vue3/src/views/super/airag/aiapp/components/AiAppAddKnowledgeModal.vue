@@ -18,18 +18,17 @@
                 <img class="checkbox-img" :src="knowledge" />
                 <span class="checkbox-name">{{ item.name }}</span>
               </div>
-              <a-checkbox v-if="multiple" v-model:checked="item.checked" @click.stop class="quantum-checker" @change="(e)=>handleChange(e,item)"> </a-checkbox>
+              <a-checkbox v-if="multiple" v-model:checked="item.checked" @click.stop class="quantum-checker" @change="(e) => handleChange(e, item)">
+              </a-checkbox>
             </div>
           </a-card>
         </a-col>
       </a-row>
       <div v-if="knowledgeIds && knowledgeIds.length > 0" class="use-select">
         <template v-if="!multiple">
-          已选择 <span class="ellipsis" style="max-width: 150px">{{knowledgeData.name}}</span>
+          已选择 <span class="ellipsis" style="max-width: 150px">{{ knowledgeData.name }}</span>
         </template>
-        <template v-else>
-          已选择 {{ knowledgeIds.length }} 知识库
-        </template>
+        <template v-else> 已选择 {{ knowledgeIds.length }} 知识库 </template>
         <span style="margin-left: 8px; color: #3d79fb; cursor: pointer" @click="handleClearClick">清空</span>
       </div>
       <Pagination
@@ -65,8 +64,8 @@
     },
     emits: ['success', 'register'],
     props: {
-      multiple:{ type: Boolean, default: true },
-      type: { type: String, default: 'knowledge' }
+      multiple: { type: Boolean, default: true },
+      type: { type: String, default: 'knowledge' },
     },
     setup(props, { emit }) {
       const title = ref<string>('添加关联知识库');
@@ -106,7 +105,7 @@
        * 保存
        */
       async function handleOk() {
-        console.log("知识库确定选中的值",knowledgeData.value);
+        console.log('知识库确定选中的值', knowledgeData.value);
         //update-begin---author:wangshuai---date:2025-12-25---for:知识库选择支持单选和多选---
         if (props.multiple) {
           emit('success', knowledgeIds.value, knowledgeData.value);
@@ -125,11 +124,11 @@
       }
 
       //复选框选中事件
-      function handleSelect(item){
+      function handleSelect(item) {
         //update-begin---author:wangshuai---date:2025-12-25---for:知识库选择支持单选和多选---
-        if(!props.multiple) {
+        if (!props.multiple) {
           if (knowledgeIds.value === item.id) {
-            knowledgeIds.value = "";
+            knowledgeIds.value = '';
             knowledgeData.value = null;
             return;
           }
@@ -145,7 +144,7 @@
           if (!knowledgeIds.value || knowledgeIds.value.length == 0) {
             knowledgeIds.value.push(id);
             knowledgeData.value.push(item);
-            console.log("知识库勾选或取消勾选复选框的值",knowledgeData.value);
+            console.log('知识库勾选或取消勾选复选框的值', knowledgeData.value);
             return;
           }
           let findIndex = knowledgeIds.value.findIndex((item) => item === id);
@@ -156,7 +155,7 @@
             knowledgeIds.value.splice(findIndex, 1);
             knowledgeData.value.splice(findIndex, 1);
           }
-          console.log("知识库勾选或取消勾选复选框的值",knowledgeData.value);
+          console.log('知识库勾选或取消勾选复选框的值', knowledgeData.value);
         }
         //update-end---author:wangshuai---date:2025-12-25---for:知识库选择支持单选和多选---
       }
@@ -208,7 +207,7 @@
       function handleClearClick() {
         //update-begin---author:wangshuai---date:2025-12-25---for:知识库选择支持单选和多选---
         if (!props.multiple) {
-          knowledgeIds.value = "";
+          knowledgeIds.value = '';
           knowledgeData.value = null;
         } else {
           knowledgeIds.value = [];
@@ -241,7 +240,7 @@
 
       /**
        * 获取卡片样式
-       * 
+       *
        * @param item
        */
       function getCardStyle(item) {

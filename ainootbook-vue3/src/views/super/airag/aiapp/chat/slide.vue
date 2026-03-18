@@ -71,9 +71,9 @@
         </li>
       </ul>
     </div>
-    <div class="left-footer" v-if="source!='chatJs'">
+    <div class="left-footer" v-if="source != 'chatJs'">
       AI客服由
-      <a style="color: #4183c4;margin-left: 2px;margin-right: 2px" href="https://www.qiaoqiaoyun.com/aiCustomerService" target="_blank">
+      <a style="color: #4183c4; margin-left: 2px; margin-right: 2px" href="https://www.qiaoqiaoyun.com/aiCustomerService" target="_blank">
         JEECG AI
       </a>
       提供
@@ -87,7 +87,7 @@
   import { defHttp } from '@/utils/http/axios';
   import { getFileAccessHttpUrl } from '@/utils/common/compUtils';
   import defaultImg from '../img/ailogo.png';
-  const props = defineProps(['dataSource', 'appData','source']);
+  const props = defineProps(['dataSource', 'appData', 'source']);
   const emit = defineEmits(['save', 'click', 'reloadRight', 'prologue']);
   const inputRef = ref(null);
   const router = useRouter();
@@ -98,7 +98,7 @@
     props.dataSource.history.unshift({ title: '新建聊天', id: uuid, isEdit: false, disabled: true });
     // 新建第一个(需要高亮选中)
     props.dataSource.active = uuid;
-    emit('click', "新建聊天", 0);
+    emit('click', '新建聊天', 0);
   };
   // 切换聊天
   const handleToggleChat = (item, index) => {
@@ -160,13 +160,16 @@
       }
     }
     //update-begin---author:wangshuai---date:2025-03-12---for:【QQYUN-11560】新建聊天内容为空，无法删除---
-    if(data.disabled){
+    if (data.disabled) {
       return;
     }
     //update-end---author:wangshuai---date:2025-03-12---for:【QQYUN-11560】新建聊天内容为空，无法删除---
-    defHttp.delete({
-      url: '/airag/chat/conversation/' + data.id,
-    },{ isTransformResponse: false });
+    defHttp.delete(
+      {
+        url: '/airag/chat/conversation/' + data.id,
+      },
+      { isTransformResponse: false }
+    );
   }
 
   /**
@@ -326,8 +329,8 @@
       font-size: 16px;
     }
   }
-  .left-footer{
-    display:flex;
+  .left-footer {
+    display: flex;
     margin-right: 20px;
     font-size: 12px;
     position: absolute;

@@ -128,16 +128,16 @@
    */
   async function loadItemByCode() {
     if (!props.value || props.value == '0') {
-      if(props.multiple){
+      if (props.multiple) {
         treeValue.value = [];
-      }else{
+      } else {
         treeValue.value = { label: null, value: null };
       }
     } else {
       // 代码逻辑说明: issues/4173 Online JTreeSelect控件changeOptions方法未生效
-      if(props.url){
+      if (props.url) {
         getItemFromTreeData();
-      }else{
+      } else {
         // 代码逻辑说明: 【issues/8093】选择节点后会先变成编码再显示label文字
         if (props.value) {
           if (isArray(treeValue.value)) {
@@ -157,14 +157,14 @@
         let params = { key: props.value };
         let result = await defHttp.get({ url: `${Api.view}${props.dict}`, params }, { isTransformResponse: false });
         if (result.success) {
-          if(props.multiple){
+          if (props.multiple) {
             let values = props.value.split(',');
             treeValue.value = result.result.map((item, index) => ({
               key: values[index],
               value: values[index],
               label: translateTitle(item),
             }));
-          }else{
+          } else {
             treeValue.value = { key: props.value, value: props.value, label: translateTitle(result.result[0]) };
           }
           onLoadTriggleChange(result.result[0]);
@@ -352,16 +352,19 @@
   }
 
   // 代码逻辑说明: issues/4173 Online JTreeSelect控件changeOptions方法未生效
-  watch(()=>props.url, async (val)=>{
-    if(val){
-      await loadRootByUrl();
+  watch(
+    () => props.url,
+    async (val) => {
+      if (val) {
+        await loadRootByUrl();
+      }
     }
-  });
+  );
 
   /**
    * 根据自定义的请求地址加载数据
    */
-  async function loadRootByUrl(){
+  async function loadRootByUrl() {
     let url = props.url;
     let params = props.params;
     let res = await defHttp.get({ url, params }, { isTransformResponse: false });
@@ -382,12 +385,12 @@
   /**
    * 根据已有的树数据 翻译选项
    */
-  function getItemFromTreeData(){
+  function getItemFromTreeData() {
     let data = treeData.value;
-    let arr = []
+    let arr = [];
     findChildrenNode(data, arr);
-    if(arr.length>0){
-      treeValue.value = arr
+    if (arr.length > 0) {
+      treeValue.value = arr;
       onLoadTriggleChange(arr[0]);
     }
   }
@@ -397,18 +400,18 @@
    * @param data
    * @param arr
    */
-  function findChildrenNode(data, arr){
+  function findChildrenNode(data, arr) {
     let val = props.value;
-    if(data && data.length){
-      for(let item of data){
-        if(val===item.value){
+    if (data && data.length) {
+      for (let item of data) {
+        if (val === item.value) {
           arr.push({
             key: item.key,
             value: item.value,
-            label: item.label||item.title
-          })
-        }else{
-          findChildrenNode(item.children, arr)
+            label: item.label || item.title,
+          });
+        } else {
+          findChildrenNode(item.children, arr);
         }
       }
     }

@@ -51,7 +51,7 @@
   import { formSchema, openApiHeaderJVxeColumns, openApiParamJVxeColumns } from '../OpenApi.data';
   import { saveOrUpdate, queryOpenApiHeader, queryOpenApiParam, getGenPath } from '../OpenApi.api';
   import { VALIDATE_FAILED } from '/@/utils/common/vxeUtils';
-  import { useMessage } from "@/hooks/web/useMessage";
+  import { useMessage } from '@/hooks/web/useMessage';
 
   // Emits声明
   const $message = useMessage();
@@ -96,14 +96,13 @@
       // 请求后端接口获取数据
       //  requestSubTableData(queryOpenApiHeader, {id:data?.record?.id}, openApiHeaderTable)
       //  requestSubTableData(queryOpenApiParam, {id:data?.record?.id}, openApiParamTable)
-      openApiHeaderTable.dataSource = !!data.record.headersJson?JSON.parse(data.record.headersJson):[];
-      openApiParamTable.dataSource = !!data.record.paramsJson?JSON.parse(data.record.paramsJson):[];
+      openApiHeaderTable.dataSource = !!data.record.headersJson ? JSON.parse(data.record.headersJson) : [];
+      openApiParamTable.dataSource = !!data.record.paramsJson ? JSON.parse(data.record.paramsJson) : [];
     } else {
       //  /openapi/genpath
       const requestUrlObj = await getGenPath({});
       await setFieldsValue({
-        requestUrl: requestUrlObj.result
-
+        requestUrl: requestUrlObj.result,
       });
     }
     // 隐藏底部时禁用整个表单
@@ -137,23 +136,23 @@
   }
   //表单提交事件
   async function requestAddOrEdit(values) {
-    let headersJson = !!values.headersJson?JSON.stringify(values.headersJson):null;
-    let paramsJson = !!values.headersJson?JSON.stringify(values.paramsJson):null;
+    let headersJson = !!values.headersJson ? JSON.stringify(values.headersJson) : null;
+    let paramsJson = !!values.headersJson ? JSON.stringify(values.paramsJson) : null;
     try {
-      if (!!values.body){
+      if (!!values.body) {
         try {
-          if (typeof JSON.parse(values.body)!='object'){
-            $message.createMessage.error("JSON格式化错误,请检查输入数据");
+          if (typeof JSON.parse(values.body) != 'object') {
+            $message.createMessage.error('JSON格式化错误,请检查输入数据');
             return;
           }
         } catch (e) {
-          $message.createMessage.error("JSON格式化错误,请检查输入数据");
+          $message.createMessage.error('JSON格式化错误,请检查输入数据');
           return;
         }
       }
       setModalProps({ confirmLoading: true });
-      values.headersJson = headersJson
-      values.paramsJson = paramsJson
+      values.headersJson = headersJson;
+      values.paramsJson = paramsJson;
       //提交表单
       await saveOrUpdate(values, isUpdate.value);
       //关闭弹窗

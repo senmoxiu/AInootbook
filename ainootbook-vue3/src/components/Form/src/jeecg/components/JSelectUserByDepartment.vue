@@ -125,7 +125,7 @@
         let isNotRequestTransform = false;
         isNotRequestTransform = value.split(',').every((value) => !!selectOptions.value.find((item) => item[props.rowKey] === value));
         if (isNotRequestTransform) {
-          selectValues.value = value.split(',')
+          selectValues.value = value.split(',');
           return;
         }
         const params = { isMultiTranslate: true, pageSize: len, [props.rowKey]: value };

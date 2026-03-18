@@ -1,13 +1,5 @@
 <template>
-  <BasicDrawer
-    :width="650"
-    :loading="loading"
-    showFooter
-    okText="保存并关闭"
-    @ok="onSubmit(true)"
-    @close="onClose"
-    @register="registerDrawer"
-  >
+  <BasicDrawer :width="650" :loading="loading" showFooter okText="保存并关闭" @ok="onSubmit(true)" @close="onClose" @register="registerDrawer">
     <template #title>
       部门角色权限配置
       <a-dropdown>
@@ -68,7 +60,7 @@
   import { useI18n } from '/@/hooks/web/useI18n';
   import DepartRoleDataRuleDrawer from './DepartRoleDataRuleDrawer.vue';
   import { queryTreeListForDeptRole, queryDeptRolePermission, saveDeptRolePermission } from '../depart.user.api';
-  import { translateTitle } from "@/utils/common/compUtils";
+  import { translateTitle } from '@/utils/common/compUtils';
   import { DEPART_ROLE_AUTH_CONFIG_KEY } from '/@/enums/cacheEnum';
 
   defineEmits(['register']);

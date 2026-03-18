@@ -1,7 +1,7 @@
 <template>
   <a-spin :spinning="loading">
     <template v-if="treeData && treeData.length > 0">
-      <div style="margin-top: 10px;margin-bottom: 10px;display: flex">
+      <div style="margin-top: 10px; margin-bottom: 10px; display: flex">
         <a-button preIcon="ant-design:down-outlined" @click="expandAll(true)" type="primary">展开全部</a-button>
         <a-button preIcon="ant-design:up-outlined" @click="expandAll(false)" type="primary" style="margin-left: 10px">折叠全部</a-button>
       </div>

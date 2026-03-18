@@ -30,8 +30,8 @@
 
   import { MenuModeEnum, MenuSplitTyeEnum } from '/@/enums/menuEnum';
 
-  import { useAppStore } from "@/store/modules/app";
-  import { useGlobSetting } from "/@/hooks/setting";
+  import { useAppStore } from '@/store/modules/app';
+  import { useGlobSetting } from '/@/hooks/setting';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   import { useTrigger, useDragLine, useSiderEvent } from './useLayoutSider';
   import { useAppInject } from '/@/hooks/web/useAppInject';
@@ -51,8 +51,8 @@
 
       const { prefixCls } = useDesign('layout-sideBar');
 
-      const glob = useGlobSetting()
-      const appStore = useAppStore()
+      const glob = useGlobSetting();
+      const appStore = useAppStore();
 
       const { getIsMobile } = useAppInject();
 

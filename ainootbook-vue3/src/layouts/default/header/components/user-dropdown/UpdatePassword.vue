@@ -1,5 +1,12 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="500px" :bodyStyle="{ padding: '20px 40px 20px 20px'}">
+  <BasicModal
+    v-bind="$attrs"
+    @register="registerModal"
+    :title="title"
+    @ok="handleSubmit"
+    width="500px"
+    :bodyStyle="{ padding: '20px 40px 20px 20px' }"
+  >
     <BasicForm @register="registerForm" />
   </BasicModal>
 </template>
@@ -46,7 +53,7 @@
           {
             pattern: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/,
             message: '密码由 8 位及以上数字、大小写字母和特殊符号组成！',
-          },  
+          },
         ],
       },
       {

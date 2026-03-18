@@ -29,32 +29,32 @@
     //重置表单
     await resetFields();
     isUpdate.value = !!data?.isUpdate;
-    if(data.tenantId){
+    if (data.tenantId) {
       tenantId.value = data.tenantId;
     }
     packType.value = data.packType;
     if (unref(isUpdate)) {
       //表单赋值
-      console.log(data.record)
+      console.log(data.record);
       await setFieldsValue({ ...data.record });
       permissionIds.value = data.record.permissionIds;
     }
     // 代码逻辑说明: 【QQYUN-5685】2 套餐包增加一个查看：添加底部有没有按钮及表单禁用------------
-    setModalProps({ confirmLoading: false, showCancelBtn:!!data?.showFooter, showOkBtn:!!data?.showFooter });
+    setModalProps({ confirmLoading: false, showCancelBtn: !!data?.showFooter, showOkBtn: !!data?.showFooter });
     // 隐藏底部时禁用整个表单
-    setProps({ disabled: !data?.showFooter })
+    setProps({ disabled: !data?.showFooter });
   });
   //设置标题
   const title = computed(() => (unref(isUpdate) ? '编辑 租户套餐' : '新增 租户套餐'));
   //表单提交事件
   async function handleSubmit(v) {
     const values = await validate();
-    
+
     setModalProps({ confirmLoading: true });
     values.packType = unref(packType);
-    if(values.packType === 'custom'){
+    if (values.packType === 'custom') {
       values.tenantId = unref(tenantId);
-    }else{
+    } else {
       values.tenantId = 0;
     }
     values.permissionIds = permissionIds.value;

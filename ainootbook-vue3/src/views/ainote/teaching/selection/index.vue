@@ -3,12 +3,8 @@
     <BasicTable @register="registerTable">
       <template #toolbar>
         <!-- 教师/管理员才能新增和批量删除 -->
-        <a-button v-if="!isStudent" type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined">
-          新增选课
-        </a-button>
-        <a-button v-if="!isStudent" type="primary" danger @click="batchHandleDelete" preIcon="ant-design:delete-outlined">
-          批量删除
-        </a-button>
+        <a-button v-if="!isStudent" type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined"> 新增选课 </a-button>
+        <a-button v-if="!isStudent" type="primary" danger @click="batchHandleDelete" preIcon="ant-design:delete-outlined"> 批量删除 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -38,9 +34,7 @@
   const roles = computed(() => new Set((roleCode.value || '').split(',')));
 
   // 学生：有 student 角色且无 admin/teacher 角色
-  const isStudent = computed(
-    () => roles.value.has('student') && !roles.value.has('admin') && !roles.value.has('teacher'),
-  );
+  const isStudent = computed(() => roles.value.has('student') && !roles.value.has('admin') && !roles.value.has('teacher'));
 
   // 根据角色动态切换列和搜索表单
   const dynamicColumns = computed(() => (isStudent.value ? studentColumns : teacherColumns));

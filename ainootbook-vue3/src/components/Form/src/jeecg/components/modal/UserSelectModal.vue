@@ -13,7 +13,6 @@
       :centered="true"
       destroyOnClose
       @visible-change="visibleChange"
-      
     >
       <a-row>
         <a-col :span="showSelected ? 18 : 24">
@@ -89,13 +88,13 @@
         default: 'j-user-select-modal',
       },
       // 查询table数据使用的自定义接口
-      customListApi: {type: Function},
+      customListApi: { type: Function },
       // 自定义接口的查询条件是否使用 JInput
-      customApiJInput: {type: Boolean, default: true},
+      customApiJInput: { type: Boolean, default: true },
       // 自定义表单配置条件
-      customFormConfig: {type: Object},
+      customFormConfig: { type: Object },
       // 自定义表格列
-      customTableColumns: {type: Array},
+      customTableColumns: { type: Array },
     },
     emits: ['register', 'getSelectResult', 'close'],
     setup(props, { emit, refs }) {
@@ -143,7 +142,7 @@
       // 代码逻辑说明: 【issues/657】右侧选中列表删除无效
       watch(rowSelection.selectedRowKeys, (newVal) => {
         // 代码逻辑说明: null指针异常导致控制台报错页面不显示------------
-        if(tableRef.value){
+        if (tableRef.value) {
           tableRef.value.setSelectedRowKeys(newVal);
         }
       });
@@ -170,12 +169,12 @@
           {
             label: '账号',
             field: 'username',
-            component: (hasCustomApi.value && !props.customApiJInput) ? 'Input' : 'JInput',
+            component: hasCustomApi.value && !props.customApiJInput ? 'Input' : 'JInput',
           },
           {
             label: '姓名',
             field: 'realname',
-            component: (hasCustomApi.value && !props.customApiJInput) ? 'Input' : 'JInput',
+            component: hasCustomApi.value && !props.customApiJInput ? 'Input' : 'JInput',
           },
         ],
         autoSubmitOnEnter: true,
@@ -183,51 +182,53 @@
         ...props.customFormConfig,
       };
       //定义表格列
-      const columns = props.customTableColumns?.length ? props.customTableColumns : [
-        {
-          title: '用户账号',
-          dataIndex: 'username',
-          width: 120,
-          align: 'left',
-        },
-        {
-          title: '用户姓名',
-          dataIndex: 'realname',
-          width: 120,
-        },
-        {
-          title: '性别',
-          dataIndex: 'sex_dictText',
-          width: 50,
-        },
-        {
-          title: '手机号码',
-          dataIndex: 'phone',
-          width: 120,
-          customRender:( { record, text })=>{
-            if(record.izHideContact && record.izHideContact === '1'){
-              return '/';
-            }
-            return text;
-          }
-        },
-        {
-          title: '邮箱',
-          dataIndex: 'email',
-          customRender:( { record, text })=>{
-            if(record.izHideContact && record.izHideContact === '1'){
-              return text?'/':'';
-            }
-            return text;
-          }
-          // width: 40,
-        },
-        {
-          title: '状态',
-          dataIndex: 'status_dictText',
-          width: 80,
-        },
-      ];
+      const columns = props.customTableColumns?.length
+        ? props.customTableColumns
+        : [
+            {
+              title: '用户账号',
+              dataIndex: 'username',
+              width: 120,
+              align: 'left',
+            },
+            {
+              title: '用户姓名',
+              dataIndex: 'realname',
+              width: 120,
+            },
+            {
+              title: '性别',
+              dataIndex: 'sex_dictText',
+              width: 50,
+            },
+            {
+              title: '手机号码',
+              dataIndex: 'phone',
+              width: 120,
+              customRender: ({ record, text }) => {
+                if (record.izHideContact && record.izHideContact === '1') {
+                  return '/';
+                }
+                return text;
+              },
+            },
+            {
+              title: '邮箱',
+              dataIndex: 'email',
+              customRender: ({ record, text }) => {
+                if (record.izHideContact && record.izHideContact === '1') {
+                  return text ? '/' : '';
+                }
+                return text;
+              },
+              // width: 40,
+            },
+            {
+              title: '状态',
+              dataIndex: 'status_dictText',
+              width: 80,
+            },
+          ];
       //已选择的table信息
       const selectedTable = {
         pagination: false,
@@ -263,21 +264,21 @@
           closeModal();
         });
       }
-      
+
       /**
        * 用户返回结果逻辑查询
        */
       function afterFetch(record) {
         let excludeList = props.excludeUserIdList;
-        if(!excludeList){
+        if (!excludeList) {
           return record;
         }
-        let arr:any[] = [];
+        let arr: any[] = [];
         //如果存在过滤用户id集合，并且后台返回的数据不为空
-        if(excludeList.length>0 && record && record.length>0){
-          for(let item of record){
-            if(excludeList.indexOf(item.id)<0){
-              arr.push({...item})
+        if (excludeList.length > 0 && record && record.length > 0) {
+          for (let item of record) {
+            if (excludeList.indexOf(item.id) < 0) {
+              arr.push({ ...item });
             }
           }
           return arr;

@@ -4,26 +4,26 @@
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="OpenApiAuthForm">
           <a-row>
-						<a-col :span="24">
-							<a-form-item label="授权名称" v-bind="validateInfos.name" id="OpenApiAuthForm-name" name="name">
-								<a-input v-model:value="formData.name" placeholder="请输入授权名称"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="AK" v-bind="validateInfos.ak" id="OpenApiAuthForm-ak" name="ak">
-								<a-input v-model:value="formData.ak" placeholder="请输入AK" disabled allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="SK" v-bind="validateInfos.sk" id="OpenApiAuthForm-sk" name="sk">
-								<a-input v-model:value="formData.sk" placeholder="请输入SK" disabled allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-<!--						<a-col :span="24">-->
-<!--							<a-form-item label="关联系统用户名" v-bind="validateInfos.systemUserId" id="OpenApiAuthForm-systemUserId" name="systemUserId">-->
-<!--								<JSearchSelect dict="sys_user,username,id" v-model:value="formData.systemUserId" placeholder="请输入关联系统用户名"  allow-clear ></JSearchSelect>-->
-<!--							</a-form-item>-->
-<!--						</a-col>-->
+            <a-col :span="24">
+              <a-form-item label="授权名称" v-bind="validateInfos.name" id="OpenApiAuthForm-name" name="name">
+                <a-input v-model:value="formData.name" placeholder="请输入授权名称" allow-clear></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
+              <a-form-item label="AK" v-bind="validateInfos.ak" id="OpenApiAuthForm-ak" name="ak">
+                <a-input v-model:value="formData.ak" placeholder="请输入AK" disabled allow-clear></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
+              <a-form-item label="SK" v-bind="validateInfos.sk" id="OpenApiAuthForm-sk" name="sk">
+                <a-input v-model:value="formData.sk" placeholder="请输入SK" disabled allow-clear></a-input>
+              </a-form-item>
+            </a-col>
+            <!--						<a-col :span="24">-->
+            <!--							<a-form-item label="关联系统用户名" v-bind="validateInfos.systemUserId" id="OpenApiAuthForm-systemUserId" name="systemUserId">-->
+            <!--								<JSearchSelect dict="sys_user,username,id" v-model:value="formData.systemUserId" placeholder="请输入关联系统用户名"  allow-clear ></JSearchSelect>-->
+            <!--							</a-form-item>-->
+            <!--						</a-col>-->
           </a-row>
         </a-form>
       </template>
@@ -32,30 +32,30 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed,  } from 'vue';
-  import { USER_INFO_KEY} from '/@/enums/cacheEnum';
+  import { ref, reactive, defineExpose, nextTick, defineProps, computed } from 'vue';
+  import { USER_INFO_KEY } from '/@/enums/cacheEnum';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getValueType } from '/@/utils';
-  import { saveOrUpdate,getGenAKSK } from '../OpenApiAuth.api';
+  import { saveOrUpdate, getGenAKSK } from '../OpenApiAuth.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
-  import { getAuthCache } from "@/utils/auth";
+  import { getAuthCache } from '@/utils/auth';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
-    formData: { type: Object, default: () => ({})},
+    formData: { type: Object, default: () => ({}) },
     formBpm: { type: Boolean, default: true },
-    title: { type: String, default: "" },
+    title: { type: String, default: '' },
   });
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    name: '',   
-    ak: '',   
-    sk: '',   
-    systemUserId: '',   
+    name: '',
+    ak: '',
+    sk: '',
+    systemUserId: '',
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
@@ -63,24 +63,23 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    name:[{ required: true, message: '请输入授权名称!'},],
-    systemUserId:[{ required: true, message: '请输入关联系统用户名!'},],
+    name: [{ required: true, message: '请输入授权名称!' }],
+    systemUserId: [{ required: true, message: '请输入关联系统用户名!' }],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
 
   // 表单禁用
-  const disabled = computed(()=>{
-    if(props.formBpm === true){
-      if(props.formData.disabled === false){
+  const disabled = computed(() => {
+    if (props.formBpm === true) {
+      if (props.formData.disabled === false) {
         return false;
-      }else{
+      } else {
         return true;
       }
     }
     return props.formDisabled;
   });
 
-  
   /**
    * 新增
    */
@@ -95,18 +94,18 @@
    * 编辑
    */
   function edit(record) {
-    const userData = getAuthCache(USER_INFO_KEY)
-    if(props.title == "新增"){
-      record.systemUserId = userData.id
+    const userData = getAuthCache(USER_INFO_KEY);
+    if (props.title == '新增') {
+      record.systemUserId = userData.id;
     }
     nextTick(() => {
       resetFields();
       const tmpData = {};
       Object.keys(formData).forEach((key) => {
-        if(record.hasOwnProperty(key)){
-          tmpData[key] = record[key]
+        if (record.hasOwnProperty(key)) {
+          tmpData[key] = record[key];
         }
-      })
+      });
       //赋值
       Object.assign(formData, tmpData);
     });
@@ -159,7 +158,6 @@
         confirmLoading.value = false;
       });
   }
-
 
   defineExpose({
     add,

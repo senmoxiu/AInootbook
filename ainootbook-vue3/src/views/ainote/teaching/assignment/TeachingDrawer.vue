@@ -1,13 +1,5 @@
 <template>
-  <BasicDrawer
-    v-bind="$attrs"
-    @register="registerDrawer"
-    :title="getTitle"
-    :width="600"
-    :showFooter="true"
-    @ok="handleSubmit"
-    destroyOnClose
-  >
+  <BasicDrawer v-bind="$attrs" @register="registerDrawer" :title="getTitle" :width="600" :showFooter="true" @ok="handleSubmit" destroyOnClose>
     <BasicForm @register="registerForm">
       <template #departSelect="{ model, field }">
         <DepartTreeSelect
@@ -73,4 +65,3 @@
     }
   }
 </script>
-

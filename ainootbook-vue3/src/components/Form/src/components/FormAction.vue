@@ -81,9 +81,7 @@
           ...advancedSpanObj,
           ...actionColOptions,
         };
-        
-        
-        
+
         return actionColOpt;
       });
 

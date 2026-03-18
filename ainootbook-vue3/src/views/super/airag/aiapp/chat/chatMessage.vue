@@ -1,62 +1,80 @@
 <template>
-  <div class="chat" :class="[inversion === 'user' ? 'self' : 'chatgpt']" v-if="getText || (props.presetQuestion && props.presetQuestion.length>0)">
+  <div class="chat" :class="[inversion === 'user' ? 'self' : 'chatgpt']" v-if="getText || (props.presetQuestion && props.presetQuestion.length > 0)">
     <div class="avatar" v-if="showAvatar !== 'no'">
       <img v-if="inversion === 'user'" :src="avatar()" />
       <img v-else :src="getAiImg()" />
     </div>
     <div class="content">
       <p class="date" v-if="showAvatar !== 'no'">
-        <span v-if="inversion === 'ai'" style="margin-right: 10px">{{appData.name || 'AI助手'}}</span>
+        <span v-if="inversion === 'ai'" style="margin-right: 10px">{{ appData.name || 'AI助手' }}</span>
         <span>{{ dateTime }}</span>
       </p>
-      <div v-if="inversion === 'user' && images && images.length>0" class="images">
-          <div v-for="(item,index) in images" :key="index" class="image" @click="handlePreview(item)">
-            <img :src="getImageUrl(item)"/>
+      <div v-if="inversion === 'user' && images && images.length > 0" class="images">
+        <div v-for="(item, index) in images" :key="index" class="image" @click="handlePreview(item)">
+          <img :src="getImageUrl(item)" />
+        </div>
+      </div>
+      <div v-if="inversion === 'user' && files && files.length > 0" class="file-list">
+        <div v-for="(item, index) in files" :key="index" class="file-item" @click="handleFilePreview(item?.filePath || item)">
+          <div class="file-icon">
+            <Icon :icon="getFileIcon(item?.filePath || item)" :color="getFileIconColor(item?.filePath || item)" size="24" />
           </div>
-      </div>     
-      <div v-if="inversion === 'user' && files && files.length>0" class="file-list">
-          <div v-for="(item,index) in files" :key="index" class="file-item" @click="handleFilePreview(item?.filePath || item)">
-            <div class="file-icon">
-              <Icon :icon="getFileIcon(item?.filePath || item)" :color="getFileIconColor(item?.filePath || item)" size="24" />
-            </div>
-            <div class="file-name" :title="item.name">{{ getFileName(item?.filePath || item)}}</div>
-          </div>
+          <div class="file-name" :title="item.name">{{ getFileName(item?.filePath || item) }}</div>
+        </div>
       </div>
       <div v-if="inversion === 'ai' && retrievalText && loading" class="retrieval">
-        {{retrievalText}}
+        {{ retrievalText }}
       </div>
       <div v-if="inversion === 'ai' && isCard" class="card">
         <a-row>
-          <a-col :xl="6" :lg="8" :md="10" :sm="24" style="flex:1" v-for="item in getCardList()">
+          <a-col :xl="6" :lg="8" :md="10" :sm="24" style="flex: 1" v-for="item in getCardList()">
             <a-card class="ai-card" @click="aiCardHandleClick(item.linkUrl)">
-               <div class="ai-card-title">{{item.productName}}</div>
-               <div class="ai-card-img">
-                 <img :src="item.productImage">
-               </div>
-               <span class="ai-card-desc">{{item.descr}}</span>
+              <div class="ai-card-title">{{ item.productName }}</div>
+              <div class="ai-card-img">
+                <img :src="item.productImage" />
+              </div>
+              <span class="ai-card-desc">{{ item.descr }}</span>
             </a-card>
           </a-col>
         </a-row>
       </div>
       <div v-if="inversion === 'ai' && isCardConfig" class="card">
         <a-row>
-          <a-col :xl="6" :lg="8" :md="10" :sm="24" style="flex:1;margin-right: 10px;" v-for="item in getCardConfigList()">
-            <CardTemplate :template-id="cardConfig?.templateId" :card-data="item" :card-config="cardConfig" @click="handleJumpClick(item)"></CardTemplate>
+          <a-col :xl="6" :lg="8" :md="10" :sm="24" style="flex: 1; margin-right: 10px" v-for="item in getCardConfigList()">
+            <CardTemplate
+              :template-id="cardConfig?.templateId"
+              :card-data="item"
+              :card-config="cardConfig"
+              @click="handleJumpClick(item)"
+            ></CardTemplate>
           </a-col>
         </a-row>
       </div>
-      <div class="thinkArea" style="margin-bottom: 10px" v-if="!isCard && !isCardConfig && (eventType === 'thinking' || eventType === 'thinking_end')">
+      <div
+        class="thinkArea"
+        style="margin-bottom: 10px"
+        v-if="!isCard && !isCardConfig && (eventType === 'thinking' || eventType === 'thinking_end')"
+      >
         <a-collapse v-model:activeKey="activeKey" ghost>
-          <a-collapse-panel :key="uuid" :header="loading?'正在思考中':'思考结束'">
+          <a-collapse-panel :key="uuid" :header="loading ? '正在思考中' : '思考结束'">
             <ThinkText :text="text" :inversion="inversion" :error="error" :loading="loading"></ThinkText>
           </a-collapse-panel>
         </a-collapse>
       </div>
       <div class="msgArea" v-else-if="!isCard && !isCardConfig" :class="showAvatar == 'no' ? 'hidden-avatar' : ''">
-        <chatText :text="text" :inversion="inversion" :error="error" :errorMsg="errorMsg" :currentToolTag="currentToolTag" :loading="loading" :referenceKnowledge="referenceKnowledge" :isLast="isLast"></chatText>
+        <chatText
+          :text="text"
+          :inversion="inversion"
+          :error="error"
+          :errorMsg="errorMsg"
+          :currentToolTag="currentToolTag"
+          :loading="loading"
+          :referenceKnowledge="referenceKnowledge"
+          :isLast="isLast"
+        ></chatText>
       </div>
       <div v-if="presetQuestion" v-for="item in presetQuestion" class="question" @click="presetQuestionClick(item.descr)">
-        <span>{{item.descr}}</span>
+        <span>{{ item.descr }}</span>
       </div>
     </div>
   </div>
@@ -65,30 +83,47 @@
 <script setup lang="ts">
   import chatText from './chatText.vue';
   import ThinkText from './ThinkText.vue';
-  import defaultAvatar from "@/assets/images/ai/avatar.jpg";
+  import defaultAvatar from '@/assets/images/ai/avatar.jpg';
   import { useUserStore } from '/@/store/modules/user';
   import defaultImg from '../img/ailogo.png';
   import { ref } from 'vue';
   import { buildUUID } from '/@/utils/uuid';
   import { getFileAccessHttpUrl, getFileIcon, getFileIconColor } from '/@/utils/common/compUtils';
-  import { createImgPreview } from "@/components/Preview";
-  import { computed } from "vue";
+  import { createImgPreview } from '@/components/Preview';
+  import { computed } from 'vue';
   import CardTemplate from '/@/views/super/airag/aiapp/chat/components/CardTemplate.vue';
-  import { useGlobSetting } from "@/hooks/setting";
-  import {encryptByBase64} from "@/utils/cipher";
+  import { useGlobSetting } from '@/hooks/setting';
+  import { encryptByBase64 } from '@/utils/cipher';
 
   const { domainUrl, viewUrl } = useGlobSetting();
-  const props = defineProps(['dateTime', 'text', 'inversion', 'error', 'loading','errorMsg', 'currentToolTag', 'appData','presetQuestion','images','retrievalText', 'referenceKnowledge', 'eventType', 'showAvatar',"files", 'isLast']);
+  const props = defineProps([
+    'dateTime',
+    'text',
+    'inversion',
+    'error',
+    'loading',
+    'errorMsg',
+    'currentToolTag',
+    'appData',
+    'presetQuestion',
+    'images',
+    'retrievalText',
+    'referenceKnowledge',
+    'eventType',
+    'showAvatar',
+    'files',
+    'isLast',
+  ]);
 
   const uuid = ref<any>(buildUUID());
   const activeKey = ref<any>(uuid.value);
-  const getText = computed(()=>{
+  const getText = computed(() => {
     let text = props.text || props.retrievalText;
-    if(text){
+    if (text) {
       text = text.trim();
     }
     return text;
-  })
+  });
 
   const isCard = computed(() => {
     let text = props.text;
@@ -96,8 +131,8 @@
       return true;
     }
     return false;
-  });  
-  
+  });
+
   const isCardConfig = computed(() => {
     let text = props.text;
     if (text && text.indexOf('::cardConfig::') != -1) {
@@ -122,7 +157,7 @@
    *
    */
   function presetQuestionClick(descr) {
-    emit("send",descr)
+    emit('send', descr);
   }
 
   /**
@@ -132,12 +167,12 @@
    */
   function getImageUrl(item) {
     let url = item;
-    if(item.hasOwnProperty('url')){
+    if (item.hasOwnProperty('url')) {
       url = item.url;
     }
-    if(item.hasOwnProperty('base64Data') && item.base64Data){
-      let mimeType = item.mimeType ? item.mimeType:'image/png';
-      return "data:"+ mimeType +";base64,"+ item.base64Data;
+    if (item.hasOwnProperty('base64Data') && item.base64Data) {
+      let mimeType = item.mimeType ? item.mimeType : 'image/png';
+      return 'data:' + mimeType + ';base64,' + item.base64Data;
     }
     return getFileAccessHttpUrl(url);
   }
@@ -146,7 +181,7 @@
    * 图片预览
    * @param url
    */
-  function handlePreview(url){
+  function handlePreview(url) {
     const onImgLoad = ({ index, url, dom }) => {
       console.log(`第${index + 1}张图片已加载，URL为：${url}`, dom);
     };
@@ -163,7 +198,7 @@
     try {
       return JSON.parse(card);
     } catch (e) {
-      console.log(e)
+      console.log(e);
       return '';
     }
   }
@@ -172,10 +207,9 @@
    * ai卡片点击事件
    * @param url
    */
-  function aiCardHandleClick(url){
-    window.open(url,'_blank');
+  function aiCardHandleClick(url) {
+    window.open(url, '_blank');
   }
-
 
   /**
    * 从config获取取卡片列表
@@ -187,8 +221,8 @@
       let parse = JSON.parse(card);
       cardConfig.value = JSON.parse(parse?.cardConfig);
       return JSON.parse(parse?.content);
-    } catch (e){
-      console.log(e)
+    } catch (e) {
+      console.log(e);
       return '';
     }
   }
@@ -197,37 +231,37 @@
    * 卡片点击跳转
    */
   function handleJumpClick(item) {
-    if(cardConfig.value?.enableJump){
+    if (cardConfig.value?.enableJump) {
       let src = item[cardConfig.value?.jumpUrl];
       let reg = /#\s*{\s*domainURL\s*}/g;
-      src = src.replace(reg,domainUrl);
-      window.open(src,"_blank")
+      src = src.replace(reg, domainUrl);
+      window.open(src, '_blank');
     }
   }
 
   /**
    * 获取文件名字
-   * 
+   *
    * @param fileUrl
    */
-  function getFileName(fileUrl){
-    if(!fileUrl) {
+  function getFileName(fileUrl) {
+    if (!fileUrl) {
       return '未命名的文件';
     }
     let fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1).toLowerCase();
-    fileName = fileName.substring(0,fileName.lastIndexOf("."));
+    fileName = fileName.substring(0, fileName.lastIndexOf('.'));
     return fileName;
   }
 
   /**
    * 文件预览
-   * 
+   *
    * @param fileUrl
    */
   function handleFilePreview(fileUrl) {
     let filePath = encodeURIComponent(encryptByBase64(getFileAccessHttpUrl(fileUrl)));
     let url = `${viewUrl}?url=` + filePath;
-    window.open(url, "_blank")
+    window.open(url, '_blank');
   }
 </script>
 
@@ -245,7 +279,7 @@
         flex-direction: row-reverse;
         margin-bottom: 6px;
       }
-      .thinkArea{
+      .thinkArea {
         margin: 0;
         padding: 5px 0 5px 22px;
         position: relative;
@@ -255,10 +289,10 @@
       }
     }
   }
-  :deep(.ant-collapse-header){
+  :deep(.ant-collapse-header) {
     padding: 0 !important;
   }
-  .hidden-avatar{
+  .hidden-avatar {
     left: 44px;
     position: relative;
     top: -18px;
@@ -276,7 +310,7 @@
       font-size: 28px;
     }
   }
-  .chat.chatgpt .avatar img{
+  .chat.chatgpt .avatar img {
     border-radius: 4px;
   }
   .content {
@@ -291,7 +325,7 @@
     }
   }
 
-  .question{
+  .question {
     margin-top: 10px;
     border-radius: 0.375rem;
     padding-top: 0.5rem;
@@ -306,17 +340,17 @@
     box-shadow: 0 2px 4px #e6e6e6;
   }
 
-  .images{
+  .images {
     margin-bottom: 10px;
     flex-wrap: wrap;
     display: flex;
     gap: 10px;
     justify-content: end;
-    .image{
+    .image {
       width: 120px;
       height: 80px;
       cursor: pointer;
-      img{
+      img {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -372,7 +406,7 @@
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
-  .retrieval:after{
+  .retrieval:after {
     animation: blink 1s steps(5, start) infinite;
     color: #000;
     content: '_';
@@ -380,15 +414,15 @@
     margin-left: 3px;
     vertical-align: baseline;
   }
-  .card{
+  .card {
     width: 100%;
     background-color: unset;
   }
-  .ai-card{
-     width: 98%;
-     height: 100%;
-     cursor: pointer;
-    .ai-card-title{
+  .ai-card {
+    width: 98%;
+    height: 100%;
+    cursor: pointer;
+    .ai-card-title {
       width: 100%;
       line-height: 20px;
       letter-spacing: 0;
@@ -403,7 +437,7 @@
       color: #191919;
       -webkit-line-clamp: 1;
     }
-    .ai-card-img{
+    .ai-card-img {
       margin-top: 10px;
       background-color: transparent;
       border-radius: 8px;
@@ -411,7 +445,7 @@
       width: 100%;
       height: max-content;
     }
-    .ai-card-desc{
+    .ai-card-desc {
       margin-top: 10px;
       width: 100%;
       font-size: 14px;
@@ -429,7 +463,7 @@
     }
   }
   @media (max-width: 600px) {
-    .content{
+    .content {
       width: 100%;
     }
   }

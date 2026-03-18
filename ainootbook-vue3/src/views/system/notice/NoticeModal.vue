@@ -68,9 +68,9 @@
       setModalProps({ confirmLoading: true });
       //提交表单
       // 代码逻辑说明: [issue#429]新增通知公告提交指定用户参数有undefined ---
-      if(values.msgType==='ALL'){
+      if (values.msgType === 'ALL') {
         values.userIds = '';
-      }else{
+      } else {
         values.userIds += ',';
       }
       if (isUpdate.value && record.value.sendStatus != '2') {

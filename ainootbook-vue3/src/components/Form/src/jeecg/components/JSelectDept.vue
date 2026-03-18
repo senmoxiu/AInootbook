@@ -1,9 +1,16 @@
 <!--部门选择组件-->
 <template>
   <div class="JSelectDept">
-    <JSelectBiz  @change="handleSelectChange" @handleOpen="handleOpen" :loading="loadingEcho" v-bind="attrs" :isCustomRenderTag="isCustomRenderTag" :rowKey="getBindValue?.rowKey"/>
+    <JSelectBiz
+      @change="handleSelectChange"
+      @handleOpen="handleOpen"
+      :loading="loadingEcho"
+      v-bind="attrs"
+      :isCustomRenderTag="isCustomRenderTag"
+      :rowKey="getBindValue?.rowKey"
+    />
     <a-form-item>
-      <DeptSelectModal @register="regModal" @getSelectResult="setValue" v-bind="getBindValue" :multiple="multiple" @close="handleClose"/>
+      <DeptSelectModal @register="regModal" @getSelectResult="setValue" v-bind="getBindValue" :multiple="multiple" @close="handleClose" />
     </a-form-item>
   </div>
 </template>
@@ -130,7 +137,7 @@
       }
       const getBindValue = Object.assign({}, unref(props), unref(attrs));
 
-       // 代码逻辑说明: 【TV360X-414】部门设置了默认值，查询重置变成空了(同步JSelectUser组件改法)
+      // 代码逻辑说明: 【TV360X-414】部门设置了默认值，查询重置变成空了(同步JSelectUser组件改法)
       const handleClose = () => {
         if (tempSave.length) {
           selectValues.value = cloneDeep(tempSave);
@@ -151,7 +158,7 @@
           emit('select', null, null);
         }
       };
-      
+
       return {
         // state,
         attrs,

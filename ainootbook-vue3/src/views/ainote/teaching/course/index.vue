@@ -5,11 +5,7 @@
         <a-button type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined">新增</a-button>
         <a-button type="primary" @click="batchHandleDelete" preIcon="ant-design:delete-outlined">批量删除</a-button>
         <a-button type="primary" @click="onExportXls" preIcon="ant-design:download-outlined">导出</a-button>
-        <a-upload
-          name="file"
-          :showUploadList="false"
-          :customRequest="onImportXls"
-        >
+        <a-upload name="file" :showUploadList="false" :customRequest="onImportXls">
           <a-button type="primary" preIcon="ant-design:upload-outlined">导入</a-button>
         </a-upload>
       </template>

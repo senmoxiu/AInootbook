@@ -17,7 +17,7 @@
         v-if="selectLocation === 'right'"
         v-model:value="selectVal"
         @change="handleSelectChange"
-        :style="{width:props.selectWidth}"
+        :style="{ width: props.selectWidth }"
       >
         <a-select-option v-for="item in options" :key="item.value">{{ item.label }}</a-select-option>
       </a-select>
@@ -34,13 +34,12 @@
     selectLocation: propTypes.oneOf(['left', 'right']).def('right'),
     selectPlaceholder: propTypes.string.def(''),
     inputPlaceholder: propTypes.string.def(''),
-    selectWidth:propTypes.string.def('auto'),
+    selectWidth: propTypes.string.def('auto'),
   });
   const emit = defineEmits(['update:value', 'change']);
   const selectVal = ref<string>();
   const inputVal = ref<string>();
 
-  
   const handleInputChange = (e) => {
     const val = e.target.value;
     setSelectValByInputVal(val);
@@ -57,7 +56,7 @@
     } else {
       selectVal.value = undefined;
     }
-  }
+  };
   watchEffect(() => {
     inputVal.value = props.value;
     setSelectValByInputVal(props.value);

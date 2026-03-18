@@ -13,7 +13,15 @@
       </span>
     </template>
     <template #content>
-      <a-textarea ref="textareaRef" :value="innerValue" :disabled="disabled" :style="textareaStyle" v-bind="attrs" @input="onInputChange" @blur="onInputBlur" />
+      <a-textarea
+        ref="textareaRef"
+        :value="innerValue"
+        :disabled="disabled"
+        :style="textareaStyle"
+        v-bind="attrs"
+        @input="onInputChange"
+        @blur="onInputBlur"
+      />
     </template>
     <a-input :class="`${prefixCls}-input`" :value="innerValue" :disabled="disabled" v-bind="attrs" @change="onInputChange" @blur="onInputBlur">
       <template #suffix>
@@ -95,7 +103,7 @@
 
   const onInputBlur = (event) => {
     emit('blur', event);
-  }
+  };
 </script>
 
 <style lang="less">

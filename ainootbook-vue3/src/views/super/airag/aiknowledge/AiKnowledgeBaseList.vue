@@ -38,7 +38,7 @@
           </div>
         </a-card>
       </a-col>
-      <a-col v-if="knowledgeList && knowledgeList.length>0" :xxl="4" :xl="6" :lg="6" :md="6" :sm="12" :xs="24" v-for="item in knowledgeList">
+      <a-col v-if="knowledgeList && knowledgeList.length > 0" :xxl="4" :xl="6" :lg="6" :md="6" :sm="12" :xs="24" v-for="item in knowledgeList">
         <a-card class="knowledge-card pointer" @click="handleDocClick(item.id, item.type)">
           <div class="knowledge-header">
             <div class="flex">
@@ -103,7 +103,7 @@
       @change="handlePageChange"
       class="list-footer"
       size="small"
-      :show-total="() => `共${total}条` "
+      :show-total="() => `共${total}条`"
     />
     <!--添加知识库弹窗-->
     <KnowledgeBaseModal @register="registerModal" @success="reload"></KnowledgeBaseModal>
@@ -116,7 +116,7 @@
   import { reactive, ref } from 'vue';
   import { useModal } from '/@/components/Modal';
   import { deleteModel, list, rebuild } from './AiKnowledgeBase.api';
-  import { doDeleteAllDoc } from "./AiKnowledgeBase.api.util";
+  import { doDeleteAllDoc } from './AiKnowledgeBase.api.util';
   import { Pagination } from 'ant-design-vue';
   import JInput from '@/components/Form/src/jeecg/components/JInput.vue';
   import KnowledgeBaseModal from './components/AiKnowledgeBaseModal.vue';
@@ -124,7 +124,7 @@
   import JDictSelectTag from '@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import AiragKnowledgeDocListModal from './components/AiragKnowledgeDocListModal.vue';
   import Icon from '@/components/Icon';
-  import { useMessage } from "@/hooks/web/useMessage";
+  import { useMessage } from '@/hooks/web/useMessage';
 
   export default {
     name: 'KnowledgeBaseList',
@@ -202,10 +202,10 @@
           pageNo: pageNo.value,
           pageSize: pageSize.value,
           column: 'createTime',
-          order: 'desc'
+          order: 'desc',
         };
         Object.assign(params, queryParam);
-      
+
         list(params).then((res) => {
           if (res.success) {
             knowledgeList.value = res.result.records;
@@ -233,7 +233,7 @@
        * @param item
        */
       async function handleDelete(item) {
-        if(knowledgeList.value.length == 1 && pageNo.value > 1) {
+        if (knowledgeList.value.length == 1 && pageNo.value > 1) {
           pageNo.value = pageNo.value - 1;
         }
         await deleteModel({ id: item.id, name: item.name }, reload);
@@ -282,16 +282,18 @@
        * @param id
        */
       async function handleVectorization(id) {
-        rebuild({ knowIds: id }).then((res) =>{
-          if(res.success){
-            createMessage.success("操作成功，开始异步重建知识库，请稍后查看！");
-            reload();
-          }else{
-            createMessage.warning("向量化失败！");
-          }
-        }).catch(err=>{
-          createMessage.warning("向量化失败！");
-        });
+        rebuild({ knowIds: id })
+          .then((res) => {
+            if (res.success) {
+              createMessage.success('操作成功，开始异步重建知识库，请稍后查看！');
+              reload();
+            } else {
+              createMessage.warning('向量化失败！');
+            }
+          })
+          .catch((err) => {
+            createMessage.warning('向量化失败！');
+          });
       }
 
       return {
@@ -373,18 +375,18 @@
     font-size: 12px;
     color: #676f83;
   }
-  
-  .knowledge-footer{
+
+  .knowledge-footer {
     font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-top: 16px;
-    .knowledge-footer-icon{
+    .knowledge-footer-icon {
       position: relative;
-      top: 2px
+      top: 2px;
     }
-    span{
+    span {
       margin-left: 2px;
     }
   }
@@ -435,7 +437,7 @@
     }
     .add-knowledge-card-title {
       font-size: 16px;
-      color:#1f2329;
+      color: #1f2329;
       font-weight: 400;
       align-self: center;
     }
@@ -479,18 +481,18 @@
       white-space: nowrap;
     }
   }
-  
-  .model-icon{
+
+  .model-icon {
     background-color: unset;
     border: none;
     margin-right: 2px;
   }
-  .model-icon:hover{
+  .model-icon:hover {
     color: #000000;
     background-color: #e9ecf2;
     border: none;
   }
-  .ant-dropdown-link{
+  .ant-dropdown-link {
     font-size: 14px;
     height: 24px;
     padding: 0 7px;
@@ -498,13 +500,13 @@
     align-content: center;
     text-align: center;
   }
-  
-  .ellipsis{
+
+  .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .tag-style{
+  .tag-style {
     margin-right: 5px;
     height: 20px;
     line-height: 18px;

@@ -42,7 +42,7 @@
           params: {
             flowId: '1904779811574784002',
             inputParams: {
-              content: values.prompt ? values.prompt: '解析图片中的文字',
+              content: values.prompt ? values.prompt : '解析图片中的文字',
               images: values.url,
             },
             responseMode: 'blocking',
@@ -56,8 +56,8 @@
       .then((res) => {
         if (res.success) {
           //update-begin---author:wangshuai---date:2026-01-14---for: OCR数据返回信息报错，增加try catch---
-          let text = res.result.data.replace(/\s+/g, '').replace('```json','').replace('```','');
-          let lastText = "";
+          let text = res.result.data.replace(/\s+/g, '').replace('```json', '').replace('```', '');
+          let lastText = '';
           try {
             let parse = JSON.parse(text);
             lastText = parse.text;
@@ -70,9 +70,10 @@
           createMessage.warning(res.message);
         }
         loading.value = false;
-      }).catch((res)=>{
-          createMessage.warning(res.message);
-          loading.value = false;
+      })
+      .catch((res) => {
+        createMessage.warning(res.message);
+        loading.value = false;
       });
   }
 </script>
@@ -83,7 +84,9 @@
     padding: 20px;
     border-radius: 16px;
     border: 1px solid #e6f4ff;
-    box-shadow: 0 12px 30px rgba(22, 119, 255, 0.08), 0 6px 18px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 12px 30px rgba(22, 119, 255, 0.08),
+      0 6px 18px rgba(0, 0, 0, 0.06);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -131,12 +134,11 @@
     font-weight: 500;
   }
 
-
   :deep(.ant-input-textarea-show-count > .ant-input-textarea) {
     background: #fafafa;
     border-radius: 10px;
     border: 1px solid #e5e6eb;
-    transition: all .2s ease;
+    transition: all 0.2s ease;
   }
   :deep(.ant-input:focus),
   :deep(textarea.ant-input:focus),

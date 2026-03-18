@@ -2,11 +2,11 @@
   <div class="p-2">
     <BasicModal destroyOnClose @register="registerModal" :canFullscreen="false" width="800px" :title="title" @ok="handleOk" @cancel="handleCancel">
       <template #title>
-         <span style="display: flex">
-          {{title}}
+        <span style="display: flex">
+          {{ title }}
           <a-tooltip title="AI应用文档">
             <a style="color: unset" href="https://help.jeecg.com/aigc/guide/app" target="_blank">
-              <Icon style="position:relative;left:2px;top:1px" icon="ant-design:question-circle-outlined"></Icon>
+              <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
             </a>
           </a-tooltip>
         </span>
@@ -55,7 +55,7 @@
       //保存或修改
       const isUpdate = ref<boolean>(false);
 
-      const title = computed<string>(() => isUpdate.value ? '修改应用' : '创建应用');
+      const title = computed<string>(() => (isUpdate.value ? '修改应用' : '创建应用'));
 
       //app类型
       const appTypeOption = ref<any>([]);
@@ -81,7 +81,7 @@
         } else {
           await setFieldsValue({
             type: 'chatSimple',
-          })
+          });
         }
         //update-end---author:wangshuai---date:2025-03-11---for:【QQYUN-11324】8.修改弹窗head---
         setModalProps({ minHeight: 500, bodyStyle: { padding: '10px' } });
@@ -99,10 +99,10 @@
             //关闭弹窗
             closeModal();
             //update-begin---author:wangshuai---date:2025-03-11---for: 【QQYUN-11324】8.修改弹窗head---
-            if(isUpdate.value){
+            if (isUpdate.value) {
               //刷新列表
               emit('success', values);
-            }else{
+            } else {
               //刷新列表
               emit('success', result);
             }

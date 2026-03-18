@@ -21,7 +21,14 @@
     <a-form-item-rest>
       <!-- 【TV360X-377】关联记录必填影响到了table的输入框和页码样式 -->
       <a-form-item>
-        <Table ref="tableElRef" v-bind="getBindValues" :rowClassName="getRowClassName" v-show="getEmptyDataIsShowTable" @resizeColumn="handleResizeColumn" @change="handleTableChange">
+        <Table
+          ref="tableElRef"
+          v-bind="getBindValues"
+          :rowClassName="getRowClassName"
+          v-show="getEmptyDataIsShowTable"
+          @resizeColumn="handleResizeColumn"
+          @change="handleTableChange"
+        >
           <!-- antd的原生插槽直接传递 -->
           <template #[item]="data" v-for="item in slotNamesGroup.native" :key="item">
             <!-- 代码逻辑说明: 【issues/1146】BasicTable使用headerCell全选框出不来 -->
@@ -33,7 +40,7 @@
           </template>
           <template #headerCell="{ column }">
             <!-- 代码逻辑说明: 【QQYUN-5571】自封装选择列，解决数据行选择卡顿问题 -->
-            <CustomSelectHeader v-if="isCustomSelection(column)" v-bind="selectHeaderProps"/>
+            <CustomSelectHeader v-if="isCustomSelection(column)" v-bind="selectHeaderProps" />
             <HeaderCell v-else :column="column" />
           </template>
           <!-- 增加对antdv3.x兼容 -->
@@ -62,7 +69,7 @@
   import { Table } from 'ant-design-vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { PageWrapperFixedHeightKey } from '/@/components/Page/injectionKey';
-  import CustomSelectHeader from './components/CustomSelectHeader.vue'
+  import CustomSelectHeader from './components/CustomSelectHeader.vue';
   import expandIcon from './components/ExpandIcon';
   import HeaderCell from './components/HeaderCell.vue';
   import TableSummary from './components/TableSummary';
@@ -81,7 +88,7 @@
   import { useTableFooter } from './hooks/useTableFooter';
   import { useTableForm } from './hooks/useTableForm';
   import { useDesign } from '/@/hooks/web/useDesign';
-  import { useCustomSelection } from "./hooks/useCustomSelection";
+  import { useCustomSelection } from './hooks/useCustomSelection';
 
   import { omit, pick } from 'lodash-es';
   import { basicProps } from './props';
@@ -140,7 +147,6 @@
       const { getLoading, setLoading } = useLoading(getProps);
       const { getPaginationInfo, getPagination, setPagination, setShowPagination, getShowPagination } = usePagination(getProps);
 
-
       // const { getRowSelection, getRowSelectionRef, getSelectRows, clearSelectedRowKeys, getSelectRowKeys, deleteSelectRowByKey, setSelectedRowKeys } =
       //   useRowSelection(getProps, tableData, emit);
 
@@ -160,14 +166,7 @@
         clearSelectedRowKeys,
         deleteSelectRowByKey,
         getExpandIconColumnIndex,
-      } = useCustomSelection(
-        getProps,
-        emit,
-        wrapRef,
-        getPaginationInfo,
-        tableData,
-        childrenColumnName
-      )
+      } = useCustomSelection(getProps, emit, wrapRef, getPaginationInfo, tableData, childrenColumnName);
 
       const {
         handleTableChange: onTableChange,
@@ -209,10 +208,18 @@
         getProps,
         getPaginationInfo,
         // 代码逻辑说明: 【QQYUN-5571】自封装选择列，解决数据行选择卡顿问题
-        handleCustomSelectColumn,
+        handleCustomSelectColumn
       );
 
-      const { getScrollRef, redoHeight } = useTableScroll(getProps, tableElRef, getColumnsRef, getRowSelectionRef, getDataSourceRef, slots, getPaginationInfo);
+      const { getScrollRef, redoHeight } = useTableScroll(
+        getProps,
+        tableElRef,
+        getColumnsRef,
+        getRowSelectionRef,
+        getDataSourceRef,
+        slots,
+        getPaginationInfo
+      );
 
       const { customRow } = useCustomRow(getProps, {
         setSelectedRowKeys,
@@ -286,7 +293,7 @@
         }*/
 
         // 自定义选择列，需要去掉原生的
-        delete propsData.rowSelection
+        delete propsData.rowSelection;
 
         // 代码逻辑说明: 【QQYUN-6387】展开写法（去掉报错）
         !propsData.isTreeTable && delete propsData.expandIconColumnIndex;
@@ -395,12 +402,11 @@
       // 代码逻辑说明: 【issues/945】BasicTable组件设置默认展开不生效
       nextTick(() => {
         getProps.value.defaultExpandAllRows && expandAll();
-      })
+      });
       // 代码逻辑说明: 【issues/7588】选择后自动刷新表格
       expose({ ...tableAction, handleSearchInfoChange });
 
       emit('register', tableAction, formActions);
-
 
       return {
         tableElRef,
@@ -429,7 +435,7 @@
             findItem.width = w;
             setColumns(columns);
           }
-          console.log('col',col);
+          console.log('col', col);
           col.width = w;
         },
         getFormProps: getFormProps as any,

@@ -221,25 +221,25 @@
         for (const line of lines) {
           if (line.startsWith('data:')) {
             const content = line.replace('data:', '').trim();
-            if(!content){
+            if (!content) {
               continue;
             }
-            if(!content.endsWith('}')){
+            if (!content.endsWith('}')) {
               buffer = buffer + line;
               continue;
             }
-            buffer = "";
-            renderText(content)
+            buffer = '';
+            renderText(content);
           } else {
-            if(!line) {
+            if (!line) {
               continue;
             }
-            if(!line.endsWith('}')) {
+            if (!line.endsWith('}')) {
               buffer = buffer + line;
               continue;
             }
-            buffer = "";
-            renderText(line)
+            buffer = '';
+            renderText(line);
           }
         }
       }
@@ -260,7 +260,7 @@
   function renderText(item) {
     try {
       let parse = JSON.parse(item);
-      if(parse.event == 'NODE_FINISHED'){
+      if (parse.event == 'NODE_FINISHED') {
         afterNodeFinished.value = true;
         return;
       }
@@ -289,7 +289,7 @@
         polishLoading.value = false;
         nextTick(scrollToBottom);
       }
-      
+
       //开始加点
       if (parse.event === 'NODE_STARTED') {
         if (!parse.data || parse.data.type !== 'end') {
@@ -319,7 +319,6 @@
   function highlightBlock(str: string, lang?: string) {
     return `<pre class="code-block-wrapper"><div class="code-block-header"><span class="code-block-header__lang">${lang}</span><span class="code-block-header__copy">复制代码</span></div><code class="hljs code-block-body ${lang}">${str}</code></pre>`;
   }
-
 
   /**
    * 润色
@@ -379,11 +378,11 @@
    */
   function initHistoryData() {
     historyData.value = [];
-    defHttp.get({ url: "/airag/app/list/article/write" }, { isTransformResponse: false }).then((res)=>{
-      if(res.success){
+    defHttp.get({ url: '/airag/app/list/article/write' }, { isTransformResponse: false }).then((res) => {
+      if (res.success) {
         historyData.value = res.result;
       }
-    })
+    });
   }
 
   /**
@@ -404,10 +403,7 @@
       cancelText: '取消',
       async onOk() {
         try {
-          await defHttp.delete(
-            { url: '/airag/app/delete/article/write', params: { version: target.version } },
-            { joinParamsToUrl: true }
-          );
+          await defHttp.delete({ url: '/airag/app/delete/article/write', params: { version: target.version } }, { joinParamsToUrl: true });
           historyData.value = historyData.value.filter((item) => item.version !== target.version);
           activeVersion.value = CURRENT_VERSION_KEY;
           writeText.value = originalContent.value ?? '';
@@ -435,7 +431,7 @@
     activeVersion.value = value;
     writeText.value = target.content;
   }
-  
+
   onMounted(() => {
     //初始化的时候加载历史版本
     initHistoryData();
@@ -504,7 +500,7 @@
   .version-select {
     min-width: 120px;
   }
-  
+
   .preview-action-btn {
     padding: 0 14px;
     font-size: 12px;
@@ -531,7 +527,8 @@
     color: white;
   }
 
-  .custom-save-btn, .version-delete-btn {
+  .custom-save-btn,
+  .version-delete-btn {
     background-color: #ffffff;
     border-color: @primary-color;
     color: @primary-color;

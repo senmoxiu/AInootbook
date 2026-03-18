@@ -2,7 +2,9 @@
   <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="800px" :showCancelBtn="false" :showOkBtn="false">
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <template #tableTitle>
-        <a-button preIcon="ant-design:plus-outlined" type="primary" @click="handleAdd" style="margin-right: 5px" v-if="showPackAddAndEdit">新增 </a-button>
+        <a-button preIcon="ant-design:plus-outlined" type="primary" @click="handleAdd" style="margin-right: 5px" v-if="showPackAddAndEdit"
+          >新增
+        </a-button>
         <a-button
           v-if="selectedRowKeys.length > 0"
           preIcon="ant-design:delete-outlined"
@@ -11,11 +13,7 @@
           style="margin-right: 5px"
           >批量删除
         </a-button>
-        <a-button
-          preIcon="ant-design:sync-outlined"
-          type="primary"
-          @click="handleSyncDefaultPack"
-          style="margin-right: 5px"
+        <a-button preIcon="ant-design:sync-outlined" type="primary" @click="handleSyncDefaultPack" style="margin-right: 5px"
           >初始化默认套餐
         </a-button>
       </template>
@@ -26,7 +24,7 @@
   </BasicModal>
   <TenantPackMenuModal @register="registerPackMenu" @success="success" />
   <TenantPackUserModal @register="registerPackUser" @success="success" />
-  <PackPermissionDrawer @register="registerPackPermDrawer" @success="success"/>
+  <PackPermissionDrawer @register="registerPackPermDrawer" @success="success" />
 </template>
 <script lang="ts" setup name="tenant-pack-modal">
   import { reactive, ref, unref } from 'vue';
@@ -36,16 +34,16 @@
   import { useListPage } from '/@/hooks/system/useListPage';
   import { BasicTable, TableAction } from '/@/components/Table';
   import TenantPackMenuModal from './TenantPackMenuModal.vue';
-  import {Modal} from "ant-design-vue";
+  import { Modal } from 'ant-design-vue';
   import TenantPackUserModal from './TenantPackUserModal.vue';
-  import {useMessage} from "/@/hooks/web/useMessage";
-  import PackPermissionDrawer from "@/views/system/tenant/pack/PackPermissionDrawer.vue";
-  import { useDrawer } from "@/components/Drawer";
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import PackPermissionDrawer from '@/views/system/tenant/pack/PackPermissionDrawer.vue';
+  import { useDrawer } from '@/components/Drawer';
 
   const [registerPackMenu, { openModal }] = useModal();
   const [registerPackUser, { openModal: packUserOpenModal }] = useModal();
   const [registerPackPermDrawer, { openDrawer: openPackPermDrawer }] = useDrawer();
-  
+
   const tenantId = ref<number>(0);
   // 列表页面公共参数、方法
   const { prefixCls, tableContext } = useListPage({
@@ -69,7 +67,7 @@
         },
       },
       beforeFetch: (params) => {
-        return Object.assign(params, { tenantId: unref(tenantId), packType:'custom' });
+        return Object.assign(params, { tenantId: unref(tenantId), packType: 'custom' });
       },
     },
   });
@@ -101,7 +99,9 @@
       {
         label: '授权',
         onClick: handleRolePrem.bind(null, record),
-        ifShow: ()=>{ return showPackAddAndEdit.value }
+        ifShow: () => {
+          return showPackAddAndEdit.value;
+        },
       },
     ];
   }
@@ -122,27 +122,27 @@
       isUpdate: true,
       record: record,
       tenantId: unref(tenantId),
-      packType:'custom',
-      showFooter: true
+      packType: 'custom',
+      showFooter: true,
     });
   }
 
   //默认系统套餐包不允许删除,包含(超级管理员、组织账户管理员、组织应用管理员)
-  const packCode = reactive<any>(['superAdmin','accountAdmin','appAdmin']);
+  const packCode = reactive<any>(['superAdmin', 'accountAdmin', 'appAdmin']);
   const { createMessage } = useMessage();
-  
+
   /**
    * 删除套餐包
    * @param 删除
    */
   async function handleDelete(record) {
     // 代码逻辑说明: 系统默认套餐包不允许删除------------
-    if(packCode.indexOf(record.packCode) != -1){
-        createMessage.warning("默认系统套餐包不允许删除");
-       return;
+    if (packCode.indexOf(record.packCode) != -1) {
+      createMessage.warning('默认系统套餐包不允许删除');
+      return;
     }
-    if(record.packCode && record.packCode.indexOf("default") != -1){
-      createMessage.warning("默认套餐包不允许删除");
+    if (record.packCode && record.packCode.indexOf('default') != -1) {
+      createMessage.warning('默认套餐包不允许删除');
       return;
     }
     await deleteTenantPack({ ids: record.id }, success);
@@ -153,15 +153,15 @@
    */
   async function handlePackBatch() {
     let value = selectedRows.value;
-    if(value && value.length>0){
+    if (value && value.length > 0) {
       for (let i = 0; i < value.length; i++) {
-        if(packCode.indexOf(value[i].packCode) != -1){
-          createMessage.warning("默认系统套餐包不允许删除");
+        if (packCode.indexOf(value[i].packCode) != -1) {
+          createMessage.warning('默认系统套餐包不允许删除');
           return;
         }
         // 代码逻辑说明: 默认套餐不允许删除---
-        if(value[i].packCode && value[i].packCode.indexOf("default") != -1){
-          createMessage.warning("默认套餐包不允许删除");
+        if (value[i].packCode && value[i].packCode.indexOf('default') != -1) {
+          createMessage.warning('默认套餐包不允许删除');
           return;
         }
       }
@@ -172,9 +172,9 @@
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
-        await deleteTenantPack({ ids: selectedRowKeys.value.join(',')}, success);
-      }
-    })
+        await deleteTenantPack({ ids: selectedRowKeys.value.join(',') }, success);
+      },
+    });
   }
 
   async function handleSyncDefaultPack() {
@@ -184,7 +184,7 @@
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
-        await syncDefaultTenantPack({tenantId: unref(tenantId)}, success);
+        await syncDefaultTenantPack({ tenantId: unref(tenantId) }, success);
       },
     });
   }
@@ -197,8 +197,8 @@
     openModal(true, {
       isUpdate: false,
       tenantId: unref(tenantId),
-      packType:'custom',
-      showFooter: true
+      packType: 'custom',
+      showFooter: true,
     });
   }
 
@@ -207,9 +207,9 @@
    * @param record
    */
   function seeTenantPackUser(record) {
-    packUserOpenModal(true,{
-      record:record
-    })
+    packUserOpenModal(true, {
+      record: record,
+    });
   }
 
   /**
@@ -221,7 +221,9 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        ifShow: ()=>{ return showPackAddAndEdit.value }
+        ifShow: () => {
+          return showPackAddAndEdit.value;
+        },
       },
       {
         label: '详情',
@@ -234,7 +236,7 @@
           confirm: handleDelete.bind(null, record),
         },
       },
-    ]
+    ];
   }
 
   /**
@@ -246,11 +248,10 @@
       isUpdate: true,
       record: record,
       tenantId: unref(tenantId),
-      packType:'custom',
-      showFooter: false
+      packType: 'custom',
+      showFooter: false,
     });
   }
-
 
   /**
    * 授权
@@ -258,9 +259,9 @@
    * @param record
    */
   function handleRolePrem(record) {
-    openPackPermDrawer(true,{
+    openPackPermDrawer(true, {
       packId: record.id,
-      permissionIds: record.permissionIds
-    })
+      permissionIds: record.permissionIds,
+    });
   }
 </script>

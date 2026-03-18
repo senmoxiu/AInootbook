@@ -13,7 +13,7 @@
   import { getTenantId, getToken } from '/@/utils/auth';
   import { getFileAccessHttpUrl } from '/@/utils/common/compUtils';
   import { uploadFile } from '@/api/common/api';
-  import {$electron} from "@/electron";
+  import { $electron } from '@/electron';
 
   type Lang = 'zh_CN' | 'en_US' | 'ja_JP' | 'ko_KR' | undefined;
 
@@ -25,7 +25,7 @@
     },
     emits: ['change', 'get', 'update:value'],
     setup(props, { attrs, emit }) {
-      console.log("---Markdown---初始化---")
+      console.log('---Markdown---初始化---');
       const wrapRef = ref<ElRef>(null);
       const vditorRef = ref(null) as Ref<Nullable<Vditor>>;
       const initedRef = ref(false);

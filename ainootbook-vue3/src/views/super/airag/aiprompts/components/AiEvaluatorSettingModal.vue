@@ -20,14 +20,14 @@
               <Icon icon="ant-design:edit-outlined" style="margin-left: 4px; cursor: pointer" color="#354052" size="20" @click="handleEdit"></Icon>
             </a-tooltip>
           </div>
-<!--          <div>-->
-<!--            应用编排-->
-<!--            <a-tooltip title="AI应用文档">-->
-<!--              <a style="color: unset" href="https://help.jeecg.com/aigc/guide/app" target="_blank">-->
-<!--                <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>-->
-<!--              </a>-->
-<!--            </a-tooltip>-->
-<!--          </div>-->
+          <!--          <div>-->
+          <!--            应用编排-->
+          <!--            <a-tooltip title="AI应用文档">-->
+          <!--              <a style="color: unset" href="https://help.jeecg.com/aigc/guide/app" target="_blank">-->
+          <!--                <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>-->
+          <!--              </a>-->
+          <!--            </a-tooltip>-->
+          <!--          </div>-->
           <div style="display: flex">
             <a-button @click="handleOk" style="margin-right: 30px" type="primary">保存</a-button>
           </div>
@@ -35,7 +35,7 @@
       </template>
       <div style="height: 100%; width: 100%">
         <a-row :span="24">
-          <a-col :span="showTest?12:24">
+          <a-col :span="showTest ? 12 : 24">
             <div class="orchestration">提示词评估器</div>
           </a-col>
           <a-col :span="12" v-if="showTest">
@@ -43,7 +43,7 @@
           </a-col>
         </a-row>
         <a-row :span="24">
-          <a-col :span="showTest?12:24" class="setting-left">
+          <a-col :span="showTest ? 12 : 24" class="setting-left">
             <a-form class="antd-modal-form" ref="formRef" :model="formState" :rules="validatorRules">
               <a-row>
                 <a-col :span="24">
@@ -115,9 +115,9 @@
                         </div>
                         <div class="output-format-content">
                           <div class="output-item">
-<!--                            <div class="output-item-label">-->
-<!--                              <span class="output-item-title">得分：</span>-->
-<!--                            </div>-->
+                            <!--                            <div class="output-item-label">-->
+                            <!--                              <span class="output-item-title">得分：</span>-->
+                            <!--                            </div>-->
                             <div class="output-item-desc">
                               得分：最终的得分，必须输出，必须输出一个数字，表示满足Prompt中评分标准的程度。得分范围从
                               <span class="score-range">0.0</span> 到 <span class="score-range">1.0</span>，<span class="score-range">1.0</span>
@@ -126,8 +126,8 @@
                           </div>
                           <div class="output-item">
                             <div class="output-item-label">
-<!--                              <span class="output-item-bullet">•</span>-->
-<!--                              <span class="output-item-title">原因：</span>-->
+                              <!--                              <span class="output-item-bullet">•</span>-->
+                              <!--                              <span class="output-item-title">原因：</span>-->
                             </div>
                             <div class="output-item-desc">
                               原因：对得分的可读解释。最后，必须用一句话结束理由，该句话为：因此，应该给出的分数是你的评分。
@@ -141,7 +141,7 @@
               </a-row>
             </a-form>
             <a-button v-if="showTest" class="mt-10 ml" style="float: right" @click="showTest = false">取消</a-button>
-<!--            <a-button class="mt-10" style="float: right" @click="showTest = true" type="primary">调试</a-button>-->
+            <!--            <a-button class="mt-10" style="float: right" @click="showTest = true" type="primary">调试</a-button>-->
           </a-col>
           <a-col :span="12" class="setting-right" v-if="showTest">
             <EvaluatorDebug ref="debugRef" :content="formState.dataValue" @run="debugRun"></EvaluatorDebug>
@@ -163,7 +163,7 @@
   import { ref, reactive } from 'vue';
   import BasicModal from '@/components/Modal/src/BasicModal.vue';
   import { useModal, useModalInner } from '@/components/Modal';
-  import {Form, message} from 'ant-design-vue';
+  import { Form, message } from 'ant-design-vue';
   import { defHttp } from '@/utils/http/axios';
   import JDictSelectTag from '@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import AiAppParamsSettingModal from '@/views/super/airag/aiapp/components/AiAppParamsSettingModal.vue';
@@ -173,7 +173,7 @@
   import defaultImg from '@/views/super/airag/aiapp/img/ailogo.png';
   import { getFileAccessHttpUrl, randomString } from '@/utils/common/compUtils';
   import { cloneDeep } from 'lodash-es';
-  import {debugEvaluator, saveOrUpdate} from '@/views/super/airag/aiprompts/AiragExtData.api';
+  import { debugEvaluator, saveOrUpdate } from '@/views/super/airag/aiprompts/AiragExtData.api';
 
   //保存或修改
   const isUpdate = ref<boolean>(false);
@@ -224,11 +224,15 @@
 
   //编辑
   function handleEdit() {
-    evaluatorModalOpen(true, { isUpdate: true, showFooter: true, record: {
+    evaluatorModalOpen(true, {
+      isUpdate: true,
+      showFooter: true,
+      record: {
         id: formState.id,
         name: formState.name,
         descr: formState.descr,
-      } });
+      },
+    });
   }
   /**
    * 保存
@@ -263,10 +267,10 @@
    * @param type
    */
   function handleTagClick(type) {
-    let label = type=='input'?'## 输入参数':type=='output'?'## 输出参数':'## 参考参数';
-    if(!formState.dataValue){
+    let label = type == 'input' ? '## 输入参数' : type == 'output' ? '## 输出参数' : '## 参考参数';
+    if (!formState.dataValue) {
       formState.dataValue = `${label}：{{${type}}}`;
-    }else{
+    } else {
       formState.dataValue += `\r\n\r\n${label}：{{${type}}}`;
       // 获取textarea元素并滚动到底部
       setTimeout(() => {
@@ -363,41 +367,41 @@
     formState.dataValue = value;
   }
   //============= end 提示词 ================================
-  
+
   /**
    * 调试运行
    */
   async function debugRun(variables: any[]) {
     //提示词
     let sysMessage = formState.dataValue;
-    let userMessage = "输入的内容：";
+    let userMessage = '输入的内容：';
     //替换变量
     variables.forEach((item) => {
       userMessage += `${item.name}:${item.value}`;
     });
     //定义返回结果
-    sysMessage += '定义返回格式：\n\n 得分：最终的得分，必须输出，必须输出一个数字，表示满足Prompt中评分标准的程度。得分范围从 0.0 到 1.0，1.0 表示完全满足评分标准，0.0 表示完全不满足评分标准。\n' +
-        '原因：（对得分的可读解释）。最后，必须用一句话结束理由，该句话为：因此，应该给出的分数是(你前面得出的评分)。';
+    sysMessage +=
+      '定义返回格式：\n\n 得分：最终的得分，必须输出，必须输出一个数字，表示满足Prompt中评分标准的程度。得分范围从 0.0 到 1.0，1.0 表示完全满足评分标准，0.0 表示完全不满足评分标准。\n' +
+      '原因：（对得分的可读解释）。最后，必须用一句话结束理由，该句话为：因此，应该给出的分数是(你前面得出的评分)。';
     console.log('userMessage', userMessage);
-    if(!formState.modelId) {
-      message.warning("请选择AI模型");
+    if (!formState.modelId) {
+      message.warning('请选择AI模型');
       return;
     }
     // 调用调试器运行
     let loading = debugRef.value?.loading;
     if (loading) return;
     debugRef.value.loading = true;
-    let params = { prompts: sysMessage,content:userMessage,modelId:formState.modelId,modelParam:JSON.stringify(formState.metadata) }
-    let res = await debugEvaluator(params).catch(() => debugRef.value.loading = false);
+    let params = { prompts: sysMessage, content: userMessage, modelId: formState.modelId, modelParam: JSON.stringify(formState.metadata) };
+    let res = await debugEvaluator(params).catch(() => (debugRef.value.loading = false));
     debugRef.value.loading = false;
-    if(res.success){
-      debugRef.value.result = res.result
-    }else{
+    if (res.success) {
+      debugRef.value.result = res.result;
+    } else {
       message.error(res.message);
     }
-    console.log("debugEvaluator",res)
+    console.log('debugEvaluator', res);
   }
-
 
   /**
    * 模型ID变化处理

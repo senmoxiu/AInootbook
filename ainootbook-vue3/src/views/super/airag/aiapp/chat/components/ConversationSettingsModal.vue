@@ -12,12 +12,7 @@
   >
     <div class="settings-content">
       <a-form :model="formData" layout="vertical">
-        <a-form-item
-          v-for="input in flowInputs"
-          :key="input.field"
-          :label="input.name"
-          :required="input.required"
-        >
+        <a-form-item v-for="input in flowInputs" :key="input.field" :label="input.name" :required="input.required">
           <!-- 文本类型 - 使用单行输入 -->
           <a-input
             v-if="input.type === 'string'"
@@ -35,8 +30,8 @@
             :min="input.min"
             :max="input.max"
           />
-          
-            <!-- 图片类型 - 使用类似chat.vue的上传样式，固定支持3张图片 -->
+
+          <!-- 图片类型 - 使用类似chat.vue的上传样式，固定支持3张图片 -->
           <div v-else-if="input.type === 'picture'" class="image-upload-container">
             <div class="image-list-wrapper">
               <!-- 已上传的图片 -->
@@ -75,11 +70,7 @@
             style="width: 100%"
           />
           <!-- 其他类型使用文本输入 -->
-          <a-input
-            v-else
-            v-model:value="formData[input.field]"
-            :placeholder="`请输入${input.name}`"
-          />
+          <a-input v-else v-model:value="formData[input.field]" :placeholder="`请输入${input.name}`" />
         </a-form-item>
       </a-form>
     </div>
@@ -139,44 +130,44 @@
       message.error('只能上传图片文件！');
       return false;
     }
-    
+
     const currentCount = imageFileList.value[field]?.length || 0;
-    
+
     if (currentCount >= 3) {
       message.warning('最多只能上传3张图片！');
       return false;
     }
-    
+
     return true;
   };
 
   // 上传状态变化处理
   const handleChange = (info: any, field: string) => {
     const { file } = info;
-    
+
     if (file.status === 'error' || (file.response && file.response.code === 500)) {
       message.error(file.response?.message || `${file.name} 上传失败`);
       return;
     }
-    
+
     if (file.status === 'done' && file.response) {
       const imageUrl = file.response.message;
       if (!imageFileList.value[field]) {
         imageFileList.value[field] = [];
       }
-      
+
       // 检查是否已达到上限
       if (imageFileList.value[field].length >= 3) {
         message.warning('最多只能上传3张图片！');
         return;
       }
-      
+
       imageFileList.value[field].push(imageUrl);
-      
+
       // 图片类型始终作为数组存储，触发响应式更新
       imageFileList.value = { ...imageFileList.value };
       formData.value[field] = [...imageFileList.value[field]];
-      
+
       console.log(`[图片上传] 当前图片数量: ${imageFileList.value[field].length}`, imageFileList.value[field]);
     }
   };
@@ -191,7 +182,7 @@
 
   // 图片预览
   const handlePreview = (img: any) => {
-    const url = typeof img === 'string' ? img : (img.url || img);
+    const url = typeof img === 'string' ? img : img.url || img;
     const imageUrl = getFileAccessHttpUrl(url);
     // 可以使用 ant-design-vue 的 Image 预览功能
     window.open(imageUrl, '_blank');
@@ -201,15 +192,13 @@
   const handleRemove = (index: number, field: string) => {
     if (imageFileList.value[field]) {
       imageFileList.value[field].splice(index, 1);
-      
+
       // 触发响应式更新
       imageFileList.value = { ...imageFileList.value };
-      
+
       // 图片类型始终作为数组存储，删除后更新
-      formData.value[field] = imageFileList.value[field].length > 0 
-        ? [...imageFileList.value[field]] 
-        : [];
-      
+      formData.value[field] = imageFileList.value[field].length > 0 ? [...imageFileList.value[field]] : [];
+
       console.log(`[图片删除] 当前图片数量: ${imageFileList.value[field].length}`, imageFileList.value[field]);
     }
   };
@@ -220,7 +209,7 @@
     // 初始化表单数据
     formData.value = {};
     imageFileList.value = {};
-    
+
     // 如果有已存在的设置，填充表单
     if (props.existingSettings && Object.keys(props.existingSettings).length > 0) {
       Object.keys(props.existingSettings).forEach((key) => {
@@ -228,10 +217,12 @@
         if (input) {
           if (input.type === 'picture') {
             // 确保是数组格式
-            const urls = Array.isArray(props.existingSettings![key]) 
-              ? props.existingSettings![key] 
-              : (props.existingSettings![key] ? [props.existingSettings![key]] : []);
-            imageFileList.value[key] = urls.filter(url => url); // 过滤空值
+            const urls = Array.isArray(props.existingSettings![key])
+              ? props.existingSettings![key]
+              : props.existingSettings![key]
+                ? [props.existingSettings![key]]
+                : [];
+            imageFileList.value[key] = urls.filter((url) => url); // 过滤空值
             formData.value[key] = [...imageFileList.value[key]]; // 始终作为数组
           } else {
             formData.value[key] = props.existingSettings![key];
@@ -247,7 +238,7 @@
       message.warning('请填写所有必填项');
       return;
     }
-    
+
     // 构建最终数据
     const result: Record<string, any> = {};
     flowInputs.value.forEach((input) => {
@@ -256,7 +247,7 @@
         result[input.field] = value;
       }
     });
-    
+
     // 先保存，再触发事件
     // 直接通过emit返回设置数据，不需要单独保存
     // 设置会在发送消息时自动保存到后端
@@ -275,37 +266,37 @@
     max-height: 60vh;
     overflow-y: auto;
     padding: 10px 5px;
-    
+
     :deep(.ant-form-item) {
       margin-bottom: 16px;
     }
-    
+
     :deep(.ant-form-item-label) {
       padding: 0 5px;
     }
-    
+
     :deep(.ant-input),
     :deep(.ant-input-number),
     :deep(.ant-select) {
       margin: 0 5px;
       width: calc(100% - 10px) !important;
     }
-    
+
     :deep(.ant-upload) {
       margin: 0 5px;
     }
   }
-  
+
   .image-upload-container {
     margin: 0 5px;
-    
+
     .image-list-wrapper {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
     }
-    
+
     .image-preview-item {
       position: relative;
       width: 80px;
@@ -314,14 +305,14 @@
       overflow: hidden;
       border: 1px solid #d9d9d9;
       flex-shrink: 0;
-      
+
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         cursor: pointer;
       }
-      
+
       .image-remove-icon {
         position: absolute;
         top: 4px;
@@ -337,17 +328,17 @@
         cursor: pointer;
         opacity: 0;
         transition: opacity 0.2s;
-        
+
         &:hover {
           background-color: rgba(0, 0, 0, 0.8);
         }
       }
-      
+
       &:hover .image-remove-icon {
         opacity: 1;
       }
     }
-    
+
     .upload-trigger {
       width: 80px;
       height: 80px;
@@ -361,22 +352,21 @@
       transition: all 0.3s;
       background-color: #fafafa;
       flex-shrink: 0;
-      
+
       &:hover {
         border-color: #1890ff;
         color: #1890ff;
       }
-      
+
       .upload-text {
         margin-top: 4px;
         font-size: 12px;
         color: rgba(0, 0, 0, 0.65);
       }
-      
+
       &:hover .upload-text {
         color: #1890ff;
       }
     }
   }
 </style>
-

@@ -1,5 +1,5 @@
 <template>
-  <a-card :bordered="false" style="height: 100%;" :body-style="{ background: backgroundColor }" >
+  <a-card :bordered="false" style="height: 100%" :body-style="{ background: backgroundColor }">
     <a-spin :spinning="loading">
       <a-input-search v-if="showSearch" placeholder="按部门名称搜索…" style="margin-bottom: 10px" @search="onSearch" allowClear />
       <!--组织机构树-->
@@ -14,10 +14,10 @@
           :load-data="loadChildrenTreeData"
           v-model:expandedKeys="expandedKeys"
           @select="onSelect"
-          style="overflow-y: auto;height: calc(100vh - 330px);"
+          style="overflow-y: auto; height: calc(100vh - 330px)"
         >
           <template #title="{ orgCategory, title, departNameAbbr }">
-            <TreeIcon :orgCategory="orgCategory" :title="getTitle(title,departNameAbbr)"></TreeIcon>
+            <TreeIcon :orgCategory="orgCategory" :title="getTitle(title, departNameAbbr)"></TreeIcon>
           </template>
         </a-tree>
       </template>
@@ -31,7 +31,7 @@
   import { queryDepartTreeSync } from '../address.api';
   import { searchByKeywords } from '/@/views/system/departUser/depart.user.api';
   import { Popconfirm } from 'ant-design-vue';
-  import TreeIcon from "@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue";
+  import TreeIcon from '@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue';
 
   const prefixCls = inject('prefixCls');
   // 定义props
@@ -178,7 +178,7 @@
    * @param departNameAbbr 缩写
    */
   function getTitle(title, departNameAbbr) {
-    if (departNameAbbr){
+    if (departNameAbbr) {
       return departNameAbbr;
     }
     return title;

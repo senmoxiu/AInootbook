@@ -23,11 +23,7 @@
 <script lang="ts" setup>
   import { ref, onUnmounted, watch } from 'vue';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import {
-    getGenerationProgress,
-    triggerGeneration,
-    cancelGeneration,
-  } from '/@/api/ainote/note.api';
+  import { getGenerationProgress, triggerGeneration, cancelGeneration } from '/@/api/ainote/note.api';
 
   const props = defineProps({
     noteId: {

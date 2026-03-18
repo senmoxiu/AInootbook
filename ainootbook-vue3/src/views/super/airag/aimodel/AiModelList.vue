@@ -2,7 +2,14 @@
   <div class="model">
     <!--查询区域-->
     <div class="jeecg-basic-table-form-container">
-      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol" style="background-color: #f7f8fc !important;">
+      <a-form
+        ref="formRef"
+        @keyup.enter.native="searchQuery"
+        :model="queryParam"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+        style="background-color: #f7f8fc !important"
+      >
         <a-row :gutter="24">
           <a-col :lg="6">
             <a-form-item name="name" label="模板名称">
@@ -34,7 +41,7 @@
           </div>
         </a-card>
       </a-col>
-      <a-col :xxl="4" :xl="6" :lg="6" :md="6" :sm="12" :xs="24" v-for="item in modalList" v-if="modalList && modalList.length>0">
+      <a-col :xxl="4" :xl="6" :lg="6" :md="6" :sm="12" :xs="24" v-for="item in modalList" v-if="modalList && modalList.length > 0">
         <a-card class="model-card" @click="handleEditClick(item)">
           <div class="model-header">
             <div class="flex">
@@ -44,20 +51,20 @@
           </div>
           <div class="mt-6">
             <ul>
-              <li class="flex mr-14" style="align-items: center;">
-                <span class="label" style="flex-shrink: 0;">模型类型</span>
-                <span class="described" style="flex: 1; min-width: 0;">{{ item.modelType_dictText }}</span>
+              <li class="flex mr-14" style="align-items: center">
+                <span class="label" style="flex-shrink: 0">模型类型</span>
+                <span class="described" style="flex: 1; min-width: 0">{{ item.modelType_dictText }}</span>
                 <a-tooltip v-if="!item.activateFlag" title="未激活模型暂无法被系统其他功能调用，激活后可正常使用。">
                   <span class="no-activate">未激活</span>
                 </a-tooltip>
               </li>
-              <li class="flex mr-14 mt-6" style="align-items: center;">
-                <span class="label" style="flex-shrink: 0;">基础模型</span>
-                <span class="described" style="flex: 1; min-width: 0;">{{ item.modelName }}</span>
+              <li class="flex mr-14 mt-6" style="align-items: center">
+                <span class="label" style="flex-shrink: 0">基础模型</span>
+                <span class="described" style="flex: 1; min-width: 0">{{ item.modelName }}</span>
               </li>
-              <li class="flex mr-14 mt-6" style="align-items: center;">
-                <span class="label" style="flex-shrink: 0;">创建者</span>
-                <span class="described" style="flex: 1; min-width: 0;">{{ item.createBy_dictText || item.createBy }}</span>
+              <li class="flex mr-14 mt-6" style="align-items: center">
+                <span class="label" style="flex-shrink: 0">创建者</span>
+                <span class="described" style="flex: 1; min-width: 0">{{ item.createBy_dictText || item.createBy }}</span>
               </li>
             </ul>
           </div>
@@ -96,7 +103,7 @@
       @change="handlePageChange"
       class="list-footer"
       size="small"
-      :show-total="() => `共${total}条` "
+      :show-total="() => `共${total}条`"
     />
   </div>
 
@@ -184,7 +191,7 @@
           pageNo: pageNo.value,
           pageSize: pageSize.value,
           column: 'createTime',
-          order: 'desc'
+          order: 'desc',
         };
         Object.assign(params, queryParam);
         list(params).then((res) => {
@@ -222,7 +229,7 @@
        * @param item
        */
       async function handleDeleteClick(item) {
-        if(modalList.value.length == 1 && pageNo.value > 1) {
+        if (modalList.value.length == 1 && pageNo.value > 1) {
           pageNo.value = pageNo.value - 1;
         }
         await deleteModel({ id: item.id, name: item.name }, reload);
@@ -317,7 +324,7 @@
     color: #8a8f98;
     overflow-wrap: break-word;
   }
-  .no-activate{
+  .no-activate {
     font-size: 10px;
     color: #ff4d4f;
     border: 1px solid #ff4d4f;
@@ -423,7 +430,7 @@
     }
     .add-knowledge-card-title {
       font-size: 16px;
-      color:#1f2329;
+      color: #1f2329;
       font-weight: 400;
       align-self: center;
     }
@@ -432,17 +439,17 @@
   .add-knowledge-card:hover {
     box-shadow: 0 6px 12px #d0d3d8;
   }
-  .model-icon{
+  .model-icon {
     background-color: unset;
     border: none;
     margin-right: 2px;
   }
-  .model-icon:hover{
+  .model-icon:hover {
     color: #000000;
     background-color: #e9ecf2;
     border: none;
   }
-  .ant-dropdown-link{
+  .ant-dropdown-link {
     font-size: 14px;
     height: 24px;
     padding: 0 7px;

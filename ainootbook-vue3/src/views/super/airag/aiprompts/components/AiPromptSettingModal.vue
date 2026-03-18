@@ -127,29 +127,29 @@
                               <JImageUpload :maxCount="1" v-if="item.type === 'FILE'" v-model:value="item.value"></JImageUpload>
                               <!-- 文本输入框 -->
                               <a-input
-                                  v-else
-                                  v-model:value="item.value"
-                                  placeholder="请输入变量值"
-                                  @focus="focusedVariable = index"
-                                  @blur="focusedVariable = null"
-                                  class="variable-input"
+                                v-else
+                                v-model:value="item.value"
+                                placeholder="请输入变量值"
+                                @focus="focusedVariable = index"
+                                @blur="focusedVariable = null"
+                                class="variable-input"
                               >
                                 <template #suffix>
                                   <Icon v-if="item.value" icon="ant-design:check-circle-outlined" style="color: #52c41a" />
                                 </template>
                               </a-input>
                             </div>
-                           
+
                             <!-- 类型选择框 -->
                             <div class="variable-input-wrapper">
                               <a-select
-                                  v-model:value="item.type"
-                                  placeholder="请选择类型"
-                                  :options="[
-                                    { value: 'TEXT', label: '文本' },
-                                    { value: 'FILE', label: '附件' }
-                                  ]"
-                                  class="variable-input"
+                                v-model:value="item.type"
+                                placeholder="请选择类型"
+                                :options="[
+                                  { value: 'TEXT', label: '文本' },
+                                  { value: 'FILE', label: '附件' },
+                                ]"
+                                class="variable-input"
                               >
                               </a-select>
                             </div>
@@ -202,7 +202,7 @@
   import { getFileAccessHttpUrl, randomString } from '@/utils/common/compUtils';
   import { cloneDeep } from 'lodash-es';
   import { saveOrUpdate } from '@/views/super/airag/aiprompts/AiragPrompts.api';
-  import { JImageUpload } from "@/components/Form";
+  import { JImageUpload } from '@/components/Form';
 
   //保存或修改
   const isUpdate = ref<boolean>(false);
@@ -292,17 +292,17 @@
    */
   function handleContentChange() {
     if (formState.content) {
-      console.log("formState.content",formState.content)
+      console.log('formState.content', formState.content);
       let variables = extractVariables(formState.content);
-      console.log("variables",variables)
-      if(variables.length > 0){
+      console.log('variables', variables);
+      if (variables.length > 0) {
         const promptVariables = metadata.value['promptVariables'];
         metadata.value['promptVariables'] = variables.map((variable) => ({
           name: variable,
           value: promptVariables.find((item) => item.name === variable)?.value || '',
-          type: promptVariables.find((item) => item.name === variable)?.type || 'TEXT'
+          type: promptVariables.find((item) => item.name === variable)?.type || 'TEXT',
         }));
-      }else{
+      } else {
         metadata.value['promptVariables'] = '';
       }
     } else {
@@ -324,7 +324,7 @@
       matches.add(match[1].trim()); // 去除可能的首尾空格并添加到 Set
     }
 
-    return Array.from(matches);;
+    return Array.from(matches);
   }
 
   //编辑

@@ -1,14 +1,23 @@
 <template>
-  <j-modal :title="title" :width="width" :maxHeight="200" :visible="visible" @ok="handleOk" :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }" @cancel="handleCancel" cancelText="关闭">
+  <j-modal
+    :title="title"
+    :width="width"
+    :maxHeight="200"
+    :visible="visible"
+    @ok="handleOk"
+    :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }"
+    @cancel="handleCancel"
+    cancelText="关闭"
+  >
     <OpenApiAuthForm ref="registerForm" @ok="submitCallback" :title="title" :formDisabled="disableSubmit" :formBpm="false"></OpenApiAuthForm>
   </j-modal>
 </template>
 
 <script lang="ts" setup>
   import { ref, nextTick, defineExpose } from 'vue';
-  import OpenApiAuthForm from './OpenApiAuthForm.vue'
+  import OpenApiAuthForm from './OpenApiAuthForm.vue';
   import JModal from '/@/components/Modal/src/JModal/JModal.vue';
-  
+
   const title = ref<string>('');
   const width = ref<number>(800);
   const visible = ref<boolean>(false);
@@ -26,7 +35,7 @@
       registerForm.value.add();
     });
   }
-  
+
   /**
    * 编辑
    * @param record
@@ -38,7 +47,7 @@
       registerForm.value.edit(record);
     });
   }
-  
+
   /**
    * 确定按钮点击事件
    */

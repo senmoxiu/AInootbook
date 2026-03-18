@@ -80,14 +80,14 @@ export default defineComponent({
       return unref(getShowMenu) && !unref(getIsHorizontal);
     });
 
-    const isDev= import.meta.env.DEV
+    const isDev = import.meta.env.DEV;
 
     function renderSidebar() {
       return (
         <>
           <TypePicker
             menuTypeList={menuTypeList}
-            handler={(item: typeof menuTypeList[0]) => {
+            handler={(item: (typeof menuTypeList)[0]) => {
               layoutHandler(HandlerEnum.CHANGE_LAYOUT, {
                 mode: item.mode,
                 type: item.type,
@@ -199,16 +199,16 @@ export default defineComponent({
             options={triggerOptions}
             disabled={!unref(getShowMenuRef) || unref(getIsMixSidebar)}
           />
-          {
-            isDev && <SelectItem
+          {isDev && (
+            <SelectItem
               title={t('layout.setting.contentMode')}
               event={HandlerEnum.CONTENT_MODE}
               def={unref(getContentMode)}
               options={contentModeOptions}
             />
-          }
-          {
-            isDev && <InputNumberItem
+          )}
+          {isDev && (
+            <InputNumberItem
               title={t('layout.setting.autoScreenLock')}
               min={0}
               event={HandlerEnum.LOCK_TIME}
@@ -217,9 +217,9 @@ export default defineComponent({
                 return parseInt(value) === 0 ? `0(${t('layout.setting.notAutoScreenLock')})` : `${value}${t('layout.setting.minute')}`;
               }}
             />
-          }
-          {
-            isDev && <InputNumberItem
+          )}
+          {isDev && (
+            <InputNumberItem
               title={t('layout.setting.expandedMenuWidth')}
               max={600}
               min={100}
@@ -229,7 +229,7 @@ export default defineComponent({
               defaultValue={unref(getMenuWidth)}
               formatter={(value: string) => `${parseInt(value)}px`}
             />
-          }
+          )}
         </>
       );
     }
@@ -237,22 +237,22 @@ export default defineComponent({
     function renderContent() {
       return (
         <>
-          {
-            isDev && <SwitchItem
+          {isDev && (
+            <SwitchItem
               title={t('layout.setting.menuDrag')}
               event={HandlerEnum.MENU_HAS_DRAG}
               def={unref(getCanDrag)}
               disabled={!unref(getShowMenuRef)}
             />
-          }
-          {
-            isDev &&  <SwitchItem
+          )}
+          {isDev && (
+            <SwitchItem
               title={t('layout.setting.collapseMenuDisplayName')}
               event={HandlerEnum.MENU_COLLAPSED_SHOW_TITLE}
               def={unref(getCollapsedShowTitle)}
               disabled={!unref(getShowMenuRef) || !unref(getCollapsed) || unref(getIsMixSidebar)}
             />
-          }
+          )}
           <SwitchItem title={t('layout.setting.tabs')} event={HandlerEnum.TABS_SHOW} def={unref(getShowMultipleTab)} />
           <SwitchItem
             title={t('layout.setting.breadcrumb')}
@@ -317,7 +317,7 @@ export default defineComponent({
 
           <SwitchItem title={t('layout.setting.colorWeak')} event={HandlerEnum.COLOR_WEAK} def={unref(getColorWeak)} />
 
-           <SwitchItem title={t('layout.setting.aiIconSHow')} event={HandlerEnum.AI_ICON_SHOW} def={unref(getAiIconShow)} />
+          <SwitchItem title={t('layout.setting.aiIconSHow')} event={HandlerEnum.AI_ICON_SHOW} def={unref(getAiIconShow)} />
         </>
       );
     }

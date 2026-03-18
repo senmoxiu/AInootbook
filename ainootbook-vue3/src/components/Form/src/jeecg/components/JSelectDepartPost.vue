@@ -1,9 +1,24 @@
 <!--部门选择组件-->
 <template>
   <div class="JSelectDepartPost">
-    <JSelectBiz @change="handleSelectChange" @handleOpen="handleOpen" :loading="loadingEcho" v-bind="attrs" :isCustomRenderTag="isCustomRenderTag" :rowKey="getBindValue?.rowKey"/>
+    <JSelectBiz
+      @change="handleSelectChange"
+      @handleOpen="handleOpen"
+      :loading="loadingEcho"
+      v-bind="attrs"
+      :isCustomRenderTag="isCustomRenderTag"
+      :rowKey="getBindValue?.rowKey"
+    />
     <a-form-item>
-      <DeptSelectModal @register="regModal" @getSelectResult="setValue" modalTitle="部门岗位选择" v-bind="getBindValue" :multiple="multiple" @close="handleClose" :izShowDepPath="izShowDepPath"/>
+      <DeptSelectModal
+        @register="regModal"
+        @getSelectResult="setValue"
+        modalTitle="部门岗位选择"
+        v-bind="getBindValue"
+        :multiple="multiple"
+        @close="handleClose"
+        :izShowDepPath="izShowDepPath"
+      />
     </a-form-item>
   </div>
 </template>

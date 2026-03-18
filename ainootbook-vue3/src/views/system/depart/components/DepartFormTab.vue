@@ -1,6 +1,6 @@
 <template>
   <a-spin :spinning="loading">
-    <BasicForm @register="registerForm" >
+    <BasicForm @register="registerForm">
       <template #depPostParentId="{ model, field }">
         <a-tree-select v-model:value="depPostValue" :treeData="treeData" allowClear treeCheckable @select="treeSelect">
           <template #title="{ orgCategory, title }">
@@ -27,7 +27,7 @@
   import { saveOrUpdateDepart } from '../depart.api';
   import { useBasicFormSchema, orgCategoryOptions, positionChange } from '../depart.data';
   import { useDesign } from '/@/hooks/web/useDesign';
-  import TreeIcon from "@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue";
+  import TreeIcon from '@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue';
   import { getDepartPathNameByOrgCode } from '@/utils/common/compUtils';
 
   const { prefixCls } = useDesign('j-depart-form-content');
@@ -159,7 +159,6 @@
   }
 </script>
 <style lang="less">
-
   @prefix-cls: ~'@{namespace}-j-depart-form-content';
   /*begin 兼容暗夜模式*/
   .@{prefix-cls} {
@@ -169,8 +168,8 @@
   /*end 兼容暗夜模式*/
 </style>
 <style lang="less" scoped>
-  :deep(.ant-select-selector .ant-select-selection-item){
-    svg{
+  :deep(.ant-select-selector .ant-select-selection-item) {
+    svg {
       display: none !important;
     }
   }

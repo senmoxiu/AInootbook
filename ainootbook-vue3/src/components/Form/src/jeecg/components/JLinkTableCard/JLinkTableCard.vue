@@ -143,7 +143,6 @@
         e?.preventDefault();
       }
 
-
       function handleAddRecord(e) {
         prevent(e);
         openListModal(true, {

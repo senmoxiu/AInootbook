@@ -56,7 +56,7 @@
               <a-select allow-clear v-model:value="fieldMappings['user_query']" placeholder="请选择数据集字段" class="field-select">
                 <a-select-option v-for="column in datasetColumns" :key="column.key" :value="column.key">
                   <span class="column-option">
-                    <span style="color:blue">评测集</span>
+                    <span style="color: blue">评测集</span>
                     <span> [{{ column.title }}]</span>
                     <span style="margin-left: 5px">
                       <a-tooltip :title="column.description"><Icon icon="ant-design:info-circle-outlined" size="14" /></a-tooltip>
@@ -74,7 +74,7 @@
               <a-select allow-clear v-model:value="fieldMappings[item.name]" placeholder="请选择数据集字段" class="field-select">
                 <a-select-option v-for="column in datasetColumns" :key="column.key" :value="column.key">
                   <span class="column-option">
-                    <span style="color:blue">评测集</span>
+                    <span style="color: blue">评测集</span>
                     <span> [{{ column.title }}]</span>
                     <span style="margin-left: 5px">
                       <a-tooltip :title="column.description"><Icon icon="ant-design:info-circle-outlined" size="14" /></a-tooltip>
@@ -119,12 +119,12 @@
               <a-select allow-clear v-model:value="fieldMappings[item.field]" placeholder="请选择数据集字段" class="field-select">
                 <a-select-option v-for="column in evaluatorColumns" :key="column.name" :value="column.name">
                   <span class="column-option">
-<!--                    <a-divider style="margin:4px 0;" v-if="column.label" />-->
-                    <span :style="{color:column.label ? 'green' : 'blue'}"> [{{ column.label || '评测集' }}] </span>
+                    <!--                    <a-divider style="margin:4px 0;" v-if="column.label" />-->
+                    <span :style="{ color: column.label ? 'green' : 'blue' }"> [{{ column.label || '评测集' }}] </span>
                     <span>{{ column.name }}</span>
                     <span style="margin-left: 5px">
                       <a-tooltip :title="column.description">
-                        <Icon icon="ant-design:info-circle-outlined" size="14"/>
+                        <Icon icon="ant-design:info-circle-outlined" size="14" />
                       </a-tooltip>
                     </span>
                   </span>
@@ -147,7 +147,9 @@
               <!-- 添加外部容器和标题 -->
               <div class="table-header">
                 <div class="table-title" v-if="!confirmLoading">调试结果</div>
-                <div class="table-title"  v-if="confirmLoading"><span>实验初始化中，请稍后点击<a href="javascript:void(0)" @click="handleReload">刷新</a></span></div>
+                <div class="table-title" v-if="confirmLoading"
+                  ><span>实验初始化中，请稍后点击<a href="javascript:void(0)" @click="handleReload">刷新</a></span></div
+                >
                 <div class="table-subtitle">实际输出与参考输出对比</div>
               </div>
 
@@ -189,7 +191,14 @@
           <Icon icon="ant-design:left-circle-outlined" />
           上一步
         </a-button>
-        <a-button v-if="debugResult.length == 0"  :disabled="canConfirmDebug" :loading="confirmLoading" type="primary" @click="confirmDebug" class="footer-btn confirm-btn">
+        <a-button
+          v-if="debugResult.length == 0"
+          :disabled="canConfirmDebug"
+          :loading="confirmLoading"
+          type="primary"
+          @click="confirmDebug"
+          class="footer-btn confirm-btn"
+        >
           <Icon v-if="!confirmLoading" icon="ant-design:play-circle-outlined" />
           {{ confirmLoading ? '正在调试...' : '确认调试配置' }}
         </a-button>
@@ -203,7 +212,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive,computed  } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import Icon from '/@/components/Icon/src/Icon.vue';
   import { list, promptExperiment } from '../AiragPrompts.api';
@@ -244,16 +253,16 @@
   const debugResult = ref<any[]>([]);
   // 结果表格列
   const resultColumns = ref<any[]>([
-    { title: '问题', dataIndex: 'userQuery', key: 'userQuery',fixed: 'left' },
-    { title: '提示词输出答案', dataIndex: 'promptAnswer', key: 'promptAnswer',fixed: 'left' },
-    { title: '评分', dataIndex: 'answerScore', key: 'answerScore',fixed: 'left' },
+    { title: '问题', dataIndex: 'userQuery', key: 'userQuery', fixed: 'left' },
+    { title: '提示词输出答案', dataIndex: 'promptAnswer', key: 'promptAnswer', fixed: 'left' },
+    { title: '评分', dataIndex: 'answerScore', key: 'answerScore', fixed: 'left' },
   ]);
 
   // 确认调试配置
   const canConfirmDebug = computed(() => {
     let canConfirm = true;
     evaluatorFields.value.forEach((field) => {
-      if(!fieldMappings[field.name]){
+      if (!fieldMappings[field.name]) {
         canConfirm = false;
       }
     });
@@ -282,10 +291,10 @@
     if (datasetValue) {
       let columns = JSON.parse(datasetValue).columns;
       columns.forEach((item) => {
-        if(item.name !== 'action') {
+        if (item.name !== 'action') {
           datasetColumns.value.push({ ...item, key: item.name, title: item.name });
           evaluatorColumns.value.push({ ...item });
-          if(!resultColumns.value.some(a=> a.dataIndex === item.name)){
+          if (!resultColumns.value.some((a) => a.dataIndex === item.name)) {
             resultColumns.value.push({ title: item.name, dataIndex: item.name, key: item.name });
           }
         }
@@ -342,9 +351,9 @@
       delete fieldMappings[key];
     });
     let modelParam = selectedPrompt.value?.modelParam;
-    if(modelParam){
+    if (modelParam) {
       modelParam = typeof modelParam === 'string' ? JSON.parse(modelParam) : modelParam;
-      if(modelParam?.promptVariables && modelParam?.promptVariables.length > 0){
+      if (modelParam?.promptVariables && modelParam?.promptVariables.length > 0) {
         modelParam.promptVariables.forEach((item) => {
           promptParams.value.push({ name: item.name, label: item.name, description: item.description, dateType: 'String' });
         });
@@ -383,7 +392,7 @@
 
   // 刷新评测集
   async function handleReload() {
-    debugResult.value = []
+    debugResult.value = [];
     let res = await queryTrackById({ id: record.value.id });
     console.log('刷新评测集res...', res);
     if (!res.success) {
@@ -394,18 +403,18 @@
         console.log('刷新评测集res.result...', res.result);
         confirmLoading.value = false;
         // 1. 先找出最大version值
-        const maxVersion = Math.max(...res.result.map(item => item.version));
+        const maxVersion = Math.max(...res.result.map((item) => item.version));
 
         // 2. 过滤出所有具有最大version的项
-        const maxVersionItems = res.result.filter(item => item.version === maxVersion);
-       
+        const maxVersionItems = res.result.filter((item) => item.version === maxVersion);
+
         console.log('刷新评测集maxVersionItems...', maxVersionItems);
         if (maxVersionItems.length > 0) {
           maxVersionItems.forEach((item) => {
             debugResult.value.push(JSON.parse(item.dataValue));
           });
         }
-      }else{
+      } else {
         createMessage.warning('数据处理中，请稍后刷新！');
       }
     }

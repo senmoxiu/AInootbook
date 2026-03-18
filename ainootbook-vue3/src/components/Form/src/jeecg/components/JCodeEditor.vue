@@ -46,7 +46,7 @@
   import 'codemirror/addon/edit/matchbrackets';
   // 占位符
   import 'codemirror/addon/display/placeholder.js';
-  
+
   import { useAttrs } from '/@/hooks/core/useAttrs';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { isJsonObjectString } from '/@/utils/is.ts';
@@ -225,19 +225,22 @@
           }
         }
       );
-      
+
       // 支持动态设置语言
-      watch(()=>props.language, (val)=>{
-        if(val && coder){
-          coder.setOption('mode', val);
+      watch(
+        () => props.language,
+        (val) => {
+          if (val && coder) {
+            coder.setOption('mode', val);
+          }
         }
-      });
+      );
 
       const getBindValue = Object.assign({}, unref(props), unref(attrs));
 
       // 代码逻辑说明: VUEN-2480【严重bug】online vue3测试的问题 8、online js增强样式问题
-      function refresh(){
-        if(coder){
+      function refresh() {
+        if (coder) {
           coder.refresh();
         }
       }
@@ -345,14 +348,27 @@
         height: 100%;
       }
     }
-    
+
     /** VUEN-2344【vue3】这个样式有问题，是不是加个边框 */
-    .CodeMirror{
+    .CodeMirror {
       border: 1px solid #ddd;
     }
     .CodeMirror pre.CodeMirror-placeholder {
       color: #cacaca;
-      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        Segoe UI,
+        PingFang SC,
+        Hiragino Sans GB,
+        Microsoft YaHei,
+        Helvetica Neue,
+        Helvetica,
+        Arial,
+        sans-serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol;
     }
   }
   .CodeMirror-hints.idea,

@@ -244,11 +244,7 @@
     try {
       const data = await getAiConfig();
       configRecord.value = data;
-      await Promise.all([
-        setServiceValues(data),
-        setPromptValues(data),
-        setFlowValues(data),
-      ]);
+      await Promise.all([setServiceValues(data), setPromptValues(data), setFlowValues(data)]);
     } catch {
       // 加载失败时保持表单空态，用户可手动刷新
     }
@@ -316,11 +312,7 @@
     try {
       const data = await refreshAiConfigCache();
       configRecord.value = data;
-      await Promise.all([
-        setServiceValues(data),
-        setPromptValues(data),
-        setFlowValues(data),
-      ]);
+      await Promise.all([setServiceValues(data), setPromptValues(data), setFlowValues(data)]);
       notification.success({ message: '缓存已刷新' });
     } catch {
       notification.error({ message: '刷新缓存失败' });

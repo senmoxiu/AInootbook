@@ -36,10 +36,10 @@
   import { useDrawer } from '/@/components/Drawer';
   import MenuDrawer from './MenuDrawer.vue';
   import DataRuleList from './DataRuleList.vue';
-  import { columns,searchFormSchema } from './menu.data';
+  import { columns, searchFormSchema } from './menu.data';
   import { list, deleteMenu, batchDeleteMenu } from './menu.api';
-  import { useDefIndexStore } from "@/store/modules/defIndex";
-  import { useI18n } from "/@/hooks/web/useI18n";
+  import { useDefIndexStore } from '@/store/modules/defIndex';
+  import { useI18n } from '/@/hooks/web/useI18n';
 
   const checkedKeys = ref<Array<string | number>>([]);
   const showFooter = ref(true);
@@ -197,11 +197,11 @@
 
   // --------------- begin 默认首页配置 ------------
 
-  const defIndexStore = useDefIndexStore()
+  const defIndexStore = useDefIndexStore();
 
   // 设置默认主页
   async function handleSetDefIndex(record: Recordable) {
-    defIndexStore.update(record.url, record.component, record.route)
+    defIndexStore.update(record.url, record.component, record.route);
   }
 
   /**
@@ -209,7 +209,7 @@
    * @param record
    */
   function checkDefIndex(record: Recordable) {
-    return defIndexStore.check(record.url)
+    return defIndexStore.check(record.url);
   }
 
   // 重新加载默认首页配置
@@ -217,11 +217,11 @@
     try {
       defIndexStore.query();
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   }
 
-  reloadDefIndex()
+  reloadDefIndex();
 
   // --------------- end 默认首页配置 ------------
 

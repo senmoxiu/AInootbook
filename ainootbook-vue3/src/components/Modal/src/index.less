@@ -20,7 +20,7 @@
       cursor: default !important;
     }
     // update-begin--author:liaozhiyang---date:20241225---for：【issues/7601】ant-design-vue@4.2.6后弹窗全屏底部有空隙
-    & > div:has( > .ant-modal-content) {
+    & > div:has(> .ant-modal-content) {
       height: 100%;
     }
     // update-end--author:liaozhiyang---date:20241225---for：【issues/7601】ant-design-vue@4.2.6后弹窗全屏底部有空隙
@@ -66,7 +66,9 @@
   }
 
   .ant-modal-content {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow:
+      0 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0 6px 20px 0 rgba(0, 0, 0, 0.19);
   }
 
   .ant-modal-footer {

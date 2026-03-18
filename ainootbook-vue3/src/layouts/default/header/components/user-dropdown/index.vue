@@ -57,7 +57,7 @@
   import { removeAuthCache, setAuthCache } from '/src/utils/auth';
   import { getFileAccessHttpUrl } from '/@/utils/common/compUtils';
   import { getRefPromise } from '/@/utils/index';
-  import { refreshDragCache } from "@/api/common/api";
+  import { refreshDragCache } from '@/api/common/api';
 
   type MenuEvent = 'logout' | 'doc' | 'lock' | 'cache' | 'depart' | 'defaultHomePage' | 'password' | 'account';
   const { createMessage } = useMessage();
@@ -246,7 +246,7 @@
     }
   }
   // 代码逻辑说明: 【QQYUN-13013】切换到英文模式下拉菜单宽度有点窄
-  html[lang="en"] {
+  html[lang='en'] {
     .@{prefix-cls} {
       &-dropdown-overlay {
         width: 175px;

@@ -1,12 +1,13 @@
 <template>
   <div class="j-vxe-drag-box">
-     <span v-if="!isAllowDrag"><span class="not-drag-btn"> <Icon icon="mi:drag" /> </span
-      ></span>
-    <a-dropdown v-else :trigger="['click']" >
+    <span v-if="!isAllowDrag"
+      ><span class="not-drag-btn"> <Icon icon="mi:drag" /> </span
+    ></span>
+    <a-dropdown v-else :trigger="['click']">
       <span
         ><span class="drag-btn"> <Icon icon="mi:drag" /> </span
       ></span>
-      <template #overlay >
+      <template #overlay>
         <a-menu>
           <a-menu-item key="0" :disabled="disabledMoveUp" @click="handleRowMoveUp">向上移</a-menu-item>
           <a-menu-item key="1" :disabled="disabledMoveDown" @click="handleRowMoveDown">向下移</a-menu-item>
@@ -115,7 +116,7 @@
 <style scoped>
   .not-drag-btn {
     opacity: 0.5;
-     .app-iconify {
+    .app-iconify {
       cursor: not-allowed;
     }
   }

@@ -39,13 +39,13 @@
   //注册model
   const [registerModal, { openModal }] = useModal();
   //注册评测集model
-  const [registerDataSetModal, { openModal:openDataSetModal }] = useModal();
+  const [registerDataSetModal, { openModal: openDataSetModal }] = useModal();
   //注册评估器model
-  const [registerEvaluatorModal, { openModal:openEvaluatorModal }] = useModal();
+  const [registerEvaluatorModal, { openModal: openEvaluatorModal }] = useModal();
   //注册评估器model
-  const [registerDebugModal, { openModal:openDebugModal }] = useModal();
+  const [registerDebugModal, { openModal: openDebugModal }] = useModal();
   //注册调用记录model
-  const [registerRecordsModal, { openDrawer:openRecordsDrawer }] = useDrawer();
+  const [registerRecordsModal, { openDrawer: openRecordsDrawer }] = useDrawer();
   const { tableContext } = useListPage({
     tableProps: {
       title: 'airag_ext_data',
@@ -131,7 +131,7 @@
       {
         label: '配置',
         onClick: handleEdit.bind(null, record),
-      }
+      },
     ];
   }
   /**

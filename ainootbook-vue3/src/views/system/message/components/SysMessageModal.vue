@@ -43,7 +43,7 @@
                   transform: activeKey == 'all' ? 'translate3d(130px, 0px, 0px)' : 'translate3d(215px, 0px, 0px)',
                   display: 'block',
                   width: '88px',
-                  height: '1px'
+                  height: '1px',
                 }"
               ></div>
             </div>
@@ -57,15 +57,14 @@
               <template #content>
                 <div>
                   <span class="search-label">回复、提到我的人?：</span>
-                  <span style="display: inline-block;">
+                  <span style="display: inline-block">
                     <div v-if="searchParams.fromUser" class="selected-user">
-                      <span>{{searchParams.realname}}</span>
-                      <span class="clear-user-icon"><close-outlined style="font-size: 12px" @click="clearSearchParamsUser"/></span>
+                      <span>{{ searchParams.realname }}</span>
+                      <span class="clear-user-icon"><close-outlined style="font-size: 12px" @click="clearSearchParamsUser" /></span>
                     </div>
                     <a-button v-else type="dashed" shape="circle" @click="openSelectPerson">
                       <plus-outlined />
                     </a-button>
-
                   </span>
                 </div>
                 <div class="search-date">
@@ -86,7 +85,11 @@
                   <div class="date-label">类型：</div>
                   <div class="date-tags">
                     <div class="tags-container">
-                      <div v-for="item in noticeTypeOption" :class="item.active == true ? 'tag active flex' : 'tag flex'" @click="handleClickNoticeType(item)">
+                      <div
+                        v-for="item in noticeTypeOption"
+                        :class="item.active == true ? 'tag active flex' : 'tag flex'"
+                        @click="handleClickNoticeType(item)"
+                      >
                         <img class="notice-type-img" v-if="item.img" :src="item.img" />
                         {{ item.text }}
                       </div>
@@ -96,16 +99,32 @@
               </template>
 
               <span v-if="conditionStr" class="anticon filtera">
-                <img v-if="noticeImg" :src="noticeImg" class="notice-type-header-img">
-                <filter-outlined v-else/>
-                <span style="font-size:12px;margin-left: 3px;position: relative;">{{conditionStr}}</span>
-                <span style="display: flex;margin:0 5px;">
-                  <svg @click="clearAll" t="1715689724802" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10694" width="14" height="14"><path d="M624.593455 23.272727a93.090909 93.090909 0 0 1 93.090909 93.090909v168.587637l143.406545 0.023272a116.363636 116.363636 0 0 1 116.247273 111.313455l0.116363 5.050182V861.090909a116.363636 116.363636 0 0 1-116.363636 116.363636H162.909091a116.363636 116.363636 0 0 1-116.363636-116.363636V401.338182a116.363636 116.363636 0 0 1 116.363636-116.363637l146.664727-0.023272V116.363636a93.090909 93.090909 0 0 1 88.459637-92.974545l4.654545-0.116364zM139.636364 581.818182v279.272727a23.272727 23.272727 0 0 0 23.272727 23.272727h302.545454v-162.909091a46.545455 46.545455 0 1 1 93.09091 0v162.909091h93.090909v-162.909091a46.545455 46.545455 0 1 1 93.090909 0v162.909091h116.363636a23.272727 23.272727 0 0 0 23.272727-23.272727V581.818182H139.636364z m0-93.090909h744.727272v-87.389091a23.272727 23.272727 0 0 0-23.272727-23.272727h-166.679273a69.818182 69.818182 0 0 1-69.818181-69.818182V116.363636h-221.905455v191.883637a69.818182 69.818182 0 0 1-69.818182 69.818182H162.909091a23.272727 23.272727 0 0 0-23.272727 23.272727V488.727273z" fill="currentColor" p-id="10695"></path></svg>
+                <img v-if="noticeImg" :src="noticeImg" class="notice-type-header-img" />
+                <filter-outlined v-else />
+                <span style="font-size: 12px; margin-left: 3px; position: relative">{{ conditionStr }}</span>
+                <span style="display: flex; margin: 0 5px">
+                  <svg
+                    @click="clearAll"
+                    t="1715689724802"
+                    class="icon"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    p-id="10694"
+                    width="14"
+                    height="14"
+                  >
+                    <path
+                      d="M624.593455 23.272727a93.090909 93.090909 0 0 1 93.090909 93.090909v168.587637l143.406545 0.023272a116.363636 116.363636 0 0 1 116.247273 111.313455l0.116363 5.050182V861.090909a116.363636 116.363636 0 0 1-116.363636 116.363636H162.909091a116.363636 116.363636 0 0 1-116.363636-116.363636V401.338182a116.363636 116.363636 0 0 1 116.363636-116.363637l146.664727-0.023272V116.363636a93.090909 93.090909 0 0 1 88.459637-92.974545l4.654545-0.116364zM139.636364 581.818182v279.272727a23.272727 23.272727 0 0 0 23.272727 23.272727h302.545454v-162.909091a46.545455 46.545455 0 1 1 93.09091 0v162.909091h93.090909v-162.909091a46.545455 46.545455 0 1 1 93.090909 0v162.909091h116.363636a23.272727 23.272727 0 0 0 23.272727-23.272727V581.818182H139.636364z m0-93.090909h744.727272v-87.389091a23.272727 23.272727 0 0 0-23.272727-23.272727h-166.679273a69.818182 69.818182 0 0 1-69.818181-69.818182V116.363636h-221.905455v191.883637a69.818182 69.818182 0 0 1-69.818182 69.818182H162.909091a23.272727 23.272727 0 0 0-23.272727 23.272727V488.727273z"
+                      fill="currentColor"
+                      p-id="10695"
+                    ></path>
+                  </svg>
                 </span>
               </span>
-              <div v-else style="align-content: center;">
-                 <img v-if="noticeImg" :src="noticeImg" class="notice-type-header-img" style="position: relative;top: -2px">
-                 <filter-outlined v-else />
+              <div v-else style="align-content: center">
+                <img v-if="noticeImg" :src="noticeImg" class="notice-type-header-img" style="position: relative; top: -2px" />
+                <filter-outlined v-else />
               </div>
             </a-popover>
             <close-outlined @click="closeModal" />
@@ -121,20 +140,45 @@
         </template>
 
         <a-tab-pane tab="全部消息" key="all" forceRender>
-          <sys-message-list :isLowApp="isLowApp" ref="allMessageRef" @close="hrefThenClose" @detail="showDetailModal" @clear="clearAll" :messageCount="messageCount" @closeModal="closeModal"/>
+          <sys-message-list
+            :isLowApp="isLowApp"
+            ref="allMessageRef"
+            @close="hrefThenClose"
+            @detail="showDetailModal"
+            @clear="clearAll"
+            :messageCount="messageCount"
+            @closeModal="closeModal"
+          />
         </a-tab-pane>
 
         <!-- 标星 -->
         <a-tab-pane tab="标星消息" key="star" forceRender>
-          <sys-message-list :isLowApp="isLowApp" ref="starMessageRef" star @close="hrefThenClose" @detail="showDetailModal" @clear="clearAll" :messageCount="messageCount" @closeModal="closeModal" :cancelStarAfterDel="true"/>
+          <sys-message-list
+            :isLowApp="isLowApp"
+            ref="starMessageRef"
+            star
+            @close="hrefThenClose"
+            @detail="showDetailModal"
+            @clear="clearAll"
+            :messageCount="messageCount"
+            @closeModal="closeModal"
+            :cancelStarAfterDel="true"
+          />
         </a-tab-pane>
       </a-tabs>
     </div>
   </BasicModal>
 
-  <user-select-modal isRadioSelection :showButton="false" labelKey="realname" rowKey="username" @register="regModal" @getSelectResult="getSelectedUser"></user-select-modal>
+  <user-select-modal
+    isRadioSelection
+    :showButton="false"
+    labelKey="realname"
+    rowKey="username"
+    @register="regModal"
+    @getSelectResult="getSelectedUser"
+  ></user-select-modal>
 
-  <DetailModal @register="registerDetail" :zIndex="1001"/>
+  <DetailModal @register="registerDetail" :zIndex="1001" />
 </template>
 
 <script>
@@ -143,7 +187,7 @@
   import JSelectUser from '/@/components/Form/src/jeecg/components/JSelectUser.vue';
   import { ref, unref, reactive, computed } from 'vue';
   // import SysMessageList from './SysMessageList.vue'
-  import UserSelectModal from '/@/components/Form/src/jeecg/components/modal/UserSelectModal.vue'
+  import UserSelectModal from '/@/components/Form/src/jeecg/components/modal/UserSelectModal.vue';
   import DetailModal from '/@/views/monitor/mynews/DetailModal.vue';
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
   import calendar from '/@/assets/icons/calendarNotice.png';
@@ -166,16 +210,16 @@
       // SysMessageList,
       UserSelectModal,
       PlusOutlined,
-      DetailModal
+      DetailModal,
     },
-    props:{
+    props: {
       messageCount: {
         type: Number,
-        default: 0
-      }
+        default: 0,
+      },
     },
-    emits:['register', 'refresh'],
-    setup(_p, {emit}) {
+    emits: ['register', 'refresh'],
+    setup(_p, { emit }) {
       const allMessageRef = ref();
       const starMessageRef = ref();
       const activeKey = ref('all');
@@ -205,18 +249,18 @@
         rangeDate: [],
       });
 
-      function loadData(){
+      function loadData() {
         let params = {
           fromUser: searchParams.fromUser,
           rangeDateKey: searchParams.rangeDateKey,
           rangeDate: searchParams.rangeDate,
-          noticeType: noticeType.value ? noticeType.value:''
-        }
-        if(activeKey.value == 'all'){
+          noticeType: noticeType.value ? noticeType.value : '',
+        };
+        if (activeKey.value == 'all') {
           getRefPromise(allMessageRef).then(() => {
             allMessageRef.value.reload(params);
           });
-        }else{
+        } else {
           starMessageRef.value.reload(params);
         }
       }
@@ -224,15 +268,15 @@
       const isLowApp = ref(false);
       //useModalInner
       const [registerModal, { closeModal }] = useModalInner(async (data) => {
-        showSearch.value = false
-        if(data.noticeType){
+        showSearch.value = false;
+        if (data.noticeType) {
           noticeType.value = data.noticeType;
           // 代码逻辑说明: 【QQYUN-12998】点击完聊天的系统图标，再点击系统上面的铃铛就不出数据了---
           for (const item of noticeTypeOption) {
-            if(item.key === data.noticeType){
+            if (item.key === data.noticeType) {
               item.active = true;
               noticeImg.value = item.img;
-            }else{
+            } else {
               item.active = false;
             }
           }
@@ -240,9 +284,9 @@
         }
         //每次弹窗打开 加载最新的数据
         loadData();
-        if(data){
-          isLowApp.value = data.isLowApp||false
-        }else{
+        if (data) {
+          isLowApp.value = data.isLowApp || false;
+        } else {
           isLowApp.value = false;
         }
       });
@@ -267,23 +311,23 @@
       ]);
       function handleClickDateTag(item) {
         for (let a of dateTags) {
-          if(a.key != item.key){
+          if (a.key != item.key) {
             a.active = false;
           }
         }
         item.active = !item.active;
-        if(item.active == false){
-          searchParams.rangeDateKey = ''
-        }else{
+        if (item.active == false) {
+          searchParams.rangeDateKey = '';
+        } else {
           searchParams.rangeDateKey = item.key;
         }
         if (item.key == 'zdy') {
           // 自定义日期查询走的是 handleChangeSearchDate
-          if(item.active == false){
-            searchParams.rangeDate = []
+          if (item.active == false) {
+            searchParams.rangeDate = [];
             loadData();
           }
-        }else{
+        } else {
           loadData();
         }
       }
@@ -298,63 +342,63 @@
       });
       const searchRangeDate = ref([]);
       function handleChangeSearchDate(_value, dateStringArray) {
-        searchParams.rangeDate = [...dateStringArray]
+        searchParams.rangeDate = [...dateStringArray];
         loadData();
       }
 
-      function hrefThenClose(id){
-        emit('refresh', id)
-       // closeModal();
+      function hrefThenClose(id) {
+        emit('refresh', id);
+        // closeModal();
       }
 
       // 有查询条件值的时候显示该字符串
-      const conditionStr = computed(()=>{
+      const conditionStr = computed(() => {
         const { fromUser, rangeDateKey, realname } = searchParams;
-        if(!fromUser && !rangeDateKey){
-          return ''
+        if (!fromUser && !rangeDateKey) {
+          return '';
         }
         let arr = [];
-        if(fromUser){
-          arr.push(realname)
+        if (fromUser) {
+          arr.push(realname);
         }
-        if(rangeDateKey){
-          let rangDates = dateTags.filter(item=>item.key == rangeDateKey);
-          if(rangDates && rangDates.length>0){
-            arr.push(rangDates[0].text)
+        if (rangeDateKey) {
+          let rangDates = dateTags.filter((item) => item.key == rangeDateKey);
+          if (rangDates && rangDates.length > 0) {
+            arr.push(rangDates[0].text);
           }
         }
-        return arr.join('、')
+        return arr.join('、');
       });
 
       //注册model
       const [regModal, { openModal }] = useModal();
 
-      function getSelectedUser(options, value){
-        if(options && options.length>0){
-          searchParams.fromUser = value
+      function getSelectedUser(options, value) {
+        if (options && options.length > 0) {
+          searchParams.fromUser = value;
           searchParams.realname = options[0].label;
         }
       }
-      
-      function openSelectPerson(){
-        openModal(true, {})
+
+      function openSelectPerson() {
+        openModal(true, {});
       }
 
-      function clearSearchParamsUser(){
-        searchParams.fromUser = ''
-        searchParams.realname = ''
+      function clearSearchParamsUser() {
+        searchParams.fromUser = '';
+        searchParams.realname = '';
       }
 
-      function clearAll(){
-        searchParams.fromUser='';
-        searchParams.realname='';
-        searchParams.rangeDateKey='';
-        searchParams.rangeDate=[];
+      function clearAll() {
+        searchParams.fromUser = '';
+        searchParams.realname = '';
+        searchParams.rangeDateKey = '';
+        searchParams.rangeDate = [];
         for (let a of dateTags) {
           a.active = false;
         }
-        noticeType.value = "";
-        noticeImg.value = "";
+        noticeType.value = '';
+        noticeImg.value = '';
         for (const item of noticeTypeOption) {
           item.active = false;
         }
@@ -376,11 +420,11 @@
         });
       }
       const [registerDetail, { openModal: openDetailModal }] = useModal();
-      function showDetailModal(record){
-        openDetailModal(true, {record: unref(record), isUpdate: true})
+      function showDetailModal(record) {
+        openDetailModal(true, { record: unref(record), isUpdate: true });
       }
 
-      function handleDetailColse(){
+      function handleDetailColse() {
         loadData();
       }
 
@@ -390,21 +434,21 @@
        */
       function handleClickNoticeType(item) {
         for (let a of noticeTypeOption) {
-          if(a.key !== item.key){
+          if (a.key !== item.key) {
             a.active = false;
           }
         }
         item.active = !item.active;
-        if(item.active === false){
-          noticeType.value = "";
-          noticeImg.value = "";
-        }else{
+        if (item.active === false) {
+          noticeType.value = '';
+          noticeImg.value = '';
+        } else {
           noticeType.value = item.key;
           noticeImg.value = item.img;
         }
         loadData();
       }
-      
+
       return {
         conditionStr,
         regModal,
@@ -444,12 +488,14 @@
 </script>
 
 <style lang="less">
-
-  @keyframes move22{
-    0%{ transform:translateY(0px); }
-    100%{transform:translateY(600px);}
+  @keyframes move22 {
+    0% {
+      transform: translateY(0px);
+    }
+    100% {
+      transform: translateY(600px);
+    }
   }
-
 
   .sys-msg-modal {
     .ant-modal-header {
@@ -465,7 +511,7 @@
       position: absolute;
       right: 10px;
       top: calc(100% - 600px);
-/*      animation-name: move22;
+      /*      animation-name: move22;
       animation-duration:0.8s;
       animation-timing-function:ease;*/
     }
@@ -492,7 +538,7 @@
           cursor: pointer;
         }
 
-        > span.filtera{
+        > span.filtera {
           //background-color: #d3eafd;
           background-color: #eff1f2;
           border-radius: 4px;
@@ -504,14 +550,12 @@
           //color: #2196f3;
           display: flex;
 
-          >span.anticon{
+          > span.anticon {
             height: auto;
             line-height: 9px;
             display: inline-block;
           }
         }
-
-
       }
     }
     .ant-tabs-nav-wrap {
@@ -539,8 +583,8 @@
         outline: none;
         cursor: pointer;
       }
-      .ant-tabs-tab+.ant-tabs-tab {
-         margin: 0 0 0 32px;
+      .ant-tabs-tab + .ant-tabs-tab {
+        margin: 0 0 0 32px;
       }
       .ant-tabs-ink-bar {
         background: @primary-color;
@@ -608,31 +652,31 @@
     }
   }
 
-  .selected-user{
+  .selected-user {
     background: #f5f5f5;
     padding: 2px 14px;
     border-radius: 30px;
-    .clear-user-icon{
+    .clear-user-icon {
       margin-left: 5px;
     }
   }
 </style>
 <style lang="less" scoped>
-  .notice-type-img{
-      width: 16px;
-      height: 16px;
-      position: relative;
-      top: 2px;
-      margin-right: 1px;
+  .notice-type-img {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 2px;
+    margin-right: 1px;
   }
-  .notice-type-header-img{
+  .notice-type-header-img {
     width: 16px;
     height: 16px;
     position: relative;
     left: 2px;
     top: 1px;
   }
-  .flex{
+  .flex {
     display: flex;
     flex: unset;
   }

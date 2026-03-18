@@ -10,7 +10,7 @@
         <span class="export-btn" v-if="searchInfo.logType == 2">
           <a-tooltip>
             <template #title>导出</template>
-            <a-button  type="text" preIcon="ant-design:download-outlined" shape="circle" @click="onExportXls" />
+            <a-button type="text" preIcon="ant-design:download-outlined" shape="circle" @click="onExportXls" />
           </a-tooltip>
         </span>
       </div>
@@ -39,13 +39,7 @@
   import { ref } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getLogList, getExportUrl } from './log.api';
-  import {
-    columns,
-    searchFormSchema,
-    operationLogColumn,
-    operationSearchFormSchema,
-    exceptionColumns
-  } from './log.data';
+  import { columns, searchFormSchema, operationLogColumn, operationSearchFormSchema, exceptionColumns } from './log.data';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useListPage } from '/@/hooks/system/useListPage';
   const { createMessage } = useMessage();
@@ -71,7 +65,7 @@
       },
     },
     exportConfig: {
-      name:"操作日志",
+      name: '操作日志',
       url: getExportUrl,
       params: searchInfo,
       timeout: 300000, // 设置超时时间为5分钟(300秒)
@@ -87,7 +81,7 @@
     if (key == '2') {
       logColumns.value = operationLogColumn;
       searchSchema.value = operationSearchFormSchema;
-    }else if(key == '4'){
+    } else if (key == '4') {
       searchSchema.value = searchFormSchema;
       logColumns.value = exceptionColumns;
     } else {
@@ -117,7 +111,7 @@
   .export-btn {
     margin-left: auto;
   }
-  :deep(.jeecg-basic-table-header__toolbar){
-    width:100px !important;
+  :deep(.jeecg-basic-table-header__toolbar) {
+    width: 100px !important;
   }
 </style>

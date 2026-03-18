@@ -99,7 +99,7 @@
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { getCodeInfo } from '/@/api/sys/user';
-  import {  encryptAESCBC } from '/@/utils/cipher';
+  import { encryptAESCBC } from '/@/utils/cipher';
 
   const ACol = Col;
   const ARow = Row;

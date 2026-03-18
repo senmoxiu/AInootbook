@@ -48,7 +48,7 @@
         isUpdate.value = !!data?.isUpdate;
         title.value = isUpdate.value ? '编辑文档' : '创建文档';
         if (unref(isUpdate)) {
-          if(data.record.type === 'file' && data.record.metadata){
+          if (data.record.type === 'file' && data.record.metadata) {
             data.record.filePath = JSON.parse(data.record.metadata).filePath;
           }
           //表单赋值
@@ -57,7 +57,7 @@
           });
         } else {
           knowledgeId.value = data.knowledgeId;
-          await setFieldsValue({ type: data.type })
+          await setFieldsValue({ type: data.type });
         }
         setModalProps({ bodyStyle: { padding: '10px' } });
       });
@@ -72,7 +72,7 @@
           if (!unref(isUpdate)) {
             values.knowledgeId = knowledgeId.value;
           }
-          if(values.filePath){
+          if (values.filePath) {
             values.metadata = JSON.stringify({ filePath: values.filePath });
             delete values.filePath;
           }

@@ -27,14 +27,7 @@
       DynamicNotice,
     },
     setup() {
-      const {
-        initDragWebSocket,
-        currentModal,
-        modalParams,
-        modalRegCache,
-        bindParams,
-        reloadPage,
-      } = useDragNotice();
+      const { initDragWebSocket, currentModal, modalParams, modalRegCache, bindParams, reloadPage } = useDragNotice();
 
       onMounted(() => {
         initDragWebSocket();

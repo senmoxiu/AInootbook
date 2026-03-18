@@ -1,6 +1,15 @@
 <template>
   <div class="p-2">
-    <BasicModal destroyOnClose @register="registerModal" :canFullscreen="false" width="1000px" @ok="handleOk" @cancel="handleCancel" okText="替换" wrapClassName='ai-rag-generate-prompt-modal'>
+    <BasicModal
+      destroyOnClose
+      @register="registerModal"
+      :canFullscreen="false"
+      width="1000px"
+      @ok="handleOk"
+      @cancel="handleCancel"
+      okText="替换"
+      wrapClassName="ai-rag-generate-prompt-modal"
+    >
       <div class="prompt">
         <div class="prompt-left">
           <div class="prompt-left-title">提示词生成器</div>
@@ -19,7 +28,7 @@
             <div class="command">
               <span style="margin-right: 5px">指令</span>
               <a-tooltip title="提示词库">
-                <span @click="openPromptApps" style="color:#1890ff;cursor: pointer">
+                <span @click="openPromptApps" style="color: #1890ff; cursor: pointer">
                   <Icon icon="ant-design:bulb-outlined" color="#1890ff"></Icon>词库选择
                 </span>
               </a-tooltip>
@@ -64,9 +73,9 @@
 <script lang="ts">
   import { ref, unref } from 'vue';
   import BasicModal from '@/components/Modal/src/BasicModal.vue';
-  import {useModal, useModalInner} from '@/components/Modal';
+  import { useModal, useModalInner } from '@/components/Modal';
   import { promptGenerate } from '@/views/super/airag/aiapp/AiApp.api';
-  import AiAppPromptMarketModal from "@/views/super/airag/aiapp/components/AiAppPromptMarketModal.vue";
+  import AiAppPromptMarketModal from '@/views/super/airag/aiapp/components/AiAppPromptMarketModal.vue';
 
   export default {
     name: 'AiAppGeneratedPrompt',
@@ -130,7 +139,7 @@
         content.value = '';
         loading.value = true;
         let readableStream = await promptGenerate({ prompt: encodeURIComponent(prompt.value) }).catch(() => {
-            loading.value = false;
+          loading.value = false;
         });
         const reader = readableStream.getReader();
         const decoder = new TextDecoder('UTF-8');
@@ -144,34 +153,34 @@
           const lines = result.split('\n\n');
           for (const line of lines) {
             if (line.startsWith('data:')) {
-                const content = line.replace('data:', '').trim();
-                if(!content){
-                  continue;
-                }
-                if(!content.endsWith('}')){
-                  buffer = buffer + line;
-                  continue;
-                }
-                buffer = "";
-                renderText(content)
-              } else {
-                if(!line) {
-                  continue;
-                }
-                if(!line.endsWith('}')) {
-                  buffer = buffer + line;
-                  continue;
-                }
-                buffer = "";
-                renderText(line)
+              const content = line.replace('data:', '').trim();
+              if (!content) {
+                continue;
               }
+              if (!content.endsWith('}')) {
+                buffer = buffer + line;
+                continue;
+              }
+              buffer = '';
+              renderText(content);
+            } else {
+              if (!line) {
+                continue;
+              }
+              if (!line.endsWith('}')) {
+                buffer = buffer + line;
+                continue;
+              }
+              buffer = '';
+              renderText(line);
             }
           }
+        }
       }
 
       /**
        * 渲染文本
-       * 
+       *
        * @param item
        */
       function renderText(item) {
@@ -179,7 +188,7 @@
           let parse = JSON.parse(item);
           if (parse.event == 'MESSAGE') {
             content.value += parse.data.message;
-            if(loading.value){
+            if (loading.value) {
               loading.value = false;
             }
           }
@@ -187,7 +196,7 @@
             loading.value = false;
           }
           if (parse.event == 'ERROR') {
-            content.value = parse.data.message?parse.data.message:'生成失败，请稍后重试！'
+            content.value = parse.data.message ? parse.data.message : '生成失败，请稍后重试！';
             loading.value = false;
           }
         } catch (error) {
@@ -214,7 +223,7 @@
        * 打开提示词库弹窗
        */
       function openPromptApps() {
-        aiPromptSelectModalOpen(true,{});
+        aiPromptSelectModalOpen(true, {});
       }
       /**
        * 提示词回调

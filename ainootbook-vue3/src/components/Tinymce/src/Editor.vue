@@ -10,16 +10,23 @@
         :disabled="disabled"
       />
     </Teleport>
-    <Editor :id="tinymceId" ref="elRef" :disabled="disabled" :init="initOptions" :style="{ visibility: 'hidden' }" v-if="!initOptions.inline"></Editor>
+    <Editor
+      :id="tinymceId"
+      ref="elRef"
+      :disabled="disabled"
+      :init="initOptions"
+      :style="{ visibility: 'hidden' }"
+      v-if="!initOptions.inline"
+    ></Editor>
     <slot v-else></slot>
-    <ProcessMask ref="processMaskRef" :show="showUploadMask"/>
+    <ProcessMask ref="processMaskRef" :show="showUploadMask" />
   </div>
 </template>
 
 <script lang="ts">
   import type { RawEditorOptions } from 'tinymce';
   import tinymce from 'tinymce/tinymce';
-  import Editor from '@tinymce/tinymce-vue'
+  import Editor from '@tinymce/tinymce-vue';
   import 'tinymce/themes/silver';
   import 'tinymce/icons/default/icons';
   import 'tinymce/models/dom';
@@ -34,7 +41,7 @@
   import { defineComponent, computed, nextTick, ref, unref, watch, onDeactivated, onBeforeUnmount, onMounted } from 'vue';
   import ImgUpload from './ImgUpload.vue';
   import ProcessMask from './ProcessMask.vue';
-  import {simpleToolbar, menubar, simplePlugins} from './tinymce';
+  import { simpleToolbar, menubar, simplePlugins } from './tinymce';
   import { buildShortUUID } from '/@/utils/uuid';
   import { bindHandlers } from './helper';
   import { onMountedOrActivated } from '/@/hooks/core/onMountedOrActivated';
@@ -45,7 +52,7 @@
   import { uploadFile } from '/@/api/common/api';
   import { getFileAccessHttpUrl } from '/@/utils/common/compUtils';
   import { ThemeEnum } from '/@/enums/appEnum';
-  import { defHttp } from "@/utils/http/axios";
+  import { defHttp } from '@/utils/http/axios';
   const tinymceProps = {
     options: {
       type: Object as PropType<Partial<RawEditorOptions>>,
@@ -89,20 +96,20 @@
       default: false,
     },
     //是否聚焦
-    autoFocus:{
+    autoFocus: {
       type: Boolean,
       default: true,
-    }
+    },
   };
 
   export default defineComponent({
     name: 'Tinymce',
-    components: { ImgUpload,Editor,ProcessMask },
+    components: { ImgUpload, Editor, ProcessMask },
     inheritAttrs: false,
     props: tinymceProps as any,
     emits: ['change', 'update:modelValue', 'inited', 'init-error'],
     setup(props, { emit, attrs }) {
-      console.log("---Tinymce---初始化---")
+      console.log('---Tinymce---初始化---');
 
       const editorRef = ref<Nullable<any>>(null);
       const fullscreen = ref(false);
@@ -185,26 +192,26 @@
           skin_url: publicPath + 'resource/tinymce/skins/ui/' + skinName.value,
           images_upload_handler: (blobInfo, process) =>
             new Promise((resolve, reject) => {
-            let params = {
-              file: blobInfo.blob(),
-              filename: blobInfo.filename(),
-              data: { biz: 'jeditor', jeditor: '1' },
-            };
-            const uploadSuccess = (res) => {
-              if (res.success) {
-                if (res.message == 'local') {
-                  const img = 'data:image/jpeg;base64,' + blobInfo.base64();
-                      resolve(img);
+              let params = {
+                file: blobInfo.blob(),
+                filename: blobInfo.filename(),
+                data: { biz: 'jeditor', jeditor: '1' },
+              };
+              const uploadSuccess = (res) => {
+                if (res.success) {
+                  if (res.message == 'local') {
+                    const img = 'data:image/jpeg;base64,' + blobInfo.base64();
+                    resolve(img);
+                  } else {
+                    let img = getFileAccessHttpUrl(res.message);
+                    resolve(img);
+                  }
                 } else {
-                  let img = getFileAccessHttpUrl(res.message);
-                  resolve(img);
-                }
-              } else {
                   reject('上传失败！');
-              }
-            };
-            uploadFile(params, uploadSuccess);
-        }),
+                }
+              };
+              uploadFile(params, uploadSuccess);
+            }),
           content_css: publicPath + 'resource/tinymce/skins/ui/' + skinName.value + '/content.min.css',
           ...options,
           setup: (editor: any) => {
@@ -275,7 +282,7 @@
                 // 处理 HTML/纯文本
                 const pasteContent = clipboardData.getData('text/html') || clipboardData.getData('text');
                 if (!pasteContent) return false;
-                
+
                 if (pasteContent.includes('<img')) {
                   const processedHtml = await preprocess(pasteContent);
                   editor.selection.setContent(processedHtml);
@@ -310,7 +317,7 @@
           if (!editor) {
             return;
           }
-         editor?.setMode && editor.setMode(attrs.disabled ? 'readonly' : 'design');
+          editor?.setMode && editor.setMode(attrs.disabled ? 'readonly' : 'design');
         }
       );
 
@@ -431,13 +438,13 @@
        * @param file
        * @param fileList
        */
-      function handleLoading(fileLength,showMask){
-        if(fileLength && fileLength > 0){
+      function handleLoading(fileLength, showMask) {
+        if (fileLength && fileLength > 0) {
           setTimeout(() => {
-              props?.showUploadMask && processMaskRef.value.calcProcess(fileLength)
-          },100)
-        }else{
-           props?.showUploadMask && (processMaskRef.value.showMask = showMask);
+            props?.showUploadMask && processMaskRef.value.calcProcess(fileLength);
+          }, 100);
+        } else {
+          props?.showUploadMask && (processMaskRef.value.showMask = showMask);
         }
       }
       function getUploadingImgName(name: string) {
@@ -506,7 +513,7 @@
         const imgTagRegex = /<img([^>]+)src="([^">]+)"([^>]*)/g;
 
         // 收集所有需要替换的图片信息（索引、原始src、完整标签）
-        const imgReplaceList:any = [];
+        const imgReplaceList: any = [];
         let match;
         while ((match = imgTagRegex.exec(pasteContent)) !== null) {
           imgReplaceList.push({
@@ -517,35 +524,35 @@
             // src前的属性（如class="xxx" ）
             prefix: match[1],
             // src后的属性（如 alt="xxx"）
-            suffix: match[3]
+            suffix: match[3],
           });
         }
-   
+
         // 替换所有图片URL为服务器地址
         let processedContent = pasteContent;
         // 获取当前域名（协议+域名+端口）
         const currentOrigin = window.location.hostname;
-        console.log("当前域名："+ currentOrigin)
+        console.log('当前域名：' + currentOrigin);
         // 处理图片
         for (const imgInfo of imgReplaceList) {
           try {
-            if(imgInfo.src.startsWith('http')){
+            if (imgInfo.src.startsWith('http')) {
               // 判断是否为当前域名下的图片
               let isOwnServer = false;
               try {
                 const imgHost = new URL(imgInfo.src, window.location.href).hostname;
                 isOwnServer = imgHost === currentOrigin;
-                console.log("图片中的域名：" + imgHost)
+                console.log('图片中的域名：' + imgHost);
               } catch (e) {
                 // 如果URL解析失败，使用简单的hostname检查作为后备
                 isOwnServer = imgInfo.src.includes(window.location.hostname);
-                console.log("图片中的域名：" + window.location.hostname)
+                console.log('图片中的域名：' + window.location.hostname);
               }
-              if(!isOwnServer){
+              if (!isOwnServer) {
                 // 非当前域名的网络图片，需要上传
                 const filename = getFilenameFromUrl(imgInfo.src) || 'pasted-image.jpg';
                 let newUrl = await uploadImage(imgInfo.src, filename);
-                if(newUrl){
+                if (newUrl) {
                   const newImgTag = `<img${imgInfo.prefix}src="${newUrl}"${imgInfo.suffix}`;
                   processedContent = processedContent.replace(imgInfo.fullTag, newImgTag);
                 }
@@ -556,11 +563,10 @@
         }
         return processedContent;
       }
-      
-      
+
       /**
        * 根据路径获取文件名
-       * 
+       *
        * @param url
        */
       function getFilenameFromUrl(url) {
@@ -569,7 +575,7 @@
 
       /**
        * 上传文件并返回文件路径
-       * 
+       *
        * @param fileUrl
        * @param filename
        */
@@ -579,10 +585,10 @@
           filename: filename,
         };
         try {
-          let { message } = await defHttp.post({ url: "/sys/common/uploadImgByHttp", params },{ isTransformResponse: false });
+          let { message } = await defHttp.post({ url: '/sys/common/uploadImgByHttp', params }, { isTransformResponse: false });
           return getFileAccessHttpUrl(message);
         } catch (e) {
-          return "";
+          return '';
         }
       }
       //update-begin-author:liusq---date:2025-11-19--for: JHHB-1070 从word复制的表格不能对齐
@@ -592,13 +598,22 @@
        */
       function initTableAlignment(editor) {
         // 表格左对齐 - 带表格图标的左对齐
-        editor.ui.registry.addIcon('table-align-left', '<svg width="24" height="24"><rect x="2" y="8" width="16" height="8" fill="currentColor"/><path d="M2 4h20v2H2zm0 14h12v2H2z" fill="currentColor"/></svg>');
+        editor.ui.registry.addIcon(
+          'table-align-left',
+          '<svg width="24" height="24"><rect x="2" y="8" width="16" height="8" fill="currentColor"/><path d="M2 4h20v2H2zm0 14h12v2H2z" fill="currentColor"/></svg>'
+        );
 
         // 表格居中对齐 - 带表格图标的居中对齐
-        editor.ui.registry.addIcon('table-align-center', '<svg width="24" height="24"><rect x="4" y="8" width="16" height="8" fill="currentColor"/><path d="M2 4h20v2H2zm4 14h12v2H6z" fill="currentColor"/></svg>');
+        editor.ui.registry.addIcon(
+          'table-align-center',
+          '<svg width="24" height="24"><rect x="4" y="8" width="16" height="8" fill="currentColor"/><path d="M2 4h20v2H2zm4 14h12v2H6z" fill="currentColor"/></svg>'
+        );
 
         // 表格右对齐 - 带表格图标的右对齐
-        editor.ui.registry.addIcon('table-align-right', '<svg width="24" height="24"><rect x="6" y="8" width="16" height="8" fill="currentColor"/><path d="M2 4h20v2H2zm8 14h12v2H10z" fill="currentColor"/></svg>');
+        editor.ui.registry.addIcon(
+          'table-align-right',
+          '<svg width="24" height="24"><rect x="6" y="8" width="16" height="8" fill="currentColor"/><path d="M2 4h20v2H2zm8 14h12v2H10z" fill="currentColor"/></svg>'
+        );
 
         // 添加表格专用对齐按钮
         editor.ui.registry.addButton('tablealignleft', {
@@ -607,7 +622,7 @@
           onAction: () => {
             const table = getSelectedTable(editor);
             if (table) alignTable(editor, table, 'JustifyLeft');
-          }
+          },
         });
         editor.ui.registry.addButton('tablealigncenter', {
           tooltip: '表格居中',
@@ -615,7 +630,7 @@
           onAction: () => {
             const table = getSelectedTable(editor);
             if (table) alignTable(editor, table, 'JustifyCenter');
-          }
+          },
         });
 
         editor.ui.registry.addButton('tablealignright', {
@@ -624,7 +639,7 @@
           onAction: () => {
             const table = getSelectedTable(editor);
             if (table) alignTable(editor, table, 'JustifyRight');
-          }
+          },
         });
       }
 
@@ -657,8 +672,8 @@
             if (!isWrapped) {
               // 创建包装器
               wrapper = editor.dom.create('div', {
-                'class': 'table-wrapper',
-                style: 'text-align: center; margin: 0 auto;'
+                class: 'table-wrapper',
+                style: 'text-align: center; margin: 0 auto;',
               });
 
               // 包装表格
@@ -669,14 +684,14 @@
             // 设置包装器样式
             editor.dom.setStyles(wrapper, {
               'text-align': 'center',
-              'margin': '0 auto',
-              'display': 'block'
+              margin: '0 auto',
+              display: 'block',
             });
             // 移除表格的浮动和边距
             editor.dom.setStyles(table, {
-              'float': '',
-              'margin': '0',
-              'display': 'inline-table' // 保持表格显示特性
+              float: '',
+              margin: '0',
+              display: 'inline-table', // 保持表格显示特性
             });
             break;
 
@@ -694,7 +709,7 @@
         editor.fire('change');
         editor.undoManager.add();
       }
-      //update-end-author:liusq---date:2025-11-19--for: JHHB-1070 从word复制的表格不能对齐 
+      //update-end-author:liusq---date:2025-11-19--for: JHHB-1070 从word复制的表格不能对齐
 
       return {
         prefixCls,
@@ -720,27 +735,27 @@
 </script>
 
 <style lang="less" scoped>
-/* 表格包装器样式 */
-.table-wrapper {
-  text-align: center;
-  margin: 0 auto;
-  display: block;
-}
-
-/* 确保在编辑器中正确显示 */
-.tox-edit-area__iframe {
+  /* 表格包装器样式 */
   .table-wrapper {
-    text-align: center !important;
-    margin: 0 auto !important;
-    display: block !important;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
   }
 
-  .table-wrapper table {
-    display: inline-table !important;
-    margin: 0 !important;
-    float: none !important;
+  /* 确保在编辑器中正确显示 */
+  .tox-edit-area__iframe {
+    .table-wrapper {
+      text-align: center !important;
+      margin: 0 auto !important;
+      display: block !important;
+    }
+
+    .table-wrapper table {
+      display: inline-table !important;
+      margin: 0 !important;
+      float: none !important;
+    }
   }
-}
 </style>
 
 <style lang="less">
@@ -755,7 +770,7 @@
       visibility: hidden;
     }
     .tox:not(.tox-tinymce-inline) .tox-editor-header {
-      padding:0;
+      padding: 0;
     }
     // 代码逻辑说明: 【TV360X-329】富文本禁用状态下工具栏划过边框丢失
     .tox .tox-tbtn--disabled,
@@ -769,7 +784,9 @@
 
   html[data-theme='dark'] {
     .@{prefix-cls} {
-      .tox .tox-edit-area__iframe {background-color: #141414;}
+      .tox .tox-edit-area__iframe {
+        background-color: #141414;
+      }
     }
   }
 </style>

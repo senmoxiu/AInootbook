@@ -13,7 +13,14 @@
       @visible-change="visibleChange"
     >
       <div class="jeecg-basic-table-form-container">
-        <a-form ref="formRef" v-if="showSearchFlag" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol" @keyup.enter.native="searchQuery">
+        <a-form
+          ref="formRef"
+          v-if="showSearchFlag"
+          :model="queryParam"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+          @keyup.enter.native="searchQuery"
+        >
           <a-row :gutter="24">
             <template v-for="(item, index) in queryInfo">
               <template v-if="item.hidden === '1'">
@@ -59,7 +66,7 @@
         @change="handleChangeInTable"
       >
         <template #tableTitle></template>
-         <template #bodyCell="{text, column}">
+        <template #bodyCell="{ text, column }">
           <template v-if="column.fieldType === 'Image'">
             <span v-if="!text" style="font-size: 12px; font-style: italic">无图片</span>
             <img v-else :src="getImgView(text)" alt="图片不存在" class="cellIamge" @click="viewOnlineCellImage($event, text)" />
@@ -90,7 +97,7 @@
         loading: true,
       }),
     },
-    props: ['multi', 'code', 'sorter', 'groupId', 'param','showAdvancedButton', 'getFormValues', 'selected', 'rowkey'],
+    props: ['multi', 'code', 'sorter', 'groupId', 'param', 'showAdvancedButton', 'getFormValues', 'selected', 'rowkey'],
     emits: ['ok', 'register'],
     setup(props, { emit }) {
       const { createMessage } = useMessage();
@@ -140,7 +147,7 @@
           queryParam,
           dictOptions,
         },
-      ] = usePopBiz(getBindValue,tableRef);
+      ] = usePopBiz(getBindValue, tableRef);
 
       const showSearchFlag = computed(() => unref(queryInfo) && unref(queryInfo).length > 0);
       /**
@@ -334,7 +341,7 @@
       white-space: nowrap;
     }
   }
-  :deep(.jeecg-basic-table .ant-table-wrapper .ant-table-title){
+  :deep(.jeecg-basic-table .ant-table-wrapper .ant-table-title) {
     min-height: 0;
   }
   .cellIamge {

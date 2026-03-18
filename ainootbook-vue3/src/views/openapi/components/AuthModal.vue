@@ -1,6 +1,6 @@
 <template>
   <!--  <j-modal :title="title" :width="width" :visible="visible" @ok="handleOk" :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }" @cancel="handleCancel" cancelText="关闭">-->
-  <div style="position: relative;">
+  <div style="position: relative">
     <a-modal
       v-model:open="authDrawerOpen"
       class="custom-class"
@@ -33,8 +33,7 @@
 
   const authDrawerOpen = ref(false);
   const authDrawerOpenChange = (val: any) => {
-    if(!val)
-      registerForm.value.cleanData()
+    if (!val) registerForm.value.cleanData();
   };
 
   /**

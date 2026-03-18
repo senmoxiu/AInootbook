@@ -8,7 +8,6 @@
 
 <script setup>
   import AiChat from '/@/views/super/airag/aiapp/chat/AiChat.vue';
-  
 </script>
 
 <style lang="less" scoped>

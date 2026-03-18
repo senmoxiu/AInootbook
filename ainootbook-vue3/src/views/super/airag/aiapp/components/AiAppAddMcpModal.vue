@@ -12,25 +12,25 @@
       </div>
       <a-row :span="24">
         <a-col :span="12" v-for="item in mcpOption" :key="item.id" @click="handleSelect(item)">
-          <a-card :body-style="{padding: '10px 12px'}" hoverable :class="['mcp-card', { 'is-active': item.checked }]">
+          <a-card :body-style="{ padding: '10px 12px' }" hoverable :class="['mcp-card', { 'is-active': item.checked }]">
             <div class="mcp-card-header">
               <div class="mcp-card-left">
                 <img class="mcp-card-icon" :src="getIcon(item.icon)" />
                 <div class="mcp-card-info">
                   <div class="mcp-card-name" :title="item.name">{{ item.name }}</div>
                   <div class="mcp-card-meta">
-                    <div class="pill type-pill" :title="'类型: '+(item.category === 'plugin' ? '插件' : 'MCP')">
+                    <div class="pill type-pill" :title="'类型: ' + (item.category === 'plugin' ? '插件' : 'MCP')">
                       <Icon :icon="getCategoryIcon(item.category)" class="pill-icon" />
                       <span class="pill-text">{{ item.category === 'plugin' ? '插件' : 'MCP' }}</span>
                     </div>
-                    <div class="pill tool-pill" :title="getToolCount(item.metadata)+' 个工具'">
+                    <div class="pill tool-pill" :title="getToolCount(item.metadata) + ' 个工具'">
                       <Icon icon="ant-design:tool-outlined" class="pill-icon" />
                       <span class="pill-text">{{ getToolCount(item.metadata) }}</span>
                     </div>
                   </div>
                 </div>
               </div>
-              <a-checkbox v-model:checked="item.checked" @click.stop class="mcp-card-checker" @change="(e)=>handleChange(e,item)"> </a-checkbox>
+              <a-checkbox v-model:checked="item.checked" @click.stop class="mcp-card-checker" @change="(e) => handleChange(e, item)"> </a-checkbox>
             </div>
           </a-card>
         </a-col>
@@ -93,16 +93,16 @@
         loadMcpData();
       });
 
-      function getIcon(icon){
+      function getIcon(icon) {
         return icon ? getFileAccessHttpUrl(icon) : defaultLogo;
       }
 
       async function handleOk() {
         // 拼接插件结构，使用item的category字段
-        const plugins = pluginDataList.value.map((item:any)=>({ 
-          pluginId: item.id, 
-          pluginName: item.name, 
-          category: item.category || 'mcp'
+        const plugins = pluginDataList.value.map((item: any) => ({
+          pluginId: item.id,
+          pluginName: item.name,
+          category: item.category || 'mcp',
         }));
         emit('success', pluginIds.value, pluginDataList.value, plugins);
         handleCancel();
@@ -112,69 +112,69 @@
         closeModal();
       }
 
-      function handleSelect(item:any){
+      function handleSelect(item: any) {
         const id = item.id;
-        const target = mcpOption.value.find((it:any)=> it.id === id);
-        if(target){
+        const target = mcpOption.value.find((it: any) => it.id === id);
+        if (target) {
           target.checked = !target.checked;
         }
-        if(!pluginIds.value || pluginIds.value.length===0){
+        if (!pluginIds.value || pluginIds.value.length === 0) {
           pluginIds.value.push(id);
           pluginDataList.value.push(item);
           return;
         }
-        const findIndex = pluginIds.value.findIndex((val:any)=> val === id);
-        if(findIndex === -1){
+        const findIndex = pluginIds.value.findIndex((val: any) => val === id);
+        if (findIndex === -1) {
           pluginIds.value.push(id);
           pluginDataList.value.push(item);
-        }else{
-          pluginIds.value.splice(findIndex,1);
-          pluginDataList.value.splice(findIndex,1);
+        } else {
+          pluginIds.value.splice(findIndex, 1);
+          pluginDataList.value.splice(findIndex, 1);
         }
       }
 
-      function loadMcpData(){
+      function loadMcpData() {
         const params = { pageNo: pageNo.value, pageSize: pageSize.value, status: 'enable', synced: 1, name: searchText.value };
-        mcpList(params).then((res:any)=>{
+        mcpList(params).then((res: any) => {
           if (res.records) {
             const records = res.records || [];
-            if(pluginIds.value.length>0){
-              for(const rec of records){
-                if(pluginIds.value.includes(rec.id)){
+            if (pluginIds.value.length > 0) {
+              for (const rec of records) {
+                if (pluginIds.value.includes(rec.id)) {
                   rec.checked = true;
                 }
               }
             }
             mcpOption.value = records;
             total.value = res.total;
-          }else{
+          } else {
             mcpOption.value = [];
             total.value = 0;
           }
         });
       }
 
-      function handlePageChange(page:number, current:number){
+      function handlePageChange(page: number, current: number) {
         pageNo.value = page;
         pageSize.value = current;
         loadMcpData();
       }
 
-      function handleClearClick(){
+      function handleClearClick() {
         pluginIds.value = [];
         pluginDataList.value = [];
-        mcpOption.value.forEach((item:any)=> item.checked = false);
+        mcpOption.value.forEach((item: any) => (item.checked = false));
       }
 
-      function handleChange(e:any, item:any){
-        if(e.target.checked){
+      function handleChange(e: any, item: any) {
+        if (e.target.checked) {
           pluginIds.value.push(item.id);
           pluginDataList.value.push(item);
-        }else{
-          const findIndex = pluginIds.value.findIndex((val:any)=> val === item.id);
-          if(findIndex>-1){
-            pluginIds.value.splice(findIndex,1);
-            pluginDataList.value.splice(findIndex,1);
+        } else {
+          const findIndex = pluginIds.value.findIndex((val: any) => val === item.id);
+          if (findIndex > -1) {
+            pluginIds.value.splice(findIndex, 1);
+            pluginDataList.value.splice(findIndex, 1);
           }
         }
       }
@@ -257,14 +257,16 @@
     border: 1px solid #e5e6eb;
     border-radius: 8px;
     background: #fff;
-    transition: box-shadow 0.25s, border-color 0.25s;
+    transition:
+      box-shadow 0.25s,
+      border-color 0.25s;
     cursor: pointer;
     &.is-active {
       border-color: #3370ff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
     &:hover {
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
   }
   .mcp-card-header {
@@ -320,19 +322,19 @@
     line-height: 16px;
     font-weight: 500;
     backdrop-filter: saturate(180%) blur(4px);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    .pill-icon { 
-      margin-right: 3px; 
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+    .pill-icon {
+      margin-right: 3px;
       font-size: 12px;
     }
   }
-  .type-pill { 
-    background: linear-gradient(135deg,#e6f4ff,#f0f9ff); 
-    color:#0958d9; 
+  .type-pill {
+    background: linear-gradient(135deg, #e6f4ff, #f0f9ff);
+    color: #0958d9;
   }
-  .tool-pill { 
-    background: linear-gradient(135deg,#f5f6f7,#f0f1f2); 
-    color:#555; 
+  .tool-pill {
+    background: linear-gradient(135deg, #f5f6f7, #f0f1f2);
+    color: #555;
   }
   .use-select {
     color: #646a73;

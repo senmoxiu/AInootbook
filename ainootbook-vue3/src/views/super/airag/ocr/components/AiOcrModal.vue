@@ -8,7 +8,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { schemas } from '../AiOcr.data';
-  import {addOcr, editOcr} from "../AiOcr.api";
+  import { addOcr, editOcr } from '../AiOcr.api';
   const title = ref<string>('新增');
   const isUpdate = ref<boolean>();
   // 声明Emits
@@ -23,13 +23,13 @@
 
   //表单赋值
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-    setModalProps({ confirmLoading: true, bodyStyle:{ padding:'24px'} });
+    setModalProps({ confirmLoading: true, bodyStyle: { padding: '24px' } });
     isUpdate.value = !!data?.isUpdate;
-    title.value = !unref(isUpdate) ? '新增' : '编辑'
+    title.value = !unref(isUpdate) ? '新增' : '编辑';
     //重置表单
     await resetFields();
     setModalProps({ confirmLoading: false });
-    if(unref(isUpdate)){
+    if (unref(isUpdate)) {
       //表单赋值
       await setFieldsValue({ ...data.record });
     }
@@ -39,9 +39,9 @@
   async function handleSubmit() {
     try {
       const values = await validate();
-      if(unref(isUpdate)){
+      if (unref(isUpdate)) {
         await editOcr(values);
-      } else{
+      } else {
         await addOcr(values);
       }
       setModalProps({ confirmLoading: true });
@@ -56,7 +56,7 @@
 </script>
 
 <style lang="less" scoped>
-:deep(.ant-modal-body){
-  padding: 24px !important;
-}
+  :deep(.ant-modal-body) {
+    padding: 24px !important;
+  }
 </style>

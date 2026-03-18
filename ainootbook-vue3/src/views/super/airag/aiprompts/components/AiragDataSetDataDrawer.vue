@@ -19,11 +19,11 @@
                 <!-- 附件输入框 -->
                 <JImageUpload :maxCount="1" v-if="item.dataType === 'FILE'" v-model:value="element[item.name]"></JImageUpload>
                 <a-input
-                    v-else
-                    v-model:value="element[item.name]"
-                    :placeholder="'请输入' + item.name"
-                    :class="{ 'has-error': !element[item.name] }"
-                    @blur="validateColumn(element[item.name])"
+                  v-else
+                  v-model:value="element[item.name]"
+                  :placeholder="'请输入' + item.name"
+                  :class="{ 'has-error': !element[item.name] }"
+                  @blur="validateColumn(element[item.name])"
                 />
               </div>
             </div>
@@ -44,7 +44,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { saveOrUpdate } from '@/views/super/airag/aiprompts/AiragExtData.api';
   import { message } from 'ant-design-vue';
-  import {JImageUpload} from "@/components/Form";
+  import { JImageUpload } from '@/components/Form';
   // Emits声明
   const emit = defineEmits(['register', 'success']);
   const attrs = useAttrs();
@@ -107,11 +107,9 @@
 
     try {
       // 构造提交数据
-      let dataSource:any = [];
+      let dataSource: any = [];
       if (isUpdate.value) {
-        dataSource = allData.value.map(item =>
-            item.id === dataSet.value[0].id ? dataSet.value[0] : item
-        );
+        dataSource = allData.value.map((item) => (item.id === dataSet.value[0].id ? dataSet.value[0] : item));
       } else {
         dataSource = allData.value.concat(dataSet.value);
       }
@@ -147,10 +145,10 @@
     dataId.value = data?.id || '';
     allData.value = data?.dataSource || [];
     columns.value = data?.columns || [];
-    console.log("columns.value",columns.value)
+    console.log('columns.value', columns.value);
     if (isUpdate.value) {
-      console.log("data?.record",data?.record)
-      dataSet.value = data?.record?[data?.record] : [];
+      console.log('data?.record', data?.record);
+      dataSet.value = data?.record ? [data?.record] : [];
     } else {
       dataSet.value = [];
     }

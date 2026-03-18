@@ -54,7 +54,7 @@
   import { queryPremTreeList, editPackPermission } from '../tenant.api';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { PACK_AUTH_CONFIG_KEY } from '/@/enums/cacheEnum';
-  const emit = defineEmits(['register','success']);
+  const emit = defineEmits(['register', 'success']);
   //树的信息
   const treeData = ref<TreeItem[]>([]);
   //树的全部节点信息
@@ -90,8 +90,8 @@
     }
 
     //初始化角色菜单数据
-    if(data.permissionIds){
-      checkedKeys.value = data.permissionIds.split(",");
+    if (data.permissionIds) {
+      checkedKeys.value = data.permissionIds.split(',');
     }
 
     setDrawerProps({ loading: false });
@@ -162,7 +162,7 @@
     node[children]?.length && recursion(node[children]);
     return result;
   }
-  
+
   /**
    * 数据重置
    */
@@ -207,7 +207,7 @@
     loading.value = true;
     try {
       await editPackPermission(params);
-      emit("success")
+      emit('success');
     } catch (e) {
       loading.value = false;
     }

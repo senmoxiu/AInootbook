@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
   import { ref, defineProps, defineEmits, computed } from 'vue';
-  import {useGlobSetting} from "@/hooks/setting";
+  import { useGlobSetting } from '@/hooks/setting';
   const props = defineProps({
     templateId: { type: String, default: '' },
     showDeleteIcon: { type: Boolean, default: false },
@@ -94,7 +94,7 @@
     if (props.cardData && props.cardConfig) {
       let src = props.cardData[props.cardConfig?.image];
       let reg = /#\s*{\s*domainURL\s*}/g;
-      src = src.replace(reg,domainUrl);
+      src = src.replace(reg, domainUrl);
       return src;
     }
     return '';

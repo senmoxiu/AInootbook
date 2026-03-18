@@ -134,8 +134,8 @@
       watch(
         () => props.value,
         (val, prevCount) => {
-         // 代码逻辑说明: 【issues/556】JImageUpload组件value赋初始值没显示图片------------
-            if (val && val instanceof Array) {
+          // 代码逻辑说明: 【issues/556】JImageUpload组件value赋初始值没显示图片------------
+          if (val && val instanceof Array) {
             val = val.join(',');
           }
           if (initTag.value == true) {

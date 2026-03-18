@@ -18,7 +18,7 @@
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
   import { saveOrUpdateUser, getUserRoles, getUserDepartList, getAllRolesListNoByTenant, getAllRolesList } from './user.api';
   import { useDrawerAdaptiveWidth } from '/@/hooks/jeecg/useAdaptiveWidth';
-  import { getTenantId } from "/@/utils/auth";
+  import { getTenantId } from '/@/utils/auth';
 
   // 声明Emits
   const emit = defineEmits(['success', 'register']);
@@ -44,7 +44,7 @@
     if (unref(isUpdate)) {
       rowId.value = data.record.id;
       //租户信息定义成数组
-   /*   if (data.record.relTenantIds && !Array.isArray(data.record.relTenantIds)) {
+      /*   if (data.record.relTenantIds && !Array.isArray(data.record.relTenantIds)) {
         data.record.relTenantIds = data.record.relTenantIds.split(',');
       } else {
         //【issues/I56C5I】用户管理中连续点两次编辑租户配置就丢失了
@@ -72,8 +72,8 @@
       //负责部门/赋值
       data.record.departIds && !Array.isArray(data.record.departIds) && (data.record.departIds = data.record.departIds.split(','));
       // 代码逻辑说明: [issues/772]避免空值显示异常------------
-      data.record.departIds =  (!data.record.departIds || data.record.departIds == '') ? [] : data.record.departIds;
-      data.record.sort = data.record.sort ? data.record.sort: 1000; 
+      data.record.departIds = !data.record.departIds || data.record.departIds == '' ? [] : data.record.departIds;
+      data.record.sort = data.record.sort ? data.record.sort : 1000;
     }
     //处理角色用户列表情况(和角色列表有关系)
     data.selectedroles && (await setFieldsValue({ selectedroles: data.selectedroles }));
@@ -107,21 +107,21 @@
         field: 'selectedroles',
         show: !data?.departDisabled,
         //判断是否为多租户模式
-        componentProps:{
-          api: data.tenantSaas?getAllRolesList:getAllRolesListNoByTenant
-        }
+        componentProps: {
+          api: data.tenantSaas ? getAllRolesList : getAllRolesListNoByTenant,
+        },
       },
       // 代码逻辑说明: 【issues/4935】租户用户编辑界面中租户下拉框未过滤，显示当前系统所有的租户------------
       {
         field: 'relTenantIds',
-        componentProps:{
+        componentProps: {
           disabled: !!data.tenantSaas,
         },
       },
     ]);
     // 代码逻辑说明: 【issues/4935】租户用户编辑界面中租户下拉框未过滤，显示当前系统所有的租户------------
-    if(!unref(isUpdate) && data.tenantSaas){
-      await setFieldsValue({ relTenantIds: getTenantId().toString() })
+    if (!unref(isUpdate) && data.tenantSaas) {
+      await setFieldsValue({ relTenantIds: getTenantId().toString() });
     }
     // 无论新增还是编辑，都可以设置表单值
     if (typeof data.record === 'object') {
@@ -132,7 +132,7 @@
     // 隐藏底部时禁用整个表单
     // 代码逻辑说明: VUEN-1117【issue】0523周开源问题
     setProps({ disabled: !showFooter.value });
-    if(unref(isUpdate)){
+    if (unref(isUpdate)) {
       updateSchema([
         //修改主岗位和兼职岗位的参数
         {
@@ -142,7 +142,7 @@
         {
           field: 'otherDepPostId',
           componentProps: { params: { departIds: data.record.selecteddeparts, parentId: data.record.selecteddeparts } },
-        }
+        },
       ]);
     }
     //部门管理，新增用户，在岗位下添加人员的时候默认当前岗位为主岗位
@@ -150,8 +150,8 @@
       {
         field: 'mainDepPostId',
         defaultValue: data?.mainDepPostId || '',
-      }
-    ])
+      },
+    ]);
   });
   //获取标题
   const getTitle = computed(() => {
@@ -182,14 +182,14 @@
       //关闭弹窗
       closeDrawer();
       //刷新列表
-      emit('success',{isUpdateVal ,values});
+      emit('success', { isUpdateVal, values });
     } finally {
       setDrawerProps({ confirmLoading: false });
     }
   }
 </script>
 <style scoped lang="less">
-  :deep(.ant-input-number){
+  :deep(.ant-input-number) {
     width: 100%;
   }
 </style>

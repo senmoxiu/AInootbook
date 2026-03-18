@@ -57,7 +57,7 @@
       //关闭弹窗
       closeModal();
       //刷新列表
-      emit('success',values);
+      emit('success', values);
     } catch ({ errorFields }) {
       if (errorFields) {
         const firstField = errorFields[0];

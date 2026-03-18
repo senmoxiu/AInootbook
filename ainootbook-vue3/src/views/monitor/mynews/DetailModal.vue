@@ -11,13 +11,13 @@
     :destroyOnClose="true"
     @visible-change="handleVisibleChange"
   >
-   <template #title>
-     <span class="basic-title">查看详情</span>
-     <div class="print-btn" @click="onPrinter">
-       <Icon icon="ant-design:printer-filled" />
-       <span class="print-text">打印</span>
-     </div>
-   </template>
+    <template #title>
+      <span class="basic-title">查看详情</span>
+      <div class="print-btn" @click="onPrinter">
+        <Icon icon="ant-design:printer-filled" />
+        <span class="print-text">打印</span>
+      </div>
+    </template>
     <a-card class="daily-article">
       <a-card-meta :title="content.titile">
         <template #description>
@@ -61,7 +61,12 @@
           </div>
         </div>
       </template>
-      <a v-if="noticeFiles.length > 1" :href="downLoadFiles + '?id=' + content.id + '&token=' + getToken()" target="_blank" style="margin: 15px 6px; color: #5ac0fa">
+      <a
+        v-if="noticeFiles.length > 1"
+        :href="downLoadFiles + '?id=' + content.id + '&token=' + getToken()"
+        target="_blank"
+        style="margin: 15px 6px; color: #5ac0fa"
+      >
         <download-outlined class="item-icon" style="margin-right: 5px" /><span>批量下载所有附件</span>
       </a>
     </template>
@@ -79,8 +84,8 @@
   import { useGlobSetting } from '@/hooks/setting';
   import { encryptByBase64 } from '@/utils/cipher';
   import { getToken } from '@/utils/auth';
-  import {defHttp} from "@/utils/http/axios";
-  import {$electron} from "@/electron";
+  import { defHttp } from '@/utils/http/axios';
+  import { $electron } from '@/electron';
   const router = useRouter();
   const glob = useGlobSetting();
   const isUpdate = ref(true);
@@ -109,10 +114,15 @@
       }
 
       content.value = data.record;
-      if(content.value.sender){
-        const userInfo = await defHttp.get({ url: '/sys/user/queryUserComponentData?isMultiTranslate=true', params: { username: content.value.sender } });
-        content.value.sender = userInfo && userInfo?.records && userInfo?.records.length>0
-            ?userInfo.records.find((item) => item.username === content.value.sender)?.realname : content.value.sender;
+      if (content.value.sender) {
+        const userInfo = await defHttp.get({
+          url: '/sys/user/queryUserComponentData?isMultiTranslate=true',
+          params: { username: content.value.sender },
+        });
+        content.value.sender =
+          userInfo && userInfo?.records && userInfo?.records.length > 0
+            ? userInfo.records.find((item) => item.username === content.value.sender)?.realname
+            : content.value.sender;
       }
       console.log('data---------->>>', data);
       if (data.record?.files && data.record?.files.length > 0) {
@@ -281,8 +291,8 @@
       console.log('glob.onlineUrl', glob.viewUrl);
       let url = encodeURIComponent(encryptByBase64(filePath));
       let previewUrl = `${glob.viewUrl}?url=` + url;
-      //update-begin-author:liusq---date:2025-12-16--for: JHHB-1139桌面端 文件预览统一修改 
-      if($electron.isElectron()){
+      //update-begin-author:liusq---date:2025-12-16--for: JHHB-1139桌面端 文件预览统一修改
+      if ($electron.isElectron()) {
         previewUrl = getElectronFileUrl(filePath);
       }
       //update-end-author:liusq---date:2025-12-16--for: JHHB-1139桌面端 文件预览统一修改
@@ -377,14 +387,14 @@
     max-width: 100%;
     height: auto;
   }
-  .basic-title{
+  .basic-title {
     position: relative;
     display: flex;
     padding-left: 7px;
     font-size: 16px;
     font-weight: 500;
     line-height: 24px;
-    color: rgba(0,0,0,0.88);
+    color: rgba(0, 0, 0, 0.88);
     cursor: move;
     -webkit-user-select: none;
     -moz-user-select: none;

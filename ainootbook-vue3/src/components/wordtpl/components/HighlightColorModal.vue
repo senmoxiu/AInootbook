@@ -32,7 +32,7 @@
           { value: '#C0C0C0', label: '浅灰色' },
           { value: '#000000', label: '黑色' },
         ],
-        getPopupContainer: ()=> document.body
+        getPopupContainer: () => document.body,
       },
     },
   ];

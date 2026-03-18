@@ -130,7 +130,7 @@
 
   // 查看用户详情
   function showUserDetail(record) {
-    record.activitiSync = record.activitiSync? Number(record.activitiSync) : 1;
+    record.activitiSync = record.activitiSync ? Number(record.activitiSync) : 1;
     openDrawer(true, {
       record,
       isUpdate: true,
@@ -140,7 +140,7 @@
 
   // 编辑用户信息
   function editUserInfo(record) {
-    record.activitiSync = record.activitiSync? Number(record.activitiSync) : 1;
+    record.activitiSync = record.activitiSync ? Number(record.activitiSync) : 1;
     openDrawer(true, { isUpdate: true, record, departDisabled: true, departPostDisabled: true });
   }
 

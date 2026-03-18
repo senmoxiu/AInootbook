@@ -23,11 +23,11 @@
        * 包含最大值、最小值和精度配置，供输入组件和格式化逻辑使用
        */
       const numberProps = computed<{
-        max?: number,
-        min?: number,
-        precision?: number,
+        max?: number;
+        min?: number;
+        precision?: number;
       }>(() => {
-        const {max, min, precision} = cellProps.value as Recordable;
+        const { max, min, precision } = cellProps.value as Recordable;
         const nProps: Recordable = {};
         // 最大值
         if (typeof max === 'number') {

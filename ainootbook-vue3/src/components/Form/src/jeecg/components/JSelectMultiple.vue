@@ -89,7 +89,7 @@
           return [];
         }
         return dictOptions.value.map((item, index) => {
-          const {useDicColor} = props;
+          const { useDicColor } = props;
           const text = item.text || item.label || item.label || '';
           const key = item.value + '_' + text + '_' + index;
           return {
@@ -98,7 +98,7 @@
             value: item.value,
             color: item.color,
             class: [useDicColor && item.color ? 'colorText' : ''],
-            style: {backgroundColor: `${useDicColor && item.color}`},
+            style: { backgroundColor: `${useDicColor && item.color}` },
           };
         });
       });
@@ -112,14 +112,14 @@
       });
 
       watch(
-          () => props.dictCode,
-          () => {
-            if (props.dictCode) {
-              loadDictOptions();
-            } else {
-              dictOptions.value = props.options;
-            }
+        () => props.dictCode,
+        () => {
+          if (props.dictCode) {
+            loadDictOptions();
+          } else {
+            dictOptions.value = props.options;
           }
+        }
       );
 
       watch(
@@ -134,13 +134,16 @@
       );
 
       //适用于 动态改变下拉选项的操作
-      watch(()=>props.options, ()=>{
-        if (props.dictCode) {
-          // nothing to do
-        } else {
-          dictOptions.value = props.options;
+      watch(
+        () => props.options,
+        () => {
+          if (props.dictCode) {
+            // nothing to do
+          } else {
+            dictOptions.value = props.options;
+          }
         }
-      });
+      );
 
       function onChange(selectedValue) {
         if (props.triggerChange) {
@@ -175,7 +178,7 @@
         }
         getDictItems(temp).then((res) => {
           if (res) {
-            dictOptions.value = res.map((item) => ({ value: item.value, label: item.text, color:item.color }));
+            dictOptions.value = res.map((item) => ({ value: item.value, label: item.text, color: item.color }));
             //console.info('res', dictOptions.value);
           } else {
             console.error('getDictItems error: : ', res);
@@ -202,9 +205,9 @@
     },
   });
 </script>
-<style scoped lang='less'>
-.colorText{
-  display: inline-block;
+<style scoped lang="less">
+  .colorText {
+    display: inline-block;
     height: 20px;
     line-height: 20px;
     padding: 0 6px;
@@ -212,5 +215,5 @@
     background-color: red;
     color: #fff;
     font-size: 12px;
-}
+  }
 </style>

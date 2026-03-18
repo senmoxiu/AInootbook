@@ -1,8 +1,24 @@
 <!--部门选择框-->
 <template>
   <div>
-    <BasicModal v-bind="$attrs" @register="register" :title="modalTitle" width="600px" :minHeight="300" :maxHeight="maxHeight" @ok="handleOk" destroyOnClose @visible-change="visibleChange">
-      <a-input-search v-if="izOnlySelectDepartPost" placeholder="按岗位名称搜索…" style="margin-bottom: 10px" @search="onSearch" @change="handelSearchChange"/>
+    <BasicModal
+      v-bind="$attrs"
+      @register="register"
+      :title="modalTitle"
+      width="600px"
+      :minHeight="300"
+      :maxHeight="maxHeight"
+      @ok="handleOk"
+      destroyOnClose
+      @visible-change="visibleChange"
+    >
+      <a-input-search
+        v-if="izOnlySelectDepartPost"
+        placeholder="按岗位名称搜索…"
+        style="margin-bottom: 10px"
+        @search="onSearch"
+        @change="handelSearchChange"
+      />
       <BasicTree
         ref="treeRef"
         :treeData="treeData"
@@ -48,10 +64,10 @@
   import { treeProps } from '/@/components/Form/src/jeecg/props/props';
   import { BasicTree, TreeActionType } from '/@/components/Tree';
   import { useTreeBiz } from '/@/components/Form/src/jeecg/hooks/useTreeBiz';
-  import {propTypes} from "/@/utils/propTypes";
+  import { propTypes } from '/@/utils/propTypes';
   import { omit } from 'lodash-es';
   import TreeIcon from '@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue';
-  import { getDepartPathNameByOrgCode } from "@/utils/common/compUtils";
+  import { getDepartPathNameByOrgCode } from '@/utils/common/compUtils';
 
   export default defineComponent({
     name: 'DeptSelectModal',
@@ -92,20 +108,35 @@
       const treeRef = ref<Nullable<TreeActionType>>(null);
       //加载树key
       const reloadKey = ref<number>(Math.random());
-      
+
       // 代码逻辑说明: 部门选择警告类型不匹配
-      let propValue = props.value === ''?[]:props.value;
+      let propValue = props.value === '' ? [] : props.value;
       // 确保传递给BasicTree的value是数组格式
       if (propValue && typeof propValue === 'string') {
         propValue = propValue.split(',');
       }
       // 代码逻辑说明: [issues/538]JSelectDept组件受 dynamicDisabled 影响
-      let temp = Object.assign({}, unref(props), unref(attrs), {value: propValue},{disabled: false});
+      let temp = Object.assign({}, unref(props), unref(attrs), { value: propValue }, { disabled: false });
       const getBindValue = omit(temp, 'multiple');
-      
+
       const queryUrl = getQueryUrl();
-      const [{ visibleChange, checkedKeys, getCheckStrictly, getSelectTreeData, onCheck, onLoadData, treeData, checkALL, expandAll, onSelect, onSearch, expandedKeys, checkStrictly }] =
-        useTreeBiz(treeRef, queryUrl, getBindValue, props, emit);
+      const [
+        {
+          visibleChange,
+          checkedKeys,
+          getCheckStrictly,
+          getSelectTreeData,
+          onCheck,
+          onLoadData,
+          treeData,
+          checkALL,
+          expandAll,
+          onSelect,
+          onSearch,
+          expandedKeys,
+          checkStrictly,
+        },
+      ] = useTreeBiz(treeRef, queryUrl, getBindValue, props, emit);
       const searchInfo = ref(props.params || {});
       const tree = ref([]);
       //替换treeNode中key字段为treeData中对应的字段
@@ -127,7 +158,7 @@
 
       /** 获取查询数据方法 */
       function getQueryUrl() {
-        let queryFn = props.izOnlySelectDepartPost ? queryDepartAndPostTreeSync :props.sync ? queryDepartTreeSync : queryTreeList;
+        let queryFn = props.izOnlySelectDepartPost ? queryDepartAndPostTreeSync : props.sync ? queryDepartTreeSync : queryTreeList;
         // 代码逻辑说明: issues/I5F3P4 online配置部门选择后编辑，查看数据应该显示部门名称，不是部门代码
         return (params) => queryFn(Object.assign({}, params, { primaryKey: props.rowKey }));
       }
@@ -137,14 +168,14 @@
        * @param value
        */
       function handelSearchChange(value) {
-        if(!value.target.value){
+        if (!value.target.value) {
           reloadKey.value = Math.random();
         }
       }
 
       /**
        * 设置层级关联和层级独立
-       * 
+       *
        * @param value
        */
       function toggleCheckStrictly(value) {
@@ -153,7 +184,7 @@
 
       //标题缓存
       const titleCache = reactive<Record<string, string>>({});
-      
+
       /**
        * 获取标题
        * @param orgCategory
@@ -161,16 +192,16 @@
        * @param orgCode
        */
       function getTitle(orgCategory, title, orgCode) {
-        if(props.izShowDepPath && orgCategory === '2'){
+        if (props.izShowDepPath && orgCategory === '2') {
           const cached = titleCache[orgCode];
-          if (cached){
+          if (cached) {
             return cached;
           }
-          getDepartPathNameByOrgCode(orgCode,title,"").then(res=>{
-            if(res){
-              titleCache[orgCode] =  title + "(" + res.substring(0, res.lastIndexOf('/')) + ")";
-            }else{
-              titleCache[orgCode] =  title;
+          getDepartPathNameByOrgCode(orgCode, title, '').then((res) => {
+            if (res) {
+              titleCache[orgCode] = title + '(' + res.substring(0, res.lastIndexOf('/')) + ')';
+            } else {
+              titleCache[orgCode] = title;
             }
           });
           return title;
@@ -178,7 +209,7 @@
           return title;
         }
       }
-      
+
       return {
         tree,
         handleOk,
@@ -214,7 +245,8 @@
     top: 1px;
     right: 2px;
   }
-  .svg-depart,.svg-post {
+  .svg-depart,
+  .svg-post {
     width: 14px;
     height: 16px;
     position: relative;

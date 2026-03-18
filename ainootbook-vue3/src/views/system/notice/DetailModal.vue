@@ -31,8 +31,13 @@
           </div>
         </div>
       </template>
-      <a v-if="noticeFiles.length > 1" :href="downLoadFiles + '?id=' + noticeId + '&token=' + getToken()" target="_blank"  style="margin: 15px 6px;color: #5ac0fa;">
-        <download-outlined class="item-icon" style="margin-right: 5px"  /><span>批量下载所有附件</span>
+      <a
+        v-if="noticeFiles.length > 1"
+        :href="downLoadFiles + '?id=' + noticeId + '&token=' + getToken()"
+        target="_blank"
+        style="margin: 15px 6px; color: #5ac0fa"
+      >
+        <download-outlined class="item-icon" style="margin-right: 5px" /><span>批量下载所有附件</span>
       </a>
     </template>
   </BasicModal>
@@ -42,12 +47,12 @@
   import { propTypes } from '/@/utils/propTypes';
   import { ref } from 'vue';
   import { buildUUID } from '@/utils/uuid';
-  import {getElectronFileUrl, getFileAccessHttpUrl} from '@/utils/common/compUtils';
+  import { getElectronFileUrl, getFileAccessHttpUrl } from '@/utils/common/compUtils';
   import { DownloadOutlined, EyeOutlined, PaperClipOutlined } from '@ant-design/icons-vue';
   import { encryptByBase64 } from '@/utils/cipher';
   import { useGlobSetting } from '@/hooks/setting';
-  import { getToken } from "@/utils/auth";
-  import {$electron} from "@/electron";
+  import { getToken } from '@/utils/auth';
+  import { $electron } from '@/electron';
   const glob = useGlobSetting();
   // 获取props
   defineProps({
@@ -104,8 +109,8 @@
     if (filePath) {
       let url = encodeURIComponent(encryptByBase64(filePath));
       let previewUrl = `${glob.viewUrl}?url=` + url;
-      //update-begin-author:liusq---date:2025-12-16--for: JHHB-1139桌面端 文件预览统一修改 
-      if($electron.isElectron()){
+      //update-begin-author:liusq---date:2025-12-16--for: JHHB-1139桌面端 文件预览统一修改
+      if ($electron.isElectron()) {
         previewUrl = getElectronFileUrl(filePath);
       }
       //update-end-author:liusq---date:2025-12-16--for: JHHB-1139桌面端 文件预览统一修改

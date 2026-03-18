@@ -1,8 +1,8 @@
 <template>
   <div :class="prefixCls">
     <div v-show="!isEdit" :class="{ [`${prefixCls}__normal`]: true, 'ellipsis-cell': column.ellipsis }" @click="handleEdit">
-      <div class="cell-content" :title="column.ellipsis ? getValues ?? '' : ''">
-        {{ typeof getValues === 'string' && getValues.length === 0 ? '&nbsp;' : getValues ?? '&nbsp;' }}
+      <div class="cell-content" :title="column.ellipsis ? (getValues ?? '') : ''">
+        {{ typeof getValues === 'string' && getValues.length === 0 ? '&nbsp;' : (getValues ?? '&nbsp;') }}
       </div>
       <FormOutlined :class="`${prefixCls}__normal-icon`" v-if="!column.editRow" />
     </div>
@@ -129,8 +129,8 @@
 
         const value = isCheckValue ? (isNumber(val) && isBoolean(val) ? val : !!val) : val;
         // 代码逻辑说明: 【issues/7136】单元格上的tooltip提示，如果表格有滚动条，会不跟着单元格滚动---
-        let tooltipPosition:any = unref(table?.wrapRef.value)?.parentElement?.querySelector('.ant-table-body');
-        if(tooltipPosition){
+        let tooltipPosition: any = unref(table?.wrapRef.value)?.parentElement?.querySelector('.ant-table-body');
+        if (tooltipPosition) {
           tooltipPosition.style.position = 'relative';
         }
         return {

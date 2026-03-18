@@ -6,9 +6,7 @@
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined" /> 删除
-              </a-menu-item>
+              <a-menu-item key="1" @click="batchHandleDelete"> <Icon icon="ant-design:delete-outlined" /> 删除 </a-menu-item>
             </a-menu>
           </template>
           <a-button>批量操作<Icon icon="mdi:chevron-down" /></a-button>

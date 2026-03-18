@@ -54,9 +54,9 @@
       },
       showIndexColumn: true,
       defSort: {
-        column: "",
-        order: ""
-      }
+        column: '',
+        order: '',
+      },
     },
     exportConfig: {
       name: '职务列表',

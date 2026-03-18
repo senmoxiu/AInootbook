@@ -230,12 +230,12 @@
         return '';
       };
       /*
-      * 2025-11-12
-      * liaozhiyang
-      * 顶部混合导航(顶部左侧组合菜单)一级菜单点击事件处理。
-      * 1.没有重定向打开子菜单的第一个
-      * 2.有重定向判断router中是否存在该路由且路由是否有对应的组件，存在则打开，不存在则打开子菜单的第一个
-      */
+       * 2025-11-12
+       * liaozhiyang
+       * 顶部混合导航(顶部左侧组合菜单)一级菜单点击事件处理。
+       * 1.没有重定向打开子菜单的第一个
+       * 2.有重定向判断router中是否存在该路由且路由是否有对应的组件，存在则打开，不存在则打开子菜单的第一个
+       */
       function handleMixMenuClick(menuItem, key) {
         const hasChildren = menuItem && menuItem.children?.length;
         // 不存在子菜单，直接返回

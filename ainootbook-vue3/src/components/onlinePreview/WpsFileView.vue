@@ -6,9 +6,9 @@
   import { defHttp } from '/@/utils/http/axios';
   import OpenSDK from './open-jssdk.es';
   import { getToken } from '@/utils/auth';
-  import {useMessage} from "@/hooks/web/useMessage";
+  import { useMessage } from '@/hooks/web/useMessage';
 
-  const {createWarningModal} = useMessage()
+  const { createWarningModal } = useMessage();
 
   initWpsPath();
 

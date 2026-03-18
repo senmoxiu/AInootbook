@@ -102,7 +102,7 @@
         }
         if (schema.component === 'Divider') {
           // 代码逻辑说明: 【QQYUN-6603】分割线标题位置显示不正确---
-          componentProps = Object.assign({ type: 'horizontal',orientation:'left', plain: true, }, componentProps);
+          componentProps = Object.assign({ type: 'horizontal', orientation: 'left', plain: true }, componentProps);
         }
         return componentProps as Recordable;
       });
@@ -304,7 +304,16 @@
       }
 
       function renderComponent() {
-        const { renderComponentContent, component, field, changeEvent = 'change', valueField, componentProps, dynamicRules, rules:defRules = [] } = props.schema;
+        const {
+          renderComponentContent,
+          component,
+          field,
+          changeEvent = 'change',
+          valueField,
+          componentProps,
+          dynamicRules,
+          rules: defRules = [],
+        } = props.schema;
 
         const isCheck = component && ['Switch', 'Checkbox'].includes(component);
         // 代码逻辑说明: 【QQYUN-6679】input去空格
@@ -358,7 +367,6 @@
         const propsData: Recordable = {
           allowClear: true,
           getPopupContainer: (trigger: Element) => {
-
             return trigger?.parentNode;
           },
           size,
@@ -379,7 +387,7 @@
           //自动设置placeholder
           // 代码逻辑说明: 【issues/6908】多语言无刷新切换时，BasicColumn和FormSchema里面的值不能正常切换
           let label = isFunction(props.schema.label) ? props.schema.label() : props.schema.label;
-          if (localeStore.getLocale === 'en' && !(/^\s/.test(label))) {
+          if (localeStore.getLocale === 'en' && !/^\s/.test(label)) {
             label = ' ' + label;
           }
           propsData.placeholder = unref(getComponentsProps)?.placeholder || createPlaceholderMessage(component) + label;
@@ -477,14 +485,16 @@
               label={renderLabelHelpMessage()}
               rules={handleRules()}
               // 代码逻辑说明: 【issues/1244】标识了必填，但是必填标识没显示
-              validateFirst = { true }
+              validateFirst={true}
               labelCol={labelCol}
               wrapperCol={wrapperCol}
             >
               <div style="display:flex">
                 {/* author: sunjianlei for: 【VUEN-744】此处加上 width: 100%; 因为要防止组件宽度超出 FormItem */}
                 {/* update-begin--author:liaozhiyang---date:20240510---for：【TV360X-719】表单校验不通过项滚动到可视区内 */}
-                <Middleware formName={props.formName} fieldName={field} source={props.source}>{getContent()}</Middleware>
+                <Middleware formName={props.formName} fieldName={field} source={props.source}>
+                  {getContent()}
+                </Middleware>
                 {/* update-end--author:liaozhiyang---date:20240510---for：【TV360X-719】表单校验不通过项滚动到可视区内 */}
                 {showSuffix && <span class="suffix">{getSuffix}</span>}
               </div>

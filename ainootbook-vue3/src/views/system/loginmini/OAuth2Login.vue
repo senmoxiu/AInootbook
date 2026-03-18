@@ -11,10 +11,10 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useI18n } from '/@/hooks/web/useI18n';
-  import { getAuthCache, getTenantId, getToken } from "/@/utils/auth";
+  import { getAuthCache, getTenantId, getToken } from '/@/utils/auth';
   import { requestAuthCode } from 'dingtalk-jsapi';
   import { defHttp } from '/@/utils/http/axios';
-  import { OAUTH2_THIRD_LOGIN_TENANT_ID } from "/@/enums/cacheEnum";
+  import { OAUTH2_THIRD_LOGIN_TENANT_ID } from '/@/enums/cacheEnum';
 
   const isOAuth = ref<boolean>(isOAuth2AppEnv());
   const env = ref<any>({ thirdApp: false, wxWork: false, dingtalk: false });
@@ -54,7 +54,7 @@
       if (route.query.oauth2LoginToken) {
         let token = route.query.oauth2LoginToken;
         //执行登录操作
-        thirdLogin({ token, thirdType: route.query.thirdType,tenantId: getTenantId });
+        thirdLogin({ token, thirdType: route.query.thirdType, tenantId: getTenantId });
       } else if (env.value.wxWork) {
         sysOAuth2Login('wechat_enterprise');
       } else if (env.value.dingtalk) {
@@ -97,24 +97,27 @@
     let tenantId = getAuthCache(OAUTH2_THIRD_LOGIN_TENANT_ID) || 0;
     let url = `/sys/thirdLogin/get/corpId/clientId?tenantId=${tenantId}`;
     // 代码逻辑说明: 不要使用getAction online里面的，要用defHttp---
-    defHttp.get({ url:url },{ isTransformResponse: false }).then((res) => {
+    defHttp
+      .get({ url: url }, { isTransformResponse: false })
+      .then((res) => {
         if (res.success) {
-          if(res.result && res.result.corpId && res.result.clientId){
+          if (res.result && res.result.corpId && res.result.clientId) {
             requestAuthCode({ corpId: res.result.corpId, clientId: res.result.clientId }).then((res) => {
               let { code } = res;
               sysOAuth2Callback(code);
             });
-          }else{
+          } else {
             toOldAuthLogin();
           }
         } else {
           toOldAuthLogin();
         }
-      }).catch((err) => {
+      })
+      .catch((err) => {
         toOldAuthLogin();
       });
   }
-  
+
   /**
    * 旧版钉钉登录
    */

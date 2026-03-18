@@ -15,7 +15,7 @@
     @search="loadData"
     @change="handleAsyncChange"
     @popupScroll="handlePopupScroll"
-    :mode="multiple?'multiple':''"
+    :mode="multiple ? 'multiple' : ''"
     @select="handleSelect"
     @deselect="handleDeSelect"
   >
@@ -34,9 +34,9 @@
     :placeholder="placeholder"
     :filterOption="filterOption"
     :notFoundContent="loading ? undefined : null"
-    :dropdownAlign="{overflow: {adjustY: adjustY }}"
+    :dropdownAlign="{ overflow: { adjustY: adjustY } }"
     @change="handleChange"
-    :mode="multiple?'multiple':''"
+    :mode="multiple ? 'multiple' : ''"
     @select="handleSelect"
     @deselect="handleDeSelect"
   >
@@ -44,7 +44,9 @@
       <a-spin v-if="loading" size="small" />
     </template>
     <a-select-option v-for="d in options" :key="d?.value" :value="d?.value">
-      <span :class="[useDicColor && d.color ? 'colorText' : '']" :style="{ backgroundColor: `${useDicColor && d.color}` }">{{ d?.text || d?.label }}</span>
+      <span :class="[useDicColor && d.color ? 'colorText' : '']" :style="{ backgroundColor: `${useDicColor && d.color}` }">{{
+        d?.text || d?.label
+      }}</span>
     </a-select-option>
   </a-select>
 </template>
@@ -80,18 +82,18 @@
       },
       //默认开启Y轴溢出位置调整，因此在可视空间不足时下拉框位置会自动上移，导致Select的输入框被遮挡。需要注意的是，默认情况是是可视空间，而不是所拥有的空间
       // 代码逻辑说明: [issue/286]下拉搜索框遮挡问题
-      adjustY:propTypes.bool.def(true),
+      adjustY: propTypes.bool.def(true),
       //是否在有值后立即触发change
       immediateChange: propTypes.bool.def(false),
       //支持传入查询参数，如排序信息
-      params:{
+      params: {
         type: Object,
-        default: ()=>{}
+        default: () => {},
       },
       //是否为多选
-      multiple:{
+      multiple: {
         type: Boolean,
-        default: false
+        default: false,
       },
       useDicColor: {
         type: Boolean,
@@ -103,7 +105,7 @@
       const options = ref<any[]>([]);
       const loading = ref(false);
       // 代码逻辑说明: 【issues/897】JSearchSelect组件添加class/style样式不生效
-      const attrs = useAttrs({'excludeDefaultKeys': false});
+      const attrs = useAttrs({ excludeDefaultKeys: false });
       const selectedValue = ref([]);
       const selectedAsyncValue = ref([]);
       const lastLoad = ref(0);
@@ -118,24 +120,28 @@
       // 是否是字典表
       const isDictTable = computed(() => {
         if (props.dict) {
-          return props.dict.split(',').length >= 2
+          return props.dict.split(',').length >= 2;
         }
         return false;
-      })
+      });
 
       /**
        * 监听字典code
        */
-      watch(() => props.dict, () => {
-        if (!props.dict) {
-          return
-        }
-        if (isDictTable.value) {
-          initDictTableData();
-        } else {
-          initDictCodeData();
-        }
-      }, {immediate: true});
+      watch(
+        () => props.dict,
+        () => {
+          if (!props.dict) {
+            return;
+          }
+          if (isDictTable.value) {
+            initDictTableData();
+          } else {
+            initDictCodeData();
+          }
+        },
+        { immediate: true }
+      );
 
       /**
        * 监听value
@@ -175,7 +181,7 @@
         pageNo = 1;
         isHasData = true;
         searchKeyword = value;
- 
+
         lastLoad.value += 1;
         const currentLoad = unref(lastLoad);
         options.value = [];
@@ -219,8 +225,8 @@
             defHttp.get({ url: `/sys/dict/loadDictItem/${dict}`, params: { key: value } }).then((res) => {
               if (res && res.length > 0) {
                 //判断组件是否为多选
-                if(props.multiple){
-                  if(value){
+                if (props.multiple) {
+                  if (value) {
                     let arr: any = [];
                     //多选返回的是以逗号拼接的方式
                     let values = value.toString().split(',');
@@ -243,7 +249,7 @@
                     selectedAsyncValue.value = { ...obj };
                   }
                   // 代码逻辑说明: 值改变触发change事件--用于online关联记录配置页面
-                  if(props.immediateChange == true){
+                  if (props.immediateChange == true) {
                     emit('change', props.value);
                   }
                 }
@@ -252,12 +258,12 @@
           }
         } else {
           // 代码逻辑说明: 【issues/8101】前端dict组件导致内存溢出问题：搜索组件支持多选---
-          if(!props.multiple){
+          if (!props.multiple) {
             selectedValue.value = value.toString();
-            if(props.immediateChange == true){
+            if (props.immediateChange == true) {
               emit('change', value.toString());
             }
-          }else{
+          } else {
             //多选的情况下需要转成数组
             selectedValue.value = value.toString().split(',');
           }
@@ -333,7 +339,7 @@
        * */
       function handleChange(value) {
         //多选也会触发change事件，需要判断如果时多选不需要赋值
-        if(!props.multiple){
+        if (!props.multiple) {
           selectedValue.value = value;
           callback();
         }
@@ -342,79 +348,79 @@
        * 异步改变事件
        * */
       function handleAsyncChange(selectedObj) {
-          // 单选情况下使用change事件
-          if(!props.multiple){
-            if (selectedObj) {
-              selectedAsyncValue.value = selectedObj;
-              selectedValue.value = selectedObj.key;
-            } else {
-              selectedAsyncValue.value = null;
-              selectedValue.value = null;
-              options.value = null;
-              loadData('');
-            }
-            callback();
-            // 点x清空时需要把loadSelectText设置true
-            selectedObj ?? (loadSelectText.value = true);
+        // 单选情况下使用change事件
+        if (!props.multiple) {
+          if (selectedObj) {
+            selectedAsyncValue.value = selectedObj;
+            selectedValue.value = selectedObj.key;
+          } else {
+            selectedAsyncValue.value = null;
+            selectedValue.value = null;
+            options.value = null;
+            loadData('');
           }
+          callback();
+          // 点x清空时需要把loadSelectText设置true
+          selectedObj ?? (loadSelectText.value = true);
+        }
       }
 
       /**
        * 异步值选中事件
        * @param selectedObj
        */
-      function handleSelect(selectedObj){
+      function handleSelect(selectedObj) {
         let key = selectedObj;
-        if(props.async){
+        if (props.async) {
           key = selectedObj.key;
         }
         //多选情况下使用select事件
-        if(props.multiple && key){
+        if (props.multiple && key) {
           //异步的时候才需要在selectedValue数组中添加值操作，同步的情况下直接走更新值操作
-          if(props.async){
+          if (props.async) {
             selectedValue.value.push(key);
           }
           selectedObj ?? (loadSelectText.value = true);
           callback();
         }
       }
-      
+
       /**
        * 异步值取消选中事件
        * @param selectedObj
        */
-      function handleDeSelect(selectedObj){
+      function handleDeSelect(selectedObj) {
         let key = selectedObj;
-        if(props.async){
+        if (props.async) {
           key = selectedObj.key;
         }
         //多选情况下使用select事件
-        if(props.multiple){
+        if (props.multiple) {
           //异步的时候才需要在selectedValue数组中删除值操作，同步的情况下直接走更新值操作
-          if(props.async){
-            let findIndex = selectedValue.value.findIndex(item => item === key);
-            if(findIndex != -1){
-              selectedValue.value.splice(findIndex,1);
+          if (props.async) {
+            let findIndex = selectedValue.value.findIndex((item) => item === key);
+            if (findIndex != -1) {
+              selectedValue.value.splice(findIndex, 1);
             }
           }
           selectedObj ?? (loadSelectText.value = true);
           callback();
         }
       }
-      
+
       /**
        *回调方法
        * */
       function callback() {
         loadSelectText.value = false;
         //单选直接走更新值操作
-        if(!props.multiple){
+        if (!props.multiple) {
           emit('change', unref(selectedValue));
           emit('update:value', unref(selectedValue));
         } else {
           //多选需要把数组转成字符串
-          emit('change', unref(selectedValue).join(","));
-          emit('update:value', unref(selectedValue).join(","));
+          emit('change', unref(selectedValue).join(','));
+          emit('update:value', unref(selectedValue).join(','));
         }
       }
       /**
@@ -422,12 +428,13 @@
        */
       function filterOption(input, option) {
         // 代码逻辑说明: issues/218 所有功能表单的下拉搜索框搜索无效
-        let value = '', label = '';
+        let value = '',
+          label = '';
         try {
           value = option.value;
           label = option.children()[0].children;
-        }catch (e) {
-          console.log('获取下拉项失败', e)
+        } catch (e) {
+          console.log('获取下拉项失败', e);
         }
         let str = input.toLowerCase();
         return value.toLowerCase().indexOf(str) >= 0 || label.toLowerCase().indexOf(str) >= 0;
@@ -448,16 +455,15 @@
       }
 
       //获取关键词参数 支持设置排序信息
-      function getKeywordParam(text){
+      function getKeywordParam(text) {
         // 如果设定了排序信息，需要写入排序信息，在关键词后加 [orderby:create_time,desc]
-        if(props.params && props.params.column && props.params.order){
-          let temp = text||''
-          
+        if (props.params && props.params.column && props.params.order) {
+          let temp = text || '';
+
           // 代码逻辑说明: /issues/4905 表单生成器字段配置时，选择关联字段，在进行高级配置时，无法加载数据库列表，提示 Sgin签名校验错误！ #4905
-          temp = temp+'[orderby:'+props.params.column+','+props.params.order+']'
+          temp = temp + '[orderby:' + props.params.column + ',' + props.params.order + ']';
           return encodeURI(temp);
-          
-        }else{
+        } else {
           return text;
         }
       }
@@ -500,7 +506,7 @@
                 if (res?.length > 0) {
                   // 防止开源只更新了前端代码没更新后端代码（第一页和第二页面的第一条数据相同则是后端代码没更新，没分页）
                   if (JSON.stringify(res[0]) === JSON.stringify(options.value[0])) {
-                    isHasData =  false;
+                    isHasData = false;
                     return;
                   }
                   options.value.push(...res);
@@ -541,14 +547,14 @@
 </script>
 
 <style scoped>
-.colorText {
-  display: inline-block;
-  height: 20px;
-  line-height: 20px;
-  padding: 0 6px;
-  border-radius: 8px;
-  background-color: red;
-  color: #fff;
-  font-size: 12px;
-}
+  .colorText {
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    padding: 0 6px;
+    border-radius: 8px;
+    background-color: red;
+    color: #fff;
+    font-size: 12px;
+  }
 </style>

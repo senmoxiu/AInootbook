@@ -3,7 +3,15 @@
     <template v-if="dataSource">
       <div v-if="isMultiSession" class="leftArea" :class="[expand ? 'expand' : 'shrink']">
         <div class="content">
-          <slide :source="source" v-if="uuid" :dataSource="dataSource" @save="handleSave" :prologue="prologue" :appData="appData" @click="handleChatClick"></slide>
+          <slide
+            :source="source"
+            v-if="uuid"
+            :dataSource="dataSource"
+            @save="handleSave"
+            :prologue="prologue"
+            :appData="appData"
+            @click="handleChatClick"
+          ></slide>
         </div>
         <div class="toggle-btn" @click="handleToggle">
           <span class="icon">
@@ -30,7 +38,7 @@
           @reload-message-title="reloadMessageTitle"
           :chatTitle="chatTitle"
           :quickCommandData="quickCommandData"
-          :showAdvertising = "showAdvertising"
+          :showAdvertising="showAdvertising"
           :hasExtraFlowInputs="hasExtraFlowInputs"
           :conversationSettings="getCurrentSettings"
           @edit-settings="handleEditSettings"
@@ -60,7 +68,7 @@
   import { JEECG_CHAT_KEY } from '/@/enums/cacheEnum';
   import { defHttp } from '/@/utils/http/axios';
   import { useRouter } from 'vue-router';
-  import { useAppInject } from "@/hooks/web/useAppInject";
+  import { useAppInject } from '@/hooks/web/useAppInject';
   import Loading from '@/components/Loading/src/Loading.vue';
 
   const router = useRouter();
@@ -126,21 +134,19 @@
   /**
    * 检查是否有额外的工作流入参
    * for [issues/8545]新建AI应用的时候只能选择没有自定义参数的AI流程
-    */
+   */
   const hasExtraFlowInputs = computed(() => {
     if (!appData.value || !appData.value.metadata) {
       return false;
     }
     try {
-      const metadata = typeof appData.value.metadata === 'string' 
-        ? JSON.parse(appData.value.metadata) 
-        : appData.value.metadata;
+      const metadata = typeof appData.value.metadata === 'string' ? JSON.parse(appData.value.metadata) : appData.value.metadata;
       const flowInputsList = metadata.flowInputs || [];
-      
+
       // 过滤掉固定参数
       const fixedParams = ['history', 'content', 'images'];
       const extraInputs = flowInputsList.filter((input: any) => !fixedParams.includes(input.field));
-      
+
       return extraInputs.length > 0;
     } catch (e) {
       console.error('解析metadata失败', e);
@@ -154,17 +160,13 @@
       return false;
     }
     try {
-      const metadata = typeof appData.value.metadata === 'string' 
-        ? JSON.parse(appData.value.metadata) 
-        : appData.value.metadata;
+      const metadata = typeof appData.value.metadata === 'string' ? JSON.parse(appData.value.metadata) : appData.value.metadata;
       const flowInputsList = metadata.flowInputs || [];
-      
+
       // 过滤掉固定参数，且必须是必填的
       const fixedParams = ['history', 'content', 'images'];
-      const requiredInputs = flowInputsList.filter((input: any) => 
-        !fixedParams.includes(input.field) && input.required
-      );
-      
+      const requiredInputs = flowInputsList.filter((input: any) => !fixedParams.includes(input.field) && input.required);
+
       return requiredInputs.length > 0;
     } catch (e) {
       console.error('解析metadata失败', e);
@@ -181,9 +183,7 @@
         return;
       }
       try {
-        const metadata = typeof val.metadata === 'string' 
-          ? JSON.parse(val.metadata) 
-          : val.metadata;
+        const metadata = typeof val.metadata === 'string' ? JSON.parse(val.metadata) : val.metadata;
         flowInputs.value = metadata.flowInputs || [];
       } catch (e) {
         console.error('解析metadata失败', e);
@@ -210,7 +210,7 @@
     // 保存到本地状态（会在发送消息时传给后端）
     conversationSettings.value[uuid.value] = data;
     message.success('对话设置已保存');
-    
+
     nextTick(() => {
       chatVisible.value = true;
     });
@@ -225,7 +225,7 @@
           if (value == '1002') {
             uuid.value = '1002';
             chatData.value = [];
-            chatTitle.value = "新建聊天";
+            chatTitle.value = '新建聊天';
             chatVisible.value = false;
             nextTick(() => {
               chatVisible.value = true;
@@ -240,8 +240,8 @@
           }
           //update-begin---author:wangshuai---date:2025-03-14---for:【QQYUN-11421】聊天，删除会话后，聊天切换到新的会话，但是聊天标题没有变---
           let values = dataSource.value.history.filter((item) => item.id === value);
-          if(values && values.length>0){
-            chatTitle.value = values[0]?.title
+          if (values && values.length > 0) {
+            chatTitle.value = values[0]?.title;
           }
           //update-end---author:wangshuai---date:2025-03-14---for:【QQYUN-11421】聊天，删除会话后，聊天切换到新的会话，但是聊天标题没有变---
           //根据选中的id查询聊天内容
@@ -271,15 +271,15 @@
               if (settingsModalRef.value) {
                 settingsModalRef.value.open();
               }
-            }else{
+            } else {
               nextTick(() => {
                 chatVisible.value = true;
               });
             }
           });
-        }else{
+        } else {
           chatData.value = [];
-          chatTitle.value = "";
+          chatTitle.value = '';
         }
       },
       { immediate: true }
@@ -292,7 +292,7 @@
   const { getIsMobile } = useAppInject();
   //来源
   const source = ref<string>('');
-  
+
   /**
    * 初始化聊天信息
    * @param appId
@@ -319,9 +319,10 @@
       })
       .catch(() => {
         priming();
-      }).finally(()=>{
-        loading.value = false
-    });
+      })
+      .finally(() => {
+        loading.value = false;
+      });
   }
 
   onMounted(() => {
@@ -334,27 +335,28 @@
     } else {
       initChartData();
       quickCommandData.value = [
-          { name: '请介绍一下JeecgBoot', descr: "请介绍一下JeecgBoot" },
-          { name: 'JEECG有哪些优势？', descr: "JEECG有哪些优势？" },
-          { name: 'JEECG可以做哪些事情？', descr: "JEECG可以做哪些事情？" },];
+        { name: '请介绍一下JeecgBoot', descr: '请介绍一下JeecgBoot' },
+        { name: 'JEECG有哪些优势？', descr: 'JEECG有哪些优势？' },
+        { name: 'JEECG可以做哪些事情？', descr: 'JEECG可以做哪些事情？' },
+      ];
     }
     let query: any = router.currentRoute.value.query;
     source.value = query.source;
-    if(query.source){
+    if (query.source) {
       showAdvertising.value = query.source === 'chatJs';
-    }else{
+    } else {
       showAdvertising.value = false;
     }
   });
 
   onUnmounted(() => {
     chatData.value = [];
-    chatTitle.value = "";
-    prologue.value = ""
-    presetQuestion.value = "";
+    chatTitle.value = '';
+    prologue.value = '';
+    presetQuestion.value = '';
     quickCommandData.value = [];
-  })
-  
+  });
+
   /**
    * 获取应用id
    *
@@ -374,19 +376,19 @@
           appData.value = res.result;
           if (res.result && res.result.prologue) {
             prologue.value = res.result.prologue;
-          }  
+          }
           if (res.result && res.result.quickCommand) {
             quickCommandData.value = JSON.parse(res.result.quickCommand);
-          } 
+          }
           if (res.result && res.result.presetQuestion) {
             presetQuestion.value = res.result.presetQuestion;
           }
           if (res.result && res.result.metadata) {
             let metadata = JSON.parse(res.result.metadata);
             //判斷是否为手机模式
-            if(!getIsMobile.value){
+            if (!getIsMobile.value) {
               //是否为多会话模式
-              if((metadata.multiSession && metadata.multiSession === '1') || !metadata.multiSession) {
+              if ((metadata.multiSession && metadata.multiSession === '1') || !metadata.multiSession) {
                 isMultiSession.value = true;
               } else {
                 isMultiSession.value = false;
@@ -394,7 +396,7 @@
               }
             }
           }
-          if(getIsMobile.value){
+          if (getIsMobile.value) {
             isMultiSession.value = false;
             expand.value = false;
           }
@@ -420,13 +422,12 @@
    */
   function reloadMessageTitle(text) {
     let title = dataSource.value.history[chatActiveKey.value].title;
-    if(title === '新建聊天'){
+    if (title === '新建聊天') {
       dataSource.value.history[chatActiveKey.value].title = text;
       dataSource.value.history[chatActiveKey.value]['disabled'] = false;
     }
-
   }
-  
+
   /**
    * 初始化聊天：用于icon点击
    */
@@ -435,10 +436,10 @@
     getApplicationData(value);
     initChartData(value);
   }
-  
+
   defineExpose({
-    initChat
-  })
+    initChat,
+  });
 
   onUnmounted(() => {
     unwatch01 && unwatch01();
@@ -447,7 +448,7 @@
   watch(
     () => chatContainerRef.value,
     () => {
-      if(chatContainerRef.value.offsetHeight){
+      if (chatContainerRef.value.offsetHeight) {
         chatContainerStyle.value = { height: `${chatContainerRef.value.offsetHeight} px` };
       }
     }

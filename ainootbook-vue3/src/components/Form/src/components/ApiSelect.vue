@@ -234,7 +234,7 @@
           fetch();
         }
       }
-      return { state, attrs_, attrs, getOptions, loading, t, handleFetch, handleChange, handlePopupScroll,filterOption };
+      return { state, attrs_, attrs, getOptions, loading, t, handleFetch, handleChange, handlePopupScroll, filterOption };
     },
   });
 </script>

@@ -42,7 +42,7 @@
           if (result.packList) {
             for (const item of result.packList) {
               if (item.packCode) {
-                item.label = item.packName + "(默认产品包)";
+                item.label = item.packName + '(默认产品包)';
               } else {
                 item.label = item.packName;
               }
@@ -53,7 +53,7 @@
           } else {
             packOption.value = [];
           }
-          if(result.userPackIdList){
+          if (result.userPackIdList) {
             data.record.packId = result.userPackIdList;
           }
         }
@@ -63,7 +63,7 @@
           userId: data.record.id,
         });
         setProps({ disabled: true });
-      })
+      });
 
       return {
         registerForm,

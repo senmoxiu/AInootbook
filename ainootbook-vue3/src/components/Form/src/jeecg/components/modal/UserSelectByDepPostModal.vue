@@ -4,7 +4,7 @@
     <a-row :gutter="10">
       <a-col :md="7" :sm="24">
         <a-card :style="{ minHeight: '613px', overflow: 'auto' }">
-          <a-input-search placeholder="按岗位名称搜索…" style="margin-bottom: 10px" @search="onSearch" @change="handelSearchChange"/>
+          <a-input-search placeholder="按岗位名称搜索…" style="margin-bottom: 10px" @search="onSearch" @change="handelSearchChange" />
           <!--组织机构-->
           <BasicTree
             ref="treeRef"
@@ -37,14 +37,14 @@
   import { defineComponent, unref, ref } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import { BasicTree } from '/@/components/Tree/index';
-  import { queryDepartPostUserPageList as getTableListOrigin} from '/@/api/common/api';
+  import { queryDepartPostUserPageList as getTableListOrigin } from '/@/api/common/api';
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
   import { useSelectBiz } from '/@/components/Form/src/jeecg/hooks/useSelectBiz';
   import { useAttrs } from '/@/hooks/core/useAttrs';
   import TreeIcon from '/@/components/Form/src/jeecg/components/TreeIcon/TreeIcon.vue';
   import { queryDepartAndPostTreeSync as queryDepartTreeSyncOrigin } from '/@/views/system/depart/depart.api';
   import { selectProps } from '/@/components/Form/src/jeecg/props/props';
-  import {defHttp} from "@/utils/http/axios";
+  import { defHttp } from '@/utils/http/axios';
   export default defineComponent({
     name: 'UserSelectByDepPostModal',
     components: {
@@ -79,7 +79,7 @@
       const searchInfo = {};
       //树加载的key
       const reloadKey = ref(Math.random());
-      
+
       /**
        *表格配置
        */
@@ -103,12 +103,12 @@
           {
             title: '手机号码',
             dataIndex: 'phone',
-            customRender:( { record, text })=>{
-              if(record.izHideContact && record.izHideContact === '1'){
+            customRender: ({ record, text }) => {
+              if (record.izHideContact && record.izHideContact === '1') {
                 return '/';
               }
               return text;
-            }
+            },
           },
         ],
         useSearchForm: true,
@@ -244,8 +244,8 @@
        * @param value
        */
       async function onSearch(value) {
-        if(value){
-          let result = await defHttp.get({ url: "/sys/sysDepart/searchBy", params: { keyWord: value, orgCategory: "3",...props.params } });
+        if (value) {
+          let result = await defHttp.get({ url: '/sys/sysDepart/searchBy', params: { keyWord: value, orgCategory: '3', ...props.params } });
           if (Array.isArray(result)) {
             departTree.value = result;
           } else {
@@ -262,7 +262,7 @@
        * @param value
        */
       function handelSearchChange(value) {
-        if(!value.target.value){
+        if (!value.target.value) {
           reloadKey.value = Math.random();
         }
       }

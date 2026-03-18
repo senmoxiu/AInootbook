@@ -131,7 +131,7 @@
         // 上面改的v-model:value导致选中数据没有显示
         // state.value = result;
       }
-      
+
       return {
         cascaderValue,
         attrs,

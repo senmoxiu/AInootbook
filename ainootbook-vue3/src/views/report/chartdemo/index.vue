@@ -71,7 +71,7 @@
   import BarAndLine from '/@/components/chart/BarAndLine.vue';
 
   const activeKey = ref('1');
-  const { barDataSource, barMultiData, pieData, barLineData, radarData,barLineColors } = getData;
+  const { barDataSource, barMultiData, pieData, barLineData, radarData, barLineColors } = getData;
   const multiBarOption = {
     title: { text: '多列柱状图', left: 'center' },
   };

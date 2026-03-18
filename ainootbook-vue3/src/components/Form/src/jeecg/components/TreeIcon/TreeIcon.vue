@@ -72,25 +72,37 @@
     right: 2px;
   }
   html[data-theme='light'] {
-    .svg-post{
-      path { fill: #333333; }
+    .svg-post {
+      path {
+        fill: #333333;
+      }
     }
-    .svg-company{
-      path { fill: #333333; }
+    .svg-company {
+      path {
+        fill: #333333;
+      }
     }
-    .svg-depart{
-      path { fill: #333333; }
+    .svg-depart {
+      path {
+        fill: #333333;
+      }
     }
   }
   html[data-theme='dark'] {
-    .svg-post{
-      path { fill: #ffffff; }
+    .svg-post {
+      path {
+        fill: #ffffff;
+      }
     }
-    .svg-company{
-      path { fill: #ffffff; }
+    .svg-company {
+      path {
+        fill: #ffffff;
+      }
     }
-    .svg-depart{
-      path { fill: #ffffff; }
+    .svg-depart {
+      path {
+        fill: #ffffff;
+      }
     }
   }
 </style>

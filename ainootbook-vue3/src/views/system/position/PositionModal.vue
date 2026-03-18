@@ -52,7 +52,7 @@
   }
 </script>
 <style lang="less" scoped>
-  :deep(.ant-input-number){
+  :deep(.ant-input-number) {
     width: 100%;
   }
 </style>

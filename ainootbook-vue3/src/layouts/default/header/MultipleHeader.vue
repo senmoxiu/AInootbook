@@ -11,8 +11,8 @@
   import LayoutHeader from './index.vue';
   import MultipleTabs from '../tabs/index.vue';
 
-  import { useAppStore } from "@/store/modules/app";
-  import { useGlobSetting } from "/@/hooks/setting";
+  import { useAppStore } from '@/store/modules/app';
+  import { useGlobSetting } from '/@/hooks/setting';
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   import { useFullContent } from '/@/hooks/web/useFullContent';
@@ -38,8 +38,8 @@
       const { setHeaderHeight } = useLayoutHeight();
       const { prefixCls } = useDesign('layout-multiple-header');
 
-      const appStore = useAppStore()
-      const glob = useGlobSetting()
+      const appStore = useAppStore();
+      const glob = useGlobSetting();
 
       const { getCalcContentWidth, getSplit, getMenuType } = useMenuSetting();
       const { getIsMobile } = useAppInject();
@@ -55,7 +55,7 @@
           return false;
         }
         return unref(getShowInsetHeaderRef);
-      })
+      });
 
       const getShowTabs = computed(() => {
         // 控制是否显示多Tabs切换
@@ -99,7 +99,10 @@
       const getPlaceholderDomStyle = computed((): CSSProperties => {
         let height = 0;
         // 代码逻辑说明: 【issues/7561】主题切换为顶部混合模式时，页面顶部内容显示不出来，被遮盖
-        if ((unref(getShowFullHeaderRef) || !unref(getSplit)) && unref(getShowHeader) && !unref(getFullContent) || unref(getMenuType) == MenuTypeEnum.MIX) {
+        if (
+          ((unref(getShowFullHeaderRef) || !unref(getSplit)) && unref(getShowHeader) && !unref(getFullContent)) ||
+          unref(getMenuType) == MenuTypeEnum.MIX
+        ) {
           height += HEADER_HEIGHT;
         }
         if (unref(getShowTabs) && !unref(getFullContent)) {
@@ -112,11 +115,15 @@
       });
 
       const getClass = computed(() => {
-        return [prefixCls, `${prefixCls}--${unref(getHeaderTheme)}`, {
-          [`${prefixCls}--fixed`]: unref(getIsFixed),
-          // 【JEECG作为乾坤子应用】
-          [`${prefixCls}--qiankun-micro`]: glob.isQiankunMicro,
-        }];
+        return [
+          prefixCls,
+          `${prefixCls}--${unref(getHeaderTheme)}`,
+          {
+            [`${prefixCls}--fixed`]: unref(getIsFixed),
+            // 【JEECG作为乾坤子应用】
+            [`${prefixCls}--qiankun-micro`]: glob.isQiankunMicro,
+          },
+        ];
       });
 
       return {
@@ -155,6 +162,5 @@
     &--qiankun-micro {
       position: absolute;
     }
-
   }
 </style>

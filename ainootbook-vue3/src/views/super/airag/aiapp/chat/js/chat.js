@@ -34,7 +34,7 @@
       return;
     }
     let body = document.body;
-    body.style.margin = "0";
+    body.style.margin = '0';
     // 创建容器
     const container = document.createElement('div');
     container.style.cssText = `
@@ -67,9 +67,9 @@
     let bottom = finalConfig.chatHeight === '100%' ? '0' : '10px';
     let chatWidth = finalConfig.chatWidth;
     let chatHeight = finalConfig.chatHeight;
-    if(isMobileDevice()){
-      chatWidth = "100%";
-      chatHeight = "100%";
+    if (isMobileDevice()) {
+      chatWidth = '100%';
+      chatHeight = '100%';
       right = '0';
       bottom = '0';
     }
@@ -97,11 +97,11 @@
 
     iframe.id = 'ai-app-chat-document';
     //update-begin---author:wangshuai---date:2025-04-25---for:【QQYUN-12159】【AI 广告位】让需要自建AI知识库的用户知道如何通过敲敲云搭建自己的AI知识库---
-    iframe.src = getIframeSrc(finalConfig) + '/ai/app/chat/' + finalConfig.appId + "?source=chatJs";
+    iframe.src = getIframeSrc(finalConfig) + '/ai/app/chat/' + finalConfig.appId + '?source=chatJs';
     //update-end---author:wangshuai---date:2025-04-25---for:【QQYUN-12159】【AI 广告位】让需要自建AI知识库的用户知道如何通过敲敲云搭建自己的AI知识库---
-    let iconRight = finalConfig.chatWidth === '100%'?'0':'-6px';
-    let iconTop = finalConfig.chatWidth === '100%'?'0':'-9px';
-    if(isMobileDevice()){
+    let iconRight = finalConfig.chatWidth === '100%' ? '0' : '-6px';
+    let iconTop = finalConfig.chatWidth === '100%' ? '0' : '-9px';
+    if (isMobileDevice()) {
       iconRight = '2px';
       iconTop = '2px';
     }
@@ -169,7 +169,7 @@
    * 获取src地址
    */
   function getIframeSrc(finalConfig) {
-    const specificScript = document.getElementById("e7e007dd52f67fe36365eff636bbffbd");
+    const specificScript = document.getElementById('e7e007dd52f67fe36365eff636bbffbd');
     if (specificScript) {
       return specificScript.src.substring(0, specificScript.src.indexOf('/', specificScript.src.indexOf('://') + 3));
     }

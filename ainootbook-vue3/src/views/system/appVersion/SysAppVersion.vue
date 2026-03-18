@@ -112,20 +112,23 @@
    */
   function handleSubmit() {
     const form = unref(formRef);
-    form.validate().then(async () => {
-      let obj = toRaw(model);
-      if (obj.appVersion.indexOf('.') != -1) {
-        obj.versionNum = Number(obj.appVersion.replace(/\./g, ''));
-      }
-      obj.id = appKey;
-      confirmLoading.value = true;
-      await saveAppVersion(obj);
-      createMessage.success('保存成功');
-      confirmLoading.value = false;
-      active.value = false;
-    }).finally(() => {
-      confirmLoading.value = false;
-    });
+    form
+      .validate()
+      .then(async () => {
+        let obj = toRaw(model);
+        if (obj.appVersion.indexOf('.') != -1) {
+          obj.versionNum = Number(obj.appVersion.replace(/\./g, ''));
+        }
+        obj.id = appKey;
+        confirmLoading.value = true;
+        await saveAppVersion(obj);
+        createMessage.success('保存成功');
+        confirmLoading.value = false;
+        active.value = false;
+      })
+      .finally(() => {
+        confirmLoading.value = false;
+      });
   }
 
   /**
@@ -134,7 +137,7 @@
    */
   function showUploadModal(type) {
     uploadType.value = type;
-    modalValue.value = type == 'web'? model.webDownloadUrl :type == 'apk' ? model.downloadUrl : model.wgtUrl;
+    modalValue.value = type == 'web' ? model.webDownloadUrl : type == 'apk' ? model.downloadUrl : model.wgtUrl;
     openModal(true, {
       maxCount: 1,
       bizPath: filePath,
@@ -149,7 +152,7 @@
       model.downloadUrl = value;
     } else if (unref(uploadType) == 'wgt') {
       model.wgtUrl = value;
-    }else{
+    } else {
       model.webDownloadUrl = value;
     }
   }

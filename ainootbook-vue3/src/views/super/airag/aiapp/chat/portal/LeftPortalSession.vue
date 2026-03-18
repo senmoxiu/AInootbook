@@ -108,7 +108,7 @@
       name: '看图说话',
       icon: 'https://jeecgdev.oss-cn-beijing.aliyuncs.com/temp/工具-图片解析_1743065064801.png',
       prologue: '上传一张图片，我来为你讲述图片中的故事',
-    },    
+    },
     {
       id: '2008448202536456193',
       name: 'Chat2BI',
@@ -116,15 +116,16 @@
       prologue: '你好，我是Chat2BI 图表生成智能体。',
       flowId: '2008379264947519489',
       type: 'chatFLow',
-      presetQuestion: '[{"key":1,"descr":"请统计系统用户的性别分布比例，并以饼状图和列表表格展示。","update":true}]'
-    },    
+      presetQuestion: '[{"key":1,"descr":"请统计系统用户的性别分布比例，并以饼状图和列表表格展示。","update":true}]',
+    },
     {
       id: '2008090512835629057',
       name: 'AI绘画',
       icon: 'https://minio.jeecg.com/otatest/AiWrite_1769395779558.png',
       prologue: '你好，我是 AI绘图智能体。',
-      presetQuestion: '[{"key":1,"descr":"请生成一张具有日本风格的动漫成年女孩。","update":true}, {"key":2,"descr":"请生成一幅中国神话故事中，手持武器的哪吒形象。","update":true}]',
-      metadata:"{\"izDraw\":\"1\"}"
+      presetQuestion:
+        '[{"key":1,"descr":"请生成一张具有日本风格的动漫成年女孩。","update":true}, {"key":2,"descr":"请生成一幅中国神话故事中，手持武器的哪吒形象。","update":true}]',
+      metadata: '{"izDraw":"1"}',
     },
   ]);
 

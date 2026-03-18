@@ -47,10 +47,10 @@
         default: () => {},
       },
       //排除用户id的集合
-      excludeUserIdList:{
+      excludeUserIdList: {
         type: Array,
         default: () => [],
-      }
+      },
     },
     emits: ['options-change', 'change', 'update:value'],
     setup(props, { emit }) {
@@ -103,14 +103,18 @@
 
       // 代码逻辑说明: 【QQYUN-5685】5、离职人员可以选自己------------
       const excludeUserIdList = ref<any>([]);
-      
+
       /**
        * 需要监听一下excludeUserIdList，否则modal获取不到
-       */ 
-      watch(()=>props.excludeUserIdList,(data)=>{
-        excludeUserIdList.value = data;
-      },{ immediate: true })
-      
+       */
+      watch(
+        () => props.excludeUserIdList,
+        (data) => {
+          excludeUserIdList.value = data;
+        },
+        { immediate: true }
+      );
+
       /**
        * 打卡弹出框
        */
@@ -161,7 +165,7 @@
         send(tempSave);
       };
       const send = (values) => {
-        let result = typeof props.value == "string" ? values.join(',') : values;
+        let result = typeof props.value == 'string' ? values.join(',') : values;
         emit('update:value', result);
         emit('change', result);
       };

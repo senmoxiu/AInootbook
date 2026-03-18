@@ -1,7 +1,15 @@
 <template>
   <Modal v-bind="getBindValue" @cancel="handleCancel">
     <template #closeIcon v-if="!$slots.closeIcon">
-      <ModalClose :canFullscreen="getProps.canFullscreen" :fullScreen="fullScreenRef" :commentSpan="commentSpan" :enableComment="getProps.enableComment" @comment="handleComment" @cancel="handleCancel" @fullscreen="handleFullScreen" />
+      <ModalClose
+        :canFullscreen="getProps.canFullscreen"
+        :fullScreen="fullScreenRef"
+        :commentSpan="commentSpan"
+        :enableComment="getProps.enableComment"
+        @comment="handleComment"
+        @cancel="handleCancel"
+        @fullscreen="handleFullScreen"
+      />
     </template>
 
     <template #title v-if="!isNoTitle">
@@ -17,7 +25,7 @@
     </template>
 
     <a-row class="jeecg-modal-wrapper">
-      <a-col :span="24-commentSpan" class="jeecg-modal-content">
+      <a-col :span="24 - commentSpan" class="jeecg-modal-content">
         <ModalWrapper
           :useWrapper="getProps.useWrapper"
           :footerOffset="wrapperFooterOffset"
@@ -33,17 +41,17 @@
           :modalFooterHeight="footer !== undefined && !footer ? 0 : getProps.modalFooterHeight"
           v-bind="omit(getProps.wrapperProps, 'visible', 'height', 'modalFooterHeight')"
           @ext-height="handleExtHeight"
-          @height-change="handleHeightChange">
+          @height-change="handleHeightChange"
+        >
           <slot></slot>
         </ModalWrapper>
       </a-col>
-      
+
       <a-col :span="commentSpan" class="jeecg-comment-outer">
         <slot name="comment"></slot>
       </a-col>
-      
     </a-row>
-    
+
     <template #[item]="data" v-for="item in Object.keys(omit($slots, 'default'))">
       <slot :name="item" v-bind="data || {}"></slot>
     </template>
@@ -66,14 +74,24 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useAppInject } from '/@/hooks/web/useAppInject';
 
-
   export default defineComponent({
     name: 'BasicModal',
     components: { Modal, ModalWrapper, ModalClose, ModalFooter, ModalHeader },
     inheritAttrs: false,
     props: basicProps,
-    emits: ['visible-change', 'open-change', 'height-change', 'cancel', 'ok', 'register', 'update:visible', 'update:open', 'fullScreen','comment-open'],
-    setup(props, { emit, attrs , slots}) {
+    emits: [
+      'visible-change',
+      'open-change',
+      'height-change',
+      'cancel',
+      'ok',
+      'register',
+      'update:visible',
+      'update:open',
+      'fullScreen',
+      'comment-open',
+    ],
+    setup(props, { emit, attrs, slots }) {
       const visibleRef = ref(false);
       const propsRef = ref<Partial<ModalProps> | null>(null);
       const modalWrapperRef = ref<any>(null);
@@ -111,11 +129,11 @@
         }
         return result;
       });
-        //是否未设置标题
-        const isNoTitle = computed(() => {
-            //标题为空并且不含有标题插槽
-            return !unref(getMergeProps).title && !slots.title;
-        });
+      //是否未设置标题
+      const isNoTitle = computed(() => {
+        //标题为空并且不含有标题插槽
+        return !unref(getMergeProps).title && !slots.title;
+      });
 
       const { handleFullScreen, getWrapClassName, fullScreenRef } = useFullScreen({
         modalWrapperRef,
@@ -161,7 +179,7 @@
         fullScreenRef.value = !!props.defaultFullscreen;
         // 代码逻辑说明: 【QQYUN-8643】弹窗移动端弹窗统一全屏
         if (getIsMobile.value) {
-          fullScreenRef.value = true
+          fullScreenRef.value = true;
         }
       });
 
@@ -221,9 +239,9 @@
         }
         if (Reflect.has(props, 'defaultFullscreen')) {
           fullScreenRef.value = !!props.defaultFullscreen;
-           // 代码逻辑说明: 【QQYUN-8643】弹窗移动端弹窗统一全屏
+          // 代码逻辑说明: 【QQYUN-8643】弹窗移动端弹窗统一全屏
           if (getIsMobile.value) {
-            fullScreenRef.value = true
+            fullScreenRef.value = true;
           }
         }
       }
@@ -248,22 +266,26 @@
 
       // 代码逻辑说明: modal支持评论 slot
       const commentSpan = ref(0);
-      watch(()=>props.enableComment, (flag)=>{
-        handleComment(flag)
-      }, {immediate:true});
-      function handleComment(flag){
-        if(flag=== true){
-          commentSpan.value = 6
-        }else{
-          commentSpan.value = 0
+      watch(
+        () => props.enableComment,
+        (flag) => {
+          handleComment(flag);
+        },
+        { immediate: true }
+      );
+      function handleComment(flag) {
+        if (flag === true) {
+          commentSpan.value = 6;
+        } else {
+          commentSpan.value = 0;
         }
         // 代码逻辑说明: 【TV360X-485】开启评论之后弹窗按钮居右隔一个评论的距离
         emit('comment-open', commentSpan.value === 0, commentSpan.value);
       }
 
       // 代码逻辑说明: 【QQYUN-5866】放大行数自适应
-      watch(fullScreenRef,(val)=>{
-        emit('fullScreen',val);
+      watch(fullScreenRef, (val) => {
+        emit('fullScreen', val);
       });
 
       return {
@@ -283,7 +305,7 @@
         getWrapperHeight,
         commentSpan,
         handleComment,
-        isNoTitle
+        isNoTitle,
       };
     },
   });
@@ -292,12 +314,12 @@
   /*update-begin-author:taoyan date:2022-7-27 for:modal评论区域样式*/
   .jeecg-comment-outer {
     border-left: 1px solid #f0f0f0;
-    .ant-tabs-nav-wrap{
-    /*  text-align: center;*/
+    .ant-tabs-nav-wrap {
+      /*  text-align: center;*/
     }
   }
-  .jeecg-modal-content{
-    >.scroll-container{
+  .jeecg-modal-content {
+    > .scroll-container {
       // 代码逻辑说明: 【QQYUN-7297】表单讨论弹窗放大按钮时只显示一部分---
       padding: 6px;
     }

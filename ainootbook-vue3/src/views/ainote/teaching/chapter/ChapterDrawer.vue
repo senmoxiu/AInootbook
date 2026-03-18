@@ -1,17 +1,8 @@
 <template>
-  <BasicDrawer
-    v-bind="$attrs"
-    @register="registerDrawer"
-    :title="getTitle"
-    :width="800"
-    :showFooter="false"
-    destroyOnClose
-  >
+  <BasicDrawer v-bind="$attrs" @register="registerDrawer" :title="getTitle" :width="800" :showFooter="false" destroyOnClose>
     <BasicTable @register="registerTable">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined">
-          新增章节
-        </a-button>
+        <a-button type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined"> 新增章节 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
@@ -86,9 +77,7 @@
   });
 
   // 抽屉标题
-  const getTitle = computed(() =>
-    courseName.value ? `章节管理 - ${courseName.value}` : '章节管理'
-  );
+  const getTitle = computed(() => (courseName.value ? `章节管理 - ${courseName.value}` : '章节管理'));
 
   /**
    * 新增章节

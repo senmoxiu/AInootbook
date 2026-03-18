@@ -80,7 +80,7 @@
   import { message } from 'ant-design-vue';
   import { PlusOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons-vue';
   import { saveOrUpdate } from '../AiragExtData.api';
-  import {JImageUpload} from "@/components/Form";
+  import { JImageUpload } from '@/components/Form';
   // Emits声明
   const emit = defineEmits(['register', 'success']);
   // 列配置接口
@@ -130,11 +130,11 @@
   const [registerModal, { closeModal }] = useModalInner(async (data) => {
     console.log('data:', data);
     dataId.value = data.id;
-    if(data.datasetValue){
-      datasetValue.value = data.datasetValue
-      if(data.datasetValue?.columns && data.datasetValue.columns.length){
+    if (data.datasetValue) {
+      datasetValue.value = data.datasetValue;
+      if (data.datasetValue?.columns && data.datasetValue.columns.length) {
         columns.value = data.datasetValue.columns;
-      }else{
+      } else {
         columns.value = defaultColumns;
       }
     }
@@ -182,16 +182,16 @@
     loading.value = true;
 
     try {
-      datasetValue.value.columns = columns.value
+      datasetValue.value.columns = columns.value;
       // 构造提交数据
       const submitData = {
-        datasetValue: JSON.stringify( datasetValue.value),
+        datasetValue: JSON.stringify(datasetValue.value),
         id: dataId.value,
       };
 
       console.log('提交数据:', submitData);
 
-      await saveOrUpdate(submitData, true,false);
+      await saveOrUpdate(submitData, true, false);
 
       message.success('配置创建成功！');
       // 关闭弹窗并触发成功事件

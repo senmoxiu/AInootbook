@@ -132,7 +132,6 @@
 
       /** 用于搜索下拉框中的内容 */
       function handleSelectFilterOption(input, option) {
-      
         let { allowSearch, allowInput } = originColumn.value;
         if (allowSearch === true || allowInput === true) {
           // 代码逻辑说明: 【QQYUN-5806】js增强改变下拉搜索options (防止option.title为null报错)

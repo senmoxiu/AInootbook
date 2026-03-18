@@ -1,5 +1,13 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" title="用户回收站" :showOkBtn="false" width="1000px" destroyOnClose @fullScreen="handleFullScreen">
+  <BasicModal
+    v-bind="$attrs"
+    @register="registerModal"
+    title="用户回收站"
+    :showOkBtn="false"
+    width="1000px"
+    destroyOnClose
+    @fullScreen="handleFullScreen"
+  >
     <BasicTable @register="registerTable" :rowSelection="rowSelection" :scroll="scroll">
       <!--插槽:table标题-->
       <template #tableTitle>
