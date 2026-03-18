@@ -49,12 +49,18 @@ public class AinoteNote implements Serializable {
     @Schema(description = "笔记内容（Markdown格式）")
     private String noteContent;
 
+    @Schema(description = "笔记内容预编译后的HTML")
+    private String renderedContent;
+
     @Schema(description = "AI生成的摘要")
     private String aiSummary;
 
     @Excel(name = "关键词", width = 20)
     @Schema(description = "关键词（逗号分隔）")
     private String keywords;
+
+    @Schema(description = "当前版本号")
+    private Integer currentVersion;
 
     @Excel(name = "笔记状态", width = 10, dicCode = "ainote_note_status")
     @Dict(dicCode = "ainote_note_status")

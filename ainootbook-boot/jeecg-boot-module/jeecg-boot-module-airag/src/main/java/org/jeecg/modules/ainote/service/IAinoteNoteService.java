@@ -8,9 +8,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.ainote.dto.AinoteNoteCreateDTO;
+import org.jeecg.modules.ainote.dto.AinoteNoteRegenerateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteShareCreateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteUpdateDTO;
 import org.jeecg.modules.ainote.entity.AinoteNote;
+import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
+import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareVO;
 
@@ -35,6 +38,16 @@ public interface IAinoteNoteService extends IService<AinoteNote> {
      * 编辑笔记（仅 owner/admin）
      */
     void updateNote(AinoteNoteUpdateDTO dto);
+
+    /**
+     * 回滚笔记到指定版本（仅 owner/admin）
+     */
+    AinoteNote rollbackToVersion(String noteId, Integer targetVersion);
+
+    /**
+     * 基于 baseVersion 乐观锁重新生成笔记
+     */
+    AinoteNoteRegenerateVO regenerateNote(AinoteNoteRegenerateDTO dto);
 
     /**
      * 逻辑删除笔记（note_status=3，仅 owner/admin）
@@ -65,6 +78,11 @@ public interface IAinoteNoteService extends IService<AinoteNote> {
      * 查询公开笔记广场（仅展示公开笔记，带租户隔离）
      */
     IPage<AinoteNote> queryPublicNotes(Integer pageNo, Integer pageSize, String keyword);
+
+    /**
+     * 分页查询笔记版本历史
+     */
+    IPage<AinoteNoteVersionVO> queryVersionPage(String noteId, Integer pageNo, Integer pageSize);
 
     /**
      * 安全导入Excel（强制覆盖敏感字段，仅管理员可用）

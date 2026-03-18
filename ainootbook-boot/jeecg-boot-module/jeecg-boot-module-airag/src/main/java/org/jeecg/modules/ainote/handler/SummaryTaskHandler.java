@@ -3,6 +3,7 @@ package org.jeecg.modules.ainote.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.jeecg.modules.ainote.service.AinoteAiRuntimeConfigResolver;
 import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteAiTaskService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
+import org.jeecg.modules.ainote.service.MarkdownPrecompileService;
 import org.jeecg.modules.ainote.task.AinoteAiTaskWorker;
 import org.jeecg.modules.ainote.util.AinotePromptRenderer;
 import org.jeecg.modules.airag.llm.entity.AiragModel;
@@ -96,6 +98,7 @@ public class SummaryTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandle
     private final IAinoteAiConfigService configService;
     private final IAiragModelService airagModelService;
     private final AinoteAiRuntimeConfigResolver runtimeConfigResolver;
+    private final MarkdownPrecompileService markdownPrecompileService;
 
     @Override
     public String getTaskType() {
@@ -170,12 +173,17 @@ public class SummaryTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandle
             log.warn("关键词阶段执行失败，按skip策略完成: noteId={}", noteId, e);
         }
 
-        AinoteNote update = new AinoteNote();
-        update.setId(noteId);
-        update.setAiSummary(summary);
-        update.setKeywords(String.join(",", keywords));
-        if (!noteService.updateById(update)) {
-            throw new JeecgBootException("更新笔记摘要/关键词失败: noteId=" + noteId);
+        // 版本校验：防止陈旧摘要覆盖新版本内容
+        Integer noteVersion = note.getCurrentVersion();
+        UpdateWrapper<AinoteNote> noteUpdateWrapper = new UpdateWrapper<>();
+        noteUpdateWrapper.eq("id", noteId);
+        noteUpdateWrapper.eq("current_version", noteVersion);
+        noteUpdateWrapper.set("rendered_content", markdownPrecompileService.precompile(note.getNoteContent()));
+        noteUpdateWrapper.set("ai_summary", summary);
+        noteUpdateWrapper.set("keywords", String.join(",", keywords));
+        boolean writeSuccess = noteService.update(null, noteUpdateWrapper);
+        if (!writeSuccess) {
+            log.warn("笔记版本已变更，摘要结果已丢弃: noteId={}, taskVersion={}", noteId, noteVersion);
         }
 
         JSONObject result = new JSONObject();

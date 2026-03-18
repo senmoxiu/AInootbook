@@ -220,6 +220,16 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>tech.catheu</groupId>
+            <artifactId>java-katex</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parser-html-module</artifactId>
             <version>${apache-tika.version}</version>

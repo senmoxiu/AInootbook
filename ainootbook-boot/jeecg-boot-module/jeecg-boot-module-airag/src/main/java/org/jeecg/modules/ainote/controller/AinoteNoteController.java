@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
@@ -19,12 +20,15 @@ import org.jeecg.common.util.TokenUtils;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.config.JeecgBaseConfig;
 import org.jeecg.modules.ainote.dto.AinoteNoteCreateDTO;
+import org.jeecg.modules.ainote.dto.AinoteNoteRegenerateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteShareCreateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteUpdateDTO;
 import org.jeecg.modules.ainote.enums.NoteSearchScope;
 import org.jeecg.modules.ainote.entity.AinoteNote;
 import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
+import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
+import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareVO;
 import org.jeecg.modules.ainote.vo.AinoteProgressVO;
@@ -35,6 +39,8 @@ import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.jeecg.modules.ainote.facade.AinoteGenerationFacade;
 import org.jeecg.modules.ainote.service.impl.AinoteEmbeddingService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -84,7 +90,8 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         ainoteNoteService.applyDataPermission(queryWrapper);
         // 列表查询排除大字段以提升性能
         queryWrapper.select(AinoteNote.class, info ->
-                !info.getColumn().equals("note_content"));
+                !"note_content".equals(info.getColumn())
+                        && !"rendered_content".equals(info.getColumn()));
         Page<AinoteNote> page = new Page<>(pageNo, pageSize);
         IPage<AinoteNote> pageList = ainoteNoteService.page(page, queryWrapper);
         return Result.OK(pageList);
@@ -114,6 +121,49 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
     public Result<String> edit(@RequestBody @Validated AinoteNoteUpdateDTO dto) {
         ainoteNoteService.updateNote(dto);
         return Result.OK("编辑成功！");
+    }
+
+    @Operation(summary = "回滚笔记到指定版本")
+    @PostMapping(value = "/rollback")
+    @RequiresPermissions("ainote:note:edit")
+    public Result<AinoteNote> rollback(
+            @RequestParam(name = "noteId") String noteId,
+            @RequestParam(name = "targetVersion") Integer targetVersion) {
+        if (oConvertUtils.isEmpty(noteId)) {
+            return Result.error("noteId不能为空");
+        }
+        if (targetVersion == null || targetVersion <= 0) {
+            return Result.error("targetVersion不合法");
+        }
+        AinoteNote note = ainoteNoteService.rollbackToVersion(noteId, targetVersion);
+        return Result.OK(note);
+    }
+
+    @Operation(summary = "基于baseVersion乐观锁重新生成笔记")
+    @PostMapping(value = "/regenerate")
+    @RequiresPermissions("ainote:note:edit")
+    public ResponseEntity<Result<AinoteNoteRegenerateVO>> regenerate(
+            @RequestBody @Validated AinoteNoteRegenerateDTO dto) {
+        try {
+            AinoteNoteRegenerateVO vo = ainoteNoteService.regenerateNote(dto);
+            return ResponseEntity.ok(Result.OK(vo));
+        } catch (JeecgBootException e) {
+            if (e.getErrCode() == HttpStatus.CONFLICT.value()) {
+                log.warn("笔记重新生成发生版本冲突: noteId={}, baseVersion={}, msg={}",
+                        dto.getNoteId(), dto.getBaseVersion(), e.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Result.error(HttpStatus.CONFLICT.value(), e.getMessage()));
+            }
+            log.warn("笔记重新生成失败: noteId={}, baseVersion={}, msg={}",
+                    dto.getNoteId(), dto.getBaseVersion(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Result.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        } catch (Exception e) {
+            log.error("笔记重新生成异常: noteId={}, baseVersion={}",
+                    dto.getNoteId(), dto.getBaseVersion(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Result.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "重新生成失败！"));
+        }
     }
 
     @Operation(summary = "通过id删除（逻辑删除）")
@@ -175,6 +225,22 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
             @RequestParam(name = "keyword", required = false) String keyword,
             HttpServletRequest req) {
         IPage<AinoteNote> pageList = ainoteNoteService.queryPublicNotes(pageNo, pageSize, keyword);
+        return Result.OK(pageList);
+    }
+
+    @Operation(summary = "查询笔记版本历史")
+    @GetMapping(value = "/versions")
+    @RequiresPermissions("ainote:note:list")
+    public Result<IPage<AinoteNoteVersionVO>> queryVersions(
+            @RequestParam(name = "noteId") String noteId,
+            @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize) {
+        if (oConvertUtils.isEmpty(noteId)) {
+            return Result.error("noteId不能为空");
+        }
+        int safePageSize = Math.min(pageSize != null ? pageSize : 20, 100);
+        IPage<AinoteNoteVersionVO> pageList =
+                ainoteNoteService.queryVersionPage(noteId, pageNo, safePageSize);
         return Result.OK(pageList);
     }
 

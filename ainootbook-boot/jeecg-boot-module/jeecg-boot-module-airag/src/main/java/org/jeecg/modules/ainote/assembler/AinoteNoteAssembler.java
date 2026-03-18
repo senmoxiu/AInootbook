@@ -91,6 +91,16 @@ public class AinoteNoteAssembler {
         return assembleIfReady(noteId, null);
     }
 
+    public String regenerateNoteContent(AinoteNote note, String additionalContent) {
+        if (note == null || oConvertUtils.isEmpty(note.getId())) {
+            throw new JeecgBootException("note is required");
+        }
+        String sourceText = buildRegenerateSourceText(note.getNoteContent(), additionalContent);
+        String markdown = integrateWithLLM(sourceText, note.getTenantId(), note.getNoteTitle());
+        return markdown != null ? markdown
+                : buildRegenerateFallbackMarkdown(note.getNoteTitle(), note.getNoteContent(), additionalContent);
+    }
+
     public boolean assembleIfReady(String noteId, String knowledgeId) {
         AinoteNote note = requireNoteWithPermission(noteId);
         List<AinoteAiTask> tasks = aiTaskService.getTasksByNoteId(note.getId());
@@ -275,6 +285,43 @@ public class AinoteNoteAssembler {
         markdown.append("# ").append(safeTitle).append("\n\n");
         markdown.append("## Content\n\n");
         markdown.append(normalizedText);
+        return markdown.toString().trim();
+    }
+
+    private String buildRegenerateSourceText(String noteContent, String additionalContent) {
+        String currentContent = trimToNull(noteContent);
+        String extraContent = trimToNull(additionalContent);
+        if (currentContent == null && extraContent == null) {
+            throw new JeecgBootException("当前笔记内容和补充内容不能同时为空");
+        }
+
+        StringBuilder source = new StringBuilder();
+        if (currentContent != null) {
+            source.append("当前笔记内容：\n").append(normalizeText(currentContent));
+        }
+        if (extraContent != null) {
+            if (source.length() > 0) {
+                source.append("\n\n");
+            }
+            source.append("补充内容：\n").append(normalizeText(extraContent));
+        }
+        return source.toString();
+    }
+
+    private String buildRegenerateFallbackMarkdown(String noteTitle, String noteContent, String additionalContent) {
+        String currentContent = trimToNull(noteContent);
+        String extraContent = trimToNull(additionalContent);
+        if (currentContent == null) {
+            return buildMarkdown(noteTitle, extraContent);
+        }
+
+        StringBuilder markdown = new StringBuilder(currentContent.trim());
+        if (extraContent != null) {
+            if (markdown.length() > 0) {
+                markdown.append("\n\n");
+            }
+            markdown.append("## 补充内容\n\n").append(normalizeText(extraContent));
+        }
         return markdown.toString().trim();
     }
 

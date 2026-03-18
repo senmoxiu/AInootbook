@@ -3,7 +3,7 @@ package org.jeecg.modules.airag.teaching.integration;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.jeecg.JeecgSystemApplication;
+// import org.jeecg.JeecgSystemApplication; // TODO: 需要在 jeecg-system-start 模块中运行集成测试
 import org.jeecg.modules.airag.teaching.dto.BatchResult;
 import org.jeecg.modules.airag.teaching.dto.BatchUpsertDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourse;
@@ -29,11 +29,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * 1. 配置 application-test.yml 数据库连接
  * 2. 执行 Flyway 迁移脚本
  * 3. 准备测试数据（sys_depart 组织数据）
+ * 4. 在 jeecg-system-start 模块中运行（需要 JeecgSystemApplication）
  */
-@SpringBootTest(classes = JeecgSystemApplication.class)
+// @SpringBootTest(classes = JeecgSystemApplication.class) // TODO: 需要在 jeecg-system-start 模块中运行
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled("需要配置测试环境后启用")
+@Disabled("需要配置测试环境后启用，且需要在 jeecg-system-start 模块中运行")
 class TeachingIntegrationTest {
 
     @Autowired
@@ -58,8 +59,8 @@ class TeachingIntegrationTest {
             AinoteCourse course = new AinoteCourse();
             course.setCourseName("测试课程");
             course.setCourseCode("TEST001");
-            course.setCredit(3.0);
-            course.setHours(48);
+            course.setCredits(new java.math.BigDecimal("3.0"));
+            course.setCourseHours(48);
             course.setStatus(1);
 
             boolean saved = courseService.save(course);

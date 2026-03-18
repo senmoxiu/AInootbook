@@ -122,6 +122,13 @@ public class AinoteGenerationFacade {
         noteAssembler.assembleIfReady(note.getId(), knowledgeId);
     }
 
+    public String regenerateNoteContent(AinoteNote note, String additionalContent) {
+        if (note == null || oConvertUtils.isEmpty(note.getId())) {
+            throw new JeecgBootException("note is required");
+        }
+        return noteAssembler.regenerateNoteContent(note, additionalContent);
+    }
+
     public void cancelGeneration(String noteId) {
         AinoteNote note = requireNoteWithPermission(noteId);
         Integer tenantId = materialService.getRequiredTenantId();
