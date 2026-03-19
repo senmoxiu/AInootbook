@@ -508,11 +508,21 @@
           "type": "imageGen"
         }
       ],
-      "type": ["LLM", "EMBED", "IMAGE"],
+      "OCR": [
+        {
+          "label": "glm-ocr",
+          "value": "glm-ocr",
+          "descr": "GLM-OCR 是一款轻量级专业 OCR 模型，参数仅 0.9B，多项能力达到 SOTA 水平。\n\n支持 PDF（≤50MB/100页）和图片（JPG/PNG ≤10MB）输入，输出文本/Markdown。\n\n在代码文档、复杂表格、手写体、多语言、印章识别等场景表现优异，成本约为传统 OCR 方案的 1/10。",
+          "type": "ocr"
+        }
+      ],
+      "type": ["LLM", "EMBED", "IMAGE", "OCR"],
       "baseUrl": "https://open.bigmodel.cn",
+      "baseOcrUrl": "https://open.bigmodel.cn",
       "LLMDefaultValue": "glm-4-flash",
       "EMBEDDefaultValue": "Embedding-2",
-      "IMAGEDefaultValue": "CogView-4"
+      "IMAGEDefaultValue": "CogView-4",
+      "OCRDefaultValue": "glm-ocr"
     }
   ]
 }

@@ -63,6 +63,7 @@
                     <span v-else-if="item === 'EMBED'">向量模型</span>
                     <span v-else-if="item === 'IMAGE'">图像模型</span>
                     <span v-else-if="item === 'AUDIO'">语音识别</span>
+                    <span v-else-if="item === 'OCR'">OCR 识别</span>
                   </a-select-option>
                 </a-select>
               </template>
@@ -83,6 +84,7 @@
                           <a-tag v-if="type && type.split(',').includes('vector')" color="#D4E0D8">向量</a-tag>
                           <a-tag v-if="type && type.split(',').includes('embeddings')" color="#FFEBD3">文本嵌入</a-tag>
                           <a-tag v-if="type && type.split(',').includes('audio')" color="#D4E0D8">语音识别</a-tag>
+                          <a-tag v-if="type && type.split(',').includes('ocr')" color="#C3D9DC">OCR</a-tag>
                         </div>
                       </div>
                     </a-tooltip>
@@ -435,6 +437,8 @@
           setFieldsValue({ baseUrl: modelData.value.baseImageUrl });
         } else if (value === 'AUDIO' && modelData.value.baseAudioUrl) {
           setFieldsValue({ baseUrl: modelData.value.baseAudioUrl });
+        } else if (value === 'OCR' && modelData.value.baseOcrUrl) {
+          setFieldsValue({ baseUrl: modelData.value.baseOcrUrl });
         } else if (modelData.value.baseUrl) {
           setFieldsValue({ baseUrl: modelData.value.baseUrl });
         }

@@ -7,22 +7,27 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.ainote.entity.AinoteAiConfig;
 import org.jeecg.modules.ainote.entity.AinoteAiTask;
 import org.jeecg.modules.ainote.entity.AinoteMaterial;
-import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
+import org.jeecg.modules.ainote.enums.AinoteProcessingType;
+import org.jeecg.modules.ainote.service.AinoteAiRuntimeConfigResolver;
 import org.jeecg.modules.ainote.service.IAinoteMaterialService;
 import org.jeecg.modules.ainote.task.AinoteAiTaskWorker;
+import org.jeecg.modules.ainote.util.MinioUtil;
+import org.jeecg.modules.airag.llm.consts.LLMConsts;
 import org.jeecg.modules.airag.llm.entity.AiragModel;
 import org.jeecg.modules.airag.llm.handler.AIChatHandler;
+import org.jeecg.modules.airag.llm.handler.GlmOcrHandler;
 import org.jeecg.modules.airag.llm.mapper.AiragModelMapper;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * OCR 任务处理器：图片文字识别
+ * 支持两种模型类型：
+ * - OCR 类型：调用 GlmOcrHandler（智谱 layout_parsing API）
+ * - LLM 类型：调用 AIChatHandler Vision（向后兼容）
  */
 @Slf4j
 @Component
@@ -38,17 +43,12 @@ public class OcrTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
             + "3. 仅输出识别到的文字，不添加任何解释或标注\n"
             + "4. 如果图片中没有文字，请回复\"无文字内容\"";
 
-    private static final String[] OCR_MODEL_ENV_KEYS = {
-            "ainote.ai.ocr-model-id",
-            "ainote.task.ocr-model-id",
-            "jeecg.airag.ocr-model-id"
-    };
-
     private final IAinoteMaterialService materialService;
     private final AIChatHandler aiChatHandler;
+    private final GlmOcrHandler glmOcrHandler;
     private final AiragModelMapper airagModelMapper;
-    private final IAinoteAiConfigService configService;
-    private final Environment environment;
+    private final AinoteAiRuntimeConfigResolver runtimeConfigResolver;
+    private final MinioUtil minioUtil;
 
     @Override
     public String getTaskType() {
@@ -69,90 +69,66 @@ public class OcrTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
             throw new JeecgBootException("素材不存在: materialId=" + materialId);
         }
 
-        String imageUrl = requireNotBlank(materialService.generatePresignedUrl(materialId),
-                "生成素材预签名URL失败: materialId=" + materialId);
+        AiragModel model = resolveOcrModel(task.getTenantId());
+        String modelType = trimToNull(model.getModelType());
 
-        AiragModel model = resolveVisionModel(task.getTenantId());
+        String text;
+        if (LLMConsts.MODEL_TYPE_OCR.equalsIgnoreCase(modelType)) {
+            // OCR 专用模型：走 layout_parsing API
+            String imageUrl = requireNotBlank(materialService.generatePresignedUrl(materialId),
+                    "生成素材预签名URL失败: materialId=" + materialId);
+            text = trimToNull(glmOcrHandler.parse(model, imageUrl));
+        } else if (LLMConsts.MODEL_TYPE_LLM.equalsIgnoreCase(modelType)) {
+            // LLM Vision 模型：走 chat completions（向后兼容）
+            String imageUrl = requireNotBlank(materialService.generatePresignedUrl(materialId),
+                    "生成素材预签名URL失败: materialId=" + materialId);
+            UserMessage userMessage = aiChatHandler.buildUserMessage(OCR_PROMPT, List.of(imageUrl));
+            String response = aiChatHandler.completions(model.getId(), List.of((ChatMessage) userMessage));
+            text = normalizeOcrText(response);
+        } else {
+            throw new JeecgBootException("OCR模型类型不支持: modelId=" + model.getId()
+                    + ", modelType=" + model.getModelType());
+        }
 
-        UserMessage userMessage = aiChatHandler.buildUserMessage(OCR_PROMPT, List.of(imageUrl));
-        String response = aiChatHandler.completions(model.getId(), List.of((ChatMessage) userMessage));
-
-        String text = normalizeOcrText(response);
         if (oConvertUtils.isEmpty(text)) {
             throw new JeecgBootException("OCR识别结果为空");
         }
 
         JSONObject result = new JSONObject();
         result.put("text", text);
-        log.info("OCR任务完成: taskId={}, materialId={}, modelId={}, textLength={}",
-                taskId, materialId, model.getId(), text.length());
+        log.info("OCR任务完成: taskId={}, materialId={}, modelId={}, modelType={}, textLength={}",
+                taskId, materialId, model.getId(), model.getModelType(), text.length());
         return result.toJSONString();
     }
 
-    // ─── 模型解析：3 级 fallback ──────────────────────────────
+    // ─── 模型解析：复用 AinoteAiRuntimeConfigResolver ─────────
 
-    private AiragModel resolveVisionModel(Integer tenantId) {
-        AiragModel model = resolveModelFromConfig(tenantId);
-        if (model != null) {
-            return model;
-        }
-        model = resolveModelFromEnvironment();
-        if (model != null) {
-            return model;
-        }
-        throw new JeecgBootException("未配置可用的OCR Vision模型，请在[AI配置]中设置OCR模型或配置环境变量");
-    }
-
-    private AiragModel resolveModelFromConfig(Integer tenantId) {
-        try {
-            int tid = tenantId != null ? tenantId : DEFAULT_TENANT_ID;
-            AinoteAiConfig config = configService.getConfig(tid);
-            if (config == null) {
-                return null;
-            }
-            return loadActiveModel(config.getOcrModelId());
-        } catch (Exception e) {
-            log.warn("读取OCR模型配置失败，尝试环境变量兜底: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    private AiragModel resolveModelFromEnvironment() {
-        if (environment == null) {
-            return null;
-        }
-        for (String key : OCR_MODEL_ENV_KEYS) {
-            AiragModel model = loadActiveModel(environment.getProperty(key));
-            if (model != null) {
-                return model;
-            }
-        }
-        return null;
-    }
-
-    private AiragModel loadActiveModel(String modelId) {
-        String resolvedId = trimToNull(modelId);
+    private AiragModel resolveOcrModel(Integer tenantId) {
+        String tid = String.valueOf(tenantId != null ? tenantId : DEFAULT_TENANT_ID);
+        String configuredModelId = runtimeConfigResolver.resolveModelId(AinoteProcessingType.OCR, tid);
+        String resolvedId = trimToNull(configuredModelId);
         if (resolvedId == null) {
-            return null;
+            throw new JeecgBootException("未配置可用的OCR模型，请在[AI配置]中设置OCR模型");
         }
+
         AiragModel model = airagModelMapper.getByIdIgnoreTenant(resolvedId);
         if (model == null) {
-            log.warn("OCR模型不存在: modelId={}", resolvedId);
-            return null;
+            throw new JeecgBootException("OCR模型不存在: modelId=" + resolvedId);
         }
         if (model.getActivateFlag() == null || model.getActivateFlag() != 1) {
-            log.warn("OCR模型未激活: modelId={}", resolvedId);
-            return null;
+            throw new JeecgBootException("OCR模型未激活: modelId=" + resolvedId);
         }
-        // W6: OCR需要多模态LLM，校验模型类型
-        if (!"llm".equalsIgnoreCase(model.getModelType())) {
-            log.warn("OCR模型类型不是llm: modelId={}, modelType={}", resolvedId, model.getModelType());
-            return null;
+
+        String modelType = trimToNull(model.getModelType());
+        if (!LLMConsts.MODEL_TYPE_OCR.equalsIgnoreCase(modelType)
+                && !LLMConsts.MODEL_TYPE_LLM.equalsIgnoreCase(modelType)) {
+            throw new JeecgBootException("OCR模型类型不支持（仅支持OCR或LLM）: modelId=" + resolvedId
+                    + ", modelType=" + model.getModelType());
         }
         return model;
     }
 
-    // ─── 响应解析 ─────────────────────────────────────────────
+    // ─── 响应解析（LLM Vision 路径使用）─────────────────────────
 
     private String normalizeOcrText(String response) {
         String trimmed = trimToNull(response);

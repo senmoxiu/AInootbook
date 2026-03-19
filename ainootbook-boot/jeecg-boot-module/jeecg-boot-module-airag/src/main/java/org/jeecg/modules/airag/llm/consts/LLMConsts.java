@@ -49,6 +49,11 @@ public class LLMConsts {
     public static final String MODEL_TYPE_ASR = "ASR";
 
     /**
+     * 模型类型: OCR 文字识别
+     */
+    public static final String MODEL_TYPE_OCR = "OCR";
+
+    /**
      * 向量模型：默认维度
      */
     public static final Integer EMBED_MODEL_DEFAULT_DIMENSION = 1536;

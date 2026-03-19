@@ -20,10 +20,10 @@ WHERE permission_id IN (
       )
 );
 
--- 3. 删除 airag_mcp 中 tool_list 包含 /demo/shop/ 的记录
+-- 3. 删除 airag_mcp 中 tools 包含 /demo/shop/ 的记录
 DELETE FROM airag_mcp
-WHERE tool_list LIKE '%/demo/shop/%';
+WHERE tools LIKE '%/demo/shop/%';
 
--- 4. 删除 airag_flow 中 flow_data 包含 /test/jeecgDemo/ 的记录
+-- 4. 删除 airag_flow 中 design 包含 /test/jeecgDemo/ 的记录
 DELETE FROM airag_flow
-WHERE flow_data LIKE '%/test/jeecgDemo/%';
+WHERE design LIKE '%/test/jeecgDemo/%';

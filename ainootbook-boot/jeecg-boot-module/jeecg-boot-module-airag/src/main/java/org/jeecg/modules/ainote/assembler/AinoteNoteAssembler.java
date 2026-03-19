@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.exception.JeecgBootException;
@@ -540,7 +541,7 @@ public class AinoteNoteAssembler {
         String rendered = AinotePromptRenderer.render(template, variables);
 
         List<ChatMessage> messages = new LinkedList<>();
-        messages.add(new SystemMessage(rendered));
+        messages.add(new UserMessage(rendered));
         return messages;
     }
 
