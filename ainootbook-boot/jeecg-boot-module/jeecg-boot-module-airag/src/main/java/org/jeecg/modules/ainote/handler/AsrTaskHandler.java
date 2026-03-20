@@ -73,6 +73,7 @@ public class AsrTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
         AiragModel asrModel = resolveAsrModel();
 
         // 4) 提交任务
+        log.info("ASR提交: taskId={}, fileUrl={}", taskId, fileUrl);
         DashscopeAsrHandler.AsrTask submit = dashscopeAsrHandler.submitTask(asrModel, fileUrl, Collections.emptyMap());
         String vendorTaskId = requireNotBlank(submit == null ? null : submit.getTaskId(), "提交ASR任务失败: 返回taskId为空");
 

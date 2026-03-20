@@ -62,7 +62,7 @@
                     <span v-if="item === 'LLM'">语言模型</span>
                     <span v-else-if="item === 'EMBED'">向量模型</span>
                     <span v-else-if="item === 'IMAGE'">图像模型</span>
-                    <span v-else-if="item === 'AUDIO'">语音识别</span>
+                    <span v-else-if="item === 'ASR'">语音识别</span>
                     <span v-else-if="item === 'OCR'">OCR 识别</span>
                   </a-select-option>
                 </a-select>
@@ -235,7 +235,7 @@
             if (values.result.modelType && values.result.modelType === 'LLM') {
               modelParamsShow.value = true;
               currentSeniorType.value = 'model';
-            } else if (values.result.modelType && values.result.modelType === 'AUDIO') {
+            } else if (values.result.modelType && values.result.modelType === 'ASR') {
               modelParamsShow.value = true;
               currentSeniorType.value = 'audio';
             }
@@ -427,7 +427,7 @@
         if (value === 'LLM') {
           modelParamsShow.value = true;
           currentSeniorType.value = 'model';
-        } else if (value === 'AUDIO') {
+        } else if (value === 'ASR') {
           modelParamsShow.value = true;
           currentSeniorType.value = 'audio';
         } else {
@@ -435,7 +435,7 @@
         }
         if (value === 'IMAGE' && modelData.value.baseImageUrl) {
           setFieldsValue({ baseUrl: modelData.value.baseImageUrl });
-        } else if (value === 'AUDIO' && modelData.value.baseAudioUrl) {
+        } else if (value === 'ASR' && modelData.value.baseAudioUrl) {
           setFieldsValue({ baseUrl: modelData.value.baseAudioUrl });
         } else if (value === 'OCR' && modelData.value.baseOcrUrl) {
           setFieldsValue({ baseUrl: modelData.value.baseOcrUrl });

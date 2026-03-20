@@ -5,6 +5,11 @@ import com.alibaba.dashscope.audio.asr.transcription.TranscriptionParam;
 import com.alibaba.dashscope.audio.asr.transcription.TranscriptionQueryParam;
 import com.alibaba.dashscope.audio.asr.transcription.TranscriptionResult;
 import com.alibaba.dashscope.audio.asr.transcription.TranscriptionTaskResult;
+import com.alibaba.dashscope.audio.qwen_asr.QwenTranscription;
+import com.alibaba.dashscope.audio.qwen_asr.QwenTranscriptionParam;
+import com.alibaba.dashscope.audio.qwen_asr.QwenTranscriptionQueryParam;
+import com.alibaba.dashscope.audio.qwen_asr.QwenTranscriptionResult;
+import com.alibaba.dashscope.audio.qwen_asr.QwenTranscriptionTaskResult;
 import com.alibaba.dashscope.common.TaskStatus;
 import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.fastjson.JSONObject;
@@ -28,6 +33,10 @@ import java.util.*;
 
 /**
  * DashScope ASR（语音转写）处理器
+ * <p>
+ * 支持两种 API 路径：
+ * - qwen3-asr-flash-filetrans 系列：使用 QwenTranscription（file_url 单数字段）
+ * - 其他 ASR 模型（paraformer 等）：使用 Transcription（file_urls 复数字段）
  */
 @Slf4j
 @Component
@@ -75,31 +84,10 @@ public class DashscopeAsrHandler {
         String apiKey = getApiKey(model);
         AssertUtils.assertNotEmpty("基础模型不能为空", model.getModelName());
 
-        Map<String, Object> mergedParams = new HashMap<>();
-        mergedParams.putAll(parseJsonToMap(model.getModelParams()));
-        if (params != null) {
-            mergedParams.putAll(params);
+        if (isQwenAsrModel(model.getModelName())) {
+            return submitQwenTask(apiKey, model, fileUrl);
         }
-
-        try {
-            Transcription transcription = new Transcription();
-            TranscriptionParam.TranscriptionParamBuilder<?, ?> builder = TranscriptionParam.builder()
-                    .apiKey(apiKey)
-                    .model(model.getModelName())
-                    .fileUrls(Collections.singletonList(fileUrl));
-
-            applyKnownOptions(builder, mergedParams);
-            applyGenericParameters(builder, mergedParams);
-
-            TranscriptionResult result = transcription.asyncCall(builder.build());
-            return toAsrTask(result);
-        } catch (ApiException e) {
-            log.error("DashScope ASR submitTask 失败: {}", e.getMessage(), e);
-            throw new JeecgBootException("提交ASR转写任务失败：" + safeMsg(e.getMessage()));
-        } catch (Exception e) {
-            log.error("DashScope ASR submitTask 异常", e);
-            throw new JeecgBootException("提交ASR转写任务失败，详情请查看后台日志。");
-        }
+        return submitLegacyTask(apiKey, model, fileUrl, params);
     }
 
     /**
@@ -109,21 +97,10 @@ public class DashscopeAsrHandler {
         AssertUtils.assertNotEmpty("taskId不能为空", taskId);
         String apiKey = getApiKey(model);
 
-        try {
-            Transcription transcription = new Transcription();
-            TranscriptionQueryParam queryParam = TranscriptionQueryParam.builder()
-                    .apiKey(apiKey)
-                    .taskId(taskId)
-                    .build();
-            TranscriptionResult result = transcription.fetch(queryParam);
-            return toAsrTask(result);
-        } catch (ApiException e) {
-            log.error("DashScope ASR queryTask 失败: {}", e.getMessage(), e);
-            throw new JeecgBootException("查询ASR任务失败：" + safeMsg(e.getMessage()));
-        } catch (Exception e) {
-            log.error("DashScope ASR queryTask 异常", e);
-            throw new JeecgBootException("查询ASR任务失败，详情请查看后台日志。");
+        if (isQwenAsrModel(model.getModelName())) {
+            return queryQwenTask(apiKey, taskId);
         }
+        return queryLegacyTask(apiKey, taskId);
     }
 
     /**
@@ -160,6 +137,158 @@ public class DashscopeAsrHandler {
             sleepQuietly(pollIntervalMs);
         }
     }
+
+    // ─── Qwen ASR（qwen3-asr-flash-filetrans）─────────
+
+    private boolean isQwenAsrModel(String modelName) {
+        return oConvertUtils.isNotEmpty(modelName)
+                && modelName.toLowerCase(Locale.ROOT).contains("qwen")
+                && modelName.toLowerCase(Locale.ROOT).contains("asr");
+    }
+
+    private AsrTask submitQwenTask(String apiKey, AiragModel model, String fileUrl) {
+        try {
+            QwenTranscription transcription = new QwenTranscription();
+            QwenTranscriptionParam param = QwenTranscriptionParam.builder()
+                    .apiKey(apiKey)
+                    .model(model.getModelName())
+                    .fileUrl(fileUrl)
+                    .build();
+            QwenTranscriptionResult result = transcription.asyncCall(param);
+            return toAsrTaskFromQwen(result);
+        } catch (ApiException e) {
+            log.error("DashScope QwenASR submitTask 失败: {}", e.getMessage(), e);
+            throw new JeecgBootException("提交ASR转写任务失败：" + safeMsg(e.getMessage()));
+        } catch (Exception e) {
+            log.error("DashScope QwenASR submitTask 异常", e);
+            throw new JeecgBootException("提交ASR转写任务失败，详情请查看后台日志。");
+        }
+    }
+
+    private AsrTask queryQwenTask(String apiKey, String taskId) {
+        try {
+            QwenTranscription transcription = new QwenTranscription();
+            QwenTranscriptionQueryParam queryParam = QwenTranscriptionQueryParam.builder()
+                    .apiKey(apiKey)
+                    .taskId(taskId)
+                    .headers(new HashMap<>())
+                    .build();
+            QwenTranscriptionResult result = transcription.fetch(queryParam);
+            return toAsrTaskFromQwen(result);
+        } catch (ApiException e) {
+            log.error("DashScope QwenASR queryTask 失败: {}", e.getMessage(), e);
+            throw new JeecgBootException("查询ASR任务失败：" + safeMsg(e.getMessage()));
+        } catch (Exception e) {
+            log.error("DashScope QwenASR queryTask 异常", e);
+            throw new JeecgBootException("查询ASR任务失败，详情请查看后台日志。");
+        }
+    }
+
+    private AsrTask toAsrTaskFromQwen(QwenTranscriptionResult result) {
+        AsrTask task = new AsrTask();
+        if (result == null) {
+            task.setStatus(TaskStatus.UNKNOWN.getValue());
+            return task;
+        }
+        task.setTaskId(result.getTaskId());
+        task.setRequestId(result.getRequestId());
+        TaskStatus status = result.getTaskStatus();
+        task.setStatus(status == null ? TaskStatus.UNKNOWN.getValue() : status.getValue());
+
+        QwenTranscriptionTaskResult taskResult = result.getResult();
+        if (taskResult != null) {
+            task.setFileUrl(taskResult.getFileUrl());
+            task.setTranscriptionUrl(taskResult.getTranscriptionUrl());
+            task.setMessage(taskResult.getMessage());
+        }
+        // FAILED 时错误信息可能在 output 顶层
+        if (oConvertUtils.isEmpty(task.getMessage())) {
+            try {
+                com.google.gson.JsonObject output = result.getOutput();
+                if (output != null) {
+                    if (output.has("message") && !output.get("message").isJsonNull()) {
+                        task.setMessage(output.get("message").getAsString());
+                    } else if (output.has("code") && !output.get("code").isJsonNull()) {
+                        task.setMessage(output.get("code").getAsString());
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return task;
+    }
+
+    // ─── Legacy ASR（paraformer 等旧模型）─────────
+
+    private AsrTask submitLegacyTask(String apiKey, AiragModel model, String fileUrl, Map<String, Object> params) {
+        Map<String, Object> mergedParams = new HashMap<>();
+        mergedParams.putAll(parseJsonToMap(model.getModelParams()));
+        if (params != null) {
+            mergedParams.putAll(params);
+        }
+
+        try {
+            Transcription transcription = new Transcription();
+            TranscriptionParam.TranscriptionParamBuilder<?, ?> builder = TranscriptionParam.builder()
+                    .apiKey(apiKey)
+                    .model(model.getModelName())
+                    .fileUrls(Collections.singletonList(fileUrl));
+
+            applyKnownOptions(builder, mergedParams);
+            applyGenericParameters(builder, mergedParams);
+
+            TranscriptionResult result = transcription.asyncCall(builder.build());
+            return toAsrTaskFromLegacy(result);
+        } catch (ApiException e) {
+            log.error("DashScope ASR submitTask 失败: {}", e.getMessage(), e);
+            throw new JeecgBootException("提交ASR转写任务失败：" + safeMsg(e.getMessage()));
+        } catch (Exception e) {
+            log.error("DashScope ASR submitTask 异常", e);
+            throw new JeecgBootException("提交ASR转写任务失败，详情请查看后台日志。");
+        }
+    }
+
+    private AsrTask queryLegacyTask(String apiKey, String taskId) {
+        try {
+            Transcription transcription = new Transcription();
+            TranscriptionQueryParam queryParam = TranscriptionQueryParam.builder()
+                    .apiKey(apiKey)
+                    .taskId(taskId)
+                    .headers(new HashMap<>())
+                    .build();
+            TranscriptionResult result = transcription.fetch(queryParam);
+            return toAsrTaskFromLegacy(result);
+        } catch (ApiException e) {
+            log.error("DashScope ASR queryTask 失败: {}", e.getMessage(), e);
+            throw new JeecgBootException("查询ASR任务失败：" + safeMsg(e.getMessage()));
+        } catch (Exception e) {
+            log.error("DashScope ASR queryTask 异常", e);
+            throw new JeecgBootException("查询ASR任务失败，详情请查看后台日志。");
+        }
+    }
+
+    private AsrTask toAsrTaskFromLegacy(TranscriptionResult result) {
+        AsrTask task = new AsrTask();
+        if (result == null) {
+            task.setStatus(TaskStatus.UNKNOWN.getValue());
+            return task;
+        }
+        task.setTaskId(result.getTaskId());
+        task.setRequestId(result.getRequestId());
+        TaskStatus status = result.getTaskStatus();
+        task.setStatus(status == null ? TaskStatus.UNKNOWN.getValue() : status.getValue());
+
+        List<TranscriptionTaskResult> results = result.getResults();
+        if (results != null && !results.isEmpty()) {
+            TranscriptionTaskResult first = results.get(0);
+            task.setFileUrl(first.getFileUrl());
+            task.setTranscriptionUrl(first.getTranscriptionUrl());
+            task.setMessage(first.getMessage());
+        }
+        return task;
+    }
+
+    // ─── 公共工具方法 ─────────
 
     private String getApiKey(AiragModel model) {
         AssertUtils.assertNotEmpty("凭证信息不能为空", model.getCredential());
@@ -278,27 +407,6 @@ public class DashscopeAsrHandler {
             }
         }
         return out;
-    }
-
-    private AsrTask toAsrTask(TranscriptionResult result) {
-        AsrTask task = new AsrTask();
-        if (result == null) {
-            task.setStatus(TaskStatus.UNKNOWN.getValue());
-            return task;
-        }
-        task.setTaskId(result.getTaskId());
-        task.setRequestId(result.getRequestId());
-        TaskStatus status = result.getTaskStatus();
-        task.setStatus(status == null ? TaskStatus.UNKNOWN.getValue() : status.getValue());
-
-        List<TranscriptionTaskResult> results = result.getResults();
-        if (results != null && !results.isEmpty()) {
-            TranscriptionTaskResult first = results.get(0);
-            task.setFileUrl(first.getFileUrl());
-            task.setTranscriptionUrl(first.getTranscriptionUrl());
-            task.setMessage(first.getMessage());
-        }
-        return task;
     }
 
     private String downloadTranscriptionJson(String transcriptionUrl) {

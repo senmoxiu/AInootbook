@@ -302,7 +302,7 @@
           "type": "imageGen"
         }
       ],
-      "AUDIO": [
+      "ASR": [
         {
           "label": "qwen3-asr-flash-filetrans",
           "value": "qwen3-asr-flash-filetrans",
@@ -310,14 +310,14 @@
           "type": "audio"
         }
       ],
-      "type": ["LLM", "EMBED", "IMAGE", "AUDIO"],
+      "type": ["LLM", "EMBED", "IMAGE", "ASR"],
       "baseUrl": "https://dashscope.aliyuncs.com/api/v1/services/",
       "baseImageUrl": "https://dashscope.aliyuncs.com/api/v1/",
       "baseAudioUrl": "https://dashscope.aliyuncs.com/api/v1/",
       "LLMDefaultValue": "qwen-plus",
       "EMBEDDefaultValue": "text-embedding-v2",
       "IMAGEDefaultValue": "wan2.2-t2i-plus",
-      "AUDIODefaultValue": "qwen3-asr-flash-filetrans"
+      "ASRDefaultValue": "qwen3-asr-flash-filetrans"
     },
     {
       "title": "千帆大模型",

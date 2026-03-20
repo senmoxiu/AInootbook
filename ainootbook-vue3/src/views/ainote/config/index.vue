@@ -59,7 +59,7 @@
       component: 'ApiSelect',
       colProps: { span: 12 },
       componentProps: {
-        api: () => defHttp.get({ url: '/airag/airagModel/list', params: { modelType: 'AUDIO', activateFlag: 1, pageSize: 50 } }),
+        api: () => defHttp.get({ url: '/airag/airagModel/list', params: { modelType: 'ASR', activateFlag: 1, pageSize: 50 } }),
         resultField: 'records',
         labelField: 'name',
         valueField: 'id',
@@ -83,7 +83,7 @@
       component: 'ApiSelect',
       colProps: { span: 12 },
       componentProps: {
-        api: () => defHttp.get({ url: '/airag/airagModel/list', params: { modelType: 'AUDIO', activateFlag: 1, pageSize: 50 } }),
+        api: () => defHttp.get({ url: '/airag/airagModel/list', params: { modelType: 'ASR', activateFlag: 1, pageSize: 50 } }),
         resultField: 'records',
         labelField: 'name',
         valueField: 'id',

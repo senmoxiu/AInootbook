@@ -247,6 +247,27 @@ public class AinoteNoteAssembler {
                 return directText;
             }
 
+            // qwen ASR 格式：transcripts[].text / transcripts[].sentences[].text
+            JSONArray transcripts = obj.getJSONArray("transcripts");
+            if (transcripts != null && !transcripts.isEmpty()) {
+                StringBuilder tsb = new StringBuilder();
+                for (int i = 0; i < transcripts.size(); i++) {
+                    Object item = transcripts.get(i);
+                    if (item instanceof JSONObject) {
+                        String tText = ((JSONObject) item).getString("text");
+                        if (oConvertUtils.isNotEmpty(tText)) {
+                            if (tsb.length() > 0) {
+                                tsb.append('\n');
+                            }
+                            tsb.append(tText);
+                        }
+                    }
+                }
+                if (tsb.length() > 0) {
+                    return tsb.toString();
+                }
+            }
+
             JSONArray segments = obj.getJSONArray("segments");
             if (segments == null) {
                 segments = obj.getJSONArray("sentences");
