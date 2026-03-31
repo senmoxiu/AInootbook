@@ -89,12 +89,15 @@ export const beforEach = (to, from, next) => {
 // 全局前置守卫
 router.beforeEach(beforEach)
 
-// 路由的最后一级为路由名字不可重复
+// 路由名生成：完整路径规范名（避免冲突）
 function setRouteName(routes) {
   routes.forEach((item) => {
-    if (item.path) {
-      const name = item.path.split('/').pop()
-      item.name = name
+    if (!item.name && item.path) {
+      // 完整路径规范名: pages-study/course/list → study-course-list
+      item.name = item.path.replace(/^\/+/, '').replace(/^pages[\/-]?/, '').replace(/\//g, '-')
+    }
+    if (item.children) {
+      setRouteName(item.children)
     }
   })
 }

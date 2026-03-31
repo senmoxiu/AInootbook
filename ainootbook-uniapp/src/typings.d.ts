@@ -5,6 +5,7 @@ declare global {
     code: number
     success: boolean
     message: string
+    msg?: string
     result: T
     data: T
   }

@@ -25,6 +25,7 @@ import org.jeecg.modules.ainote.dto.AinoteNoteShareCreateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteUpdateDTO;
 import org.jeecg.modules.ainote.enums.NoteSearchScope;
 import org.jeecg.modules.ainote.entity.AinoteNote;
+import org.jeecg.modules.ainote.entity.AinoteNoteVersion;
 import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
 import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
@@ -43,6 +44,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.jeecg.common.exception.JeecgBootException;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
@@ -118,9 +120,21 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
     @Operation(summary = "编辑笔记")
     @RequestMapping(value = "/edit", method = {RequestMethod.PUT, RequestMethod.POST})
     @RequiresPermissions("ainote:note:edit")
-    public Result<String> edit(@RequestBody @Validated AinoteNoteUpdateDTO dto) {
-        ainoteNoteService.updateNote(dto);
-        return Result.OK("编辑成功！");
+    public ResponseEntity<Result<String>> edit(@RequestBody @Validated AinoteNoteUpdateDTO dto) {
+        try {
+            ainoteNoteService.updateNote(dto);
+            return ResponseEntity.ok(Result.OK("编辑成功！"));
+        } catch (JeecgBootException e) {
+            if (e.getErrCode() == HttpStatus.CONFLICT.value()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Result.error(HttpStatus.CONFLICT.value(), e.getMessage()));
+            }
+            if (e.getErrCode() == HttpStatus.BAD_REQUEST.value()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Result.error(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+            }
+            throw e;
+        }
     }
 
     @Operation(summary = "回滚笔记到指定版本")
@@ -242,6 +256,30 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         IPage<AinoteNoteVersionVO> pageList =
                 ainoteNoteService.queryVersionPage(noteId, pageNo, safePageSize);
         return Result.OK(pageList);
+    }
+
+    @Operation(summary = "查询版本详情（含完整内容）")
+    @GetMapping(value = "/version/{versionId}")
+    @RequiresPermissions("ainote:note:list")
+    public Result<AinoteNoteVersion> queryVersionDetail(
+            @PathVariable(name = "versionId") String versionId) {
+        if (oConvertUtils.isEmpty(versionId)) {
+            return Result.error("versionId不能为空");
+        }
+        AinoteNoteVersion version = ainoteNoteService.queryVersionDetail(versionId);
+        if (version == null) {
+            return Result.error("版本不存在或无权限访问");
+        }
+        AinoteNoteVersion sanitized = new AinoteNoteVersion()
+                .setId(version.getId())
+                .setNoteId(version.getNoteId())
+                .setVersionNumber(version.getVersionNumber())
+                .setNoteContent(version.getNoteContent())
+                .setAiSummary(version.getAiSummary())
+                .setKeywords(version.getKeywords())
+                .setCreatedBy(version.getCreatedBy())
+                .setCreatedAt(version.getCreatedAt());
+        return Result.OK(sanitized);
     }
 
     @Operation(summary = "导出excel（带数据权限）")

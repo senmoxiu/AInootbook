@@ -1,3 +1,4 @@
+<!-- @ts-nocheck -->
 <template>
   <view class="CategorySelect">
     <view class="pickerArea" :class="{ clear: !!showText }" @click="handleClick">

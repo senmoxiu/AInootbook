@@ -22,7 +22,15 @@
 
     <!-- 笔记内容 -->
     <a-card title="笔记内容" :bordered="false" class="!mb-4">
-      <MarkdownViewer v-if="noteData.noteContent" :value="sanitizedContent" />
+      <template #extra>
+        <a-button v-if="mode === 'preview'" type="primary" @click="handleEdit">编辑</a-button>
+        <a-space v-else>
+          <a-button @click="handleCancel" :disabled="saving">取消</a-button>
+          <a-button type="primary" @click="handleSave" :loading="saving">保存</a-button>
+        </a-space>
+      </template>
+      <MarkdownViewer v-if="mode === 'preview' && noteData.noteContent" :value="sanitizedContent" />
+      <JMarkdownEditor v-else-if="mode === 'edit'" v-model:value="draftNoteContent" />
       <a-empty v-else description="暂无内容" />
     </a-card>
 
@@ -92,7 +100,7 @@
   import { useRoute, useRouter } from 'vue-router';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { PageWrapper } from '/@/components/Page';
-  import { getNoteById, shareNote } from '/@/api/ainote/note.api';
+  import { getNoteById, shareNote, editNote } from '/@/api/ainote/note.api';
   import { getMaterialList, uploadMaterial, getPresignedUrl, deleteMaterial } from '/@/api/ainote/material.api';
   import AiProcessProgress from './components/AiProcessProgress.vue';
   import { MarkdownViewer } from '/@/components/Markdown';
@@ -112,6 +120,9 @@
   const uploadCount = ref(0);
   const previewVisible = ref(false);
   const previewUrl = ref('');
+  const mode = ref<'preview' | 'edit'>('preview');
+  const draftNoteContent = ref('');
+  const saving = ref(false);
 
   const keywordList = computed(() => {
     const kw = noteData.value.keywords;
@@ -261,6 +272,30 @@
       createMessage.error('创建分享失败');
     } finally {
       shareLoading.value = false;
+    }
+  }
+
+  function handleEdit() {
+    draftNoteContent.value = String(noteData.value.noteContent || '');
+    mode.value = 'edit';
+  }
+
+  function handleCancel() {
+    mode.value = 'preview';
+    draftNoteContent.value = '';
+  }
+
+  async function handleSave() {
+    try {
+      saving.value = true;
+      await editNote({ id: noteId.value, noteContent: draftNoteContent.value });
+      createMessage.success('保存成功');
+      await loadNoteData();
+      mode.value = 'preview';
+    } catch (e) {
+      createMessage.error('保存失败');
+    } finally {
+      saving.value = false;
     }
   }
 

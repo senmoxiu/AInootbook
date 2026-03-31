@@ -18,7 +18,8 @@ const render = {
           src: getFileAccessHttpUrl(item),
           width: 30,
           height: 30,
-          style: { marginRight: '5px' },
+          // @ts-ignore - UniApp h() style prop accepts plain objects
+        style: { marginRight: '5px' },
         })
       }),
     )

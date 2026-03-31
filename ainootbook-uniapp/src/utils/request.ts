@@ -273,7 +273,7 @@ export interface CustomDownloadOptions extends Omit<UniApp.DownloadFileOption, '
  */
 export const downloadFile = (options: CustomDownloadOptions): Promise<UniApp.DownloadSuccessData> => {
   const reqOpts = { ...options }
-  handleUrlAndQuery(reqOpts as CustomRequestOptions)
+  handleUrlAndQuery(reqOpts as unknown as CustomRequestOptions)
 
   // 添加认证头
   const userStore = useUserStore()

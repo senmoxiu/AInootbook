@@ -88,9 +88,9 @@ const updateProgressState = (newProgress: number, newStatus: string) => {
   }
 }
 
-const getStepStatus = (stepIndex: number) => {
+const getStepStatus = (stepIndex: number): 'error' | 'finished' | 'process' | undefined => {
   if (status.value === 'failed') {
-    return stepIndex === currentStep.value ? 'error' : 'wait'
+    return stepIndex === currentStep.value ? 'error' : undefined
   }
   if (stepIndex < currentStep.value || status.value === 'completed') {
     return 'finished'
@@ -98,7 +98,7 @@ const getStepStatus = (stepIndex: number) => {
   if (stepIndex === currentStep.value) {
     return 'process'
   }
-  return 'wait'
+  return undefined
 }
 
 const getPollInterval = () => {
@@ -210,6 +210,19 @@ const handleRetry = () => {
   startPolling()
 }
 
+const onAppShowHandler = () => {
+  isBackground = false
+  if (status.value === 'processing' || status.value === 'idle') {
+    noChangeCount = 0
+    stopPolling()
+    fetchProgress()
+  }
+}
+
+const onAppHideHandler = () => {
+  isBackground = true
+}
+
 onMounted(() => {
   const cached = store.getTask(props.noteId)
   if (cached) {
@@ -222,25 +235,20 @@ onMounted(() => {
     currentHintIndex.value = (currentHintIndex.value + 1) % hints.length
   }, 5000) as unknown as number
 
-  startPolling()
+  uni.onAppShow(onAppShowHandler)
+  uni.onAppHide(onAppHideHandler)
+
+  if (store.claimPolling(props.noteId)) {
+    startPolling()
+  }
 })
 
 onUnmounted(() => {
   stopPolling()
   if (hintInterval) clearInterval(hintInterval)
-})
-
-uni.onAppShow(() => {
-  isBackground = false
-  if (status.value === 'processing' || status.value === 'idle') {
-    noChangeCount = 0
-    stopPolling()
-    fetchProgress()
-  }
-})
-
-uni.onAppHide(() => {
-  isBackground = true
+  uni.offAppShow(onAppShowHandler)
+  uni.offAppHide(onAppHideHandler)
+  store.releasePolling(props.noteId)
 })
 </script>
 

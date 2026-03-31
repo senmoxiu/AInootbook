@@ -26,14 +26,6 @@ export const us = {
       enabled: true,
     },
     {
-      title: '组件示例',
-      icon: icon_prefix + 'chuchai.png',
-      description: '组件示例',
-      useCount: 10000,
-      routeIndex: 'demo',
-      enabled: true,
-    },
-    {
       title: '流程待办',
       icon: icon_prefix + 'gongwen.png',
       description: '流程待办',

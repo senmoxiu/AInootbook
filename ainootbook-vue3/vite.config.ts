@@ -143,7 +143,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       exclude: [
         //升级vite4后，需要排除online依赖
         '@jeecg/online',
-        '@jeecg/aiflow',
       ],
       // 强制预构建clipboard，解决Vite6对CommonJS模块的严格检查
       include: ['clipboard']

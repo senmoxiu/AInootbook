@@ -124,6 +124,7 @@ import { courseApi, type Course, type CourseChapter } from '@/api/course'
 import { noteApi } from '@/api/note'
 import type { Material } from '@/api/material'
 import MaterialUpload from '@/components/MaterialUpload.vue'
+// @ts-ignore - da-tree is a uni_modules third-party component, excluded from type-check
 import DaTree from '@/uni_modules/da-tree/index.vue'
 import AiProgressTracker from '@/components/AiProgressTracker.vue'
 
@@ -244,23 +245,22 @@ const nextStep = async () => {
     uni.showLoading({ title: '准备中...' })
     try {
       if (!store.wizardData.noteId) {
-        const res = await noteApi.addNote({
+        const noteId = await noteApi.addNote({
           courseId: store.wizardData.courseId,
           courseName: store.wizardData.courseName,
           chapterId: store.wizardData.chapterId,
           chapterName: store.wizardData.chapterName,
           noteTitle: '新建笔记'
         })
-        if (res.success && res.result) {
-          const noteId = typeof res.result === 'string' ? res.result : res.result.id
+        if (noteId) {
           store.setWizardData({
-            noteId: noteId,
+            noteId,
             currentVersion: 1,
             title: '新建笔记'
           })
           store.setStep(2)
         } else {
-          toast.error(res.message || '创建草稿失败')
+          toast.error('创建草稿失败')
         }
       } else {
         store.setStep(2)
@@ -304,11 +304,9 @@ const onAiComplete = async () => {
   try {
     uni.showLoading({ title: '正在获取内容...' })
     const detail = await noteApi.getNoteDetail(store.wizardData.noteId)
-    const content = (detail as any).result?.noteContent || (detail as any).noteContent || '生成内容为空'
-    const version = (detail as any).result?.currentVersion || (detail as any).currentVersion || store.wizardData.currentVersion
     store.setWizardData({
-      generatedContent: content,
-      currentVersion: version
+      generatedContent: detail.noteContent || '生成内容为空',
+      currentVersion: detail.currentVersion || store.wizardData.currentVersion
     })
     store.setStep(4)
   } catch (err: any) {
@@ -340,16 +338,10 @@ const regenerateContent = async () => {
       baseVersion: store.wizardData.currentVersion || 1,
       additionalContent: store.wizardData.additionalContent
     })
-    if (res && res.noteContent) {
+    if (res?.noteContent) {
       store.setWizardData({
         generatedContent: res.noteContent,
         currentVersion: res.version || store.wizardData.currentVersion
-      })
-      toast.success('重新生成成功')
-    } else if (res && (res as any).result?.noteContent) {
-      store.setWizardData({
-        generatedContent: (res as any).result.noteContent,
-        currentVersion: (res as any).result.version || store.wizardData.currentVersion
       })
       toast.success('重新生成成功')
     } else {
@@ -370,7 +362,7 @@ const saveNote = async () => {
       id: store.wizardData.noteId,
       noteTitle: store.wizardData.title,
       noteContent: store.wizardData.generatedContent,
-      noteStatus: 'COMPLETED'
+      noteStatus: 2
     })
     if (res.success) {
       toast.success('保存成功')

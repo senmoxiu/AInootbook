@@ -194,11 +194,11 @@
   import { Form } from 'ant-design-vue';
   import { defHttp } from '@/utils/http/axios';
   import JDictSelectTag from '@/components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import AiAppParamsSettingModal from '@/views/super/airag/aiapp/components/AiAppParamsSettingModal.vue';
-  import AiAppGeneratedPromptModal from '@/views/super/airag/aiapp/components/AiAppGeneratedPromptModal.vue';
+  import AiAppParamsSettingModal from '@/views/super/airag/shared/components/AiAppParamsSettingModal.vue';
+  import AiAppGeneratedPromptModal from '@/views/super/airag/shared/components/AiAppGeneratedPromptModal.vue';
   import AiragPromptsModal from './AiragPromptsModal.vue';
-  import chat from '@/views/super/airag/aiapp/chat/chat.vue';
-  import defaultImg from '@/views/super/airag/aiapp/img/ailogo.png';
+  import chat from '@/views/super/airag/shared/chat/chat.vue';
+  import defaultImg from '@/views/super/airag/shared/assets/ailogo.png';
   import { getFileAccessHttpUrl, randomString } from '@/utils/common/compUtils';
   import { cloneDeep } from 'lodash-es';
   import { saveOrUpdate } from '@/views/super/airag/aiprompts/AiragPrompts.api';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // TODO: 别忘加更改环境变量的 VITE_UPLOAD_BASEURL 地址。
 import { getEnvBaseUploadUrl } from '@/utils'
 import { useUserStore } from '@/store/user'

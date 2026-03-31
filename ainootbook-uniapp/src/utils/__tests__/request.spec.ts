@@ -138,6 +138,7 @@ describe('src/utils/request.ts', () => {
       }
     })
 
+    // @ts-ignore - globalThis.uni is a UniApp global
     globalThis.uni = {
       request: mockState.request,
       uploadFile: mockState.uploadFile,
@@ -146,7 +147,7 @@ describe('src/utils/request.ts', () => {
       navigateTo: mockState.navigateTo,
       getStorageSync: mockState.getStorageSync,
       setStorageSync: mockState.setStorageSync,
-    } as typeof uni
+    } as unknown as typeof uni
 
     Object.assign(import.meta.env, {
       MODE: 'development',

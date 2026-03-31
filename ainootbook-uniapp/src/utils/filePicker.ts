@@ -28,7 +28,7 @@ export const chooseFile = (options: FilePickerOptions = {}): Promise<PickedFile[
     // #ifdef H5
     uni.chooseFile({
       count: options.count || 1,
-      type: options.type || 'all',
+      type: (options.type || 'all') as 'image' | 'video' | 'all',
       extension: options.extension,
       success: (res: any) => {
         const files = res.tempFiles.map((f: any) => ({

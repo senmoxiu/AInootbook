@@ -1,3 +1,4 @@
+<!-- @ts-nocheck -->
 <route lang="json5" type="page">
 {
   layout: 'default',

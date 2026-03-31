@@ -14,7 +14,7 @@
   "scripts": {
     "electron:dev": "cross-env VITE_GLOB_RUN_PLATFORM=electron npm run dev",
     "electron:build-all": "npm run electron:build-web && npm run electron:build-app",
-    "electron:build-web": "cross-env VITE_GLOB_RUN_PLATFORM=electron NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 vite build --mode prod_electron && cross-env VITE_GLOB_RUN_PLATFORM=electron esno ./build/script/postBuild.ts && esno ./build/script/copyChat.ts",
+    "electron:build-web": "cross-env VITE_GLOB_RUN_PLATFORM=electron NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 vite build --mode prod_electron && cross-env VITE_GLOB_RUN_PLATFORM=electron esno ./build/script/postBuild.ts",
     "electron:build-app": "esno ./electron/script/buildBefore.ts && electron-builder && esno ./electron/script/buildAfter.ts",
     "electron:install": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ node node_modules/electron/install.js",
   },

@@ -16,6 +16,7 @@ export interface MaterialListParams {
   pageSize?: number
   noteId?: string
   fileType?: string
+  [key: string]: unknown
 }
 
 export interface MaterialListResult {
@@ -34,7 +35,7 @@ export interface ChunkedUploadProgressResult {
   totalChunks: number
 }
 
-const BASE_URL = '/jeecg-boot/ainote/material'
+const BASE_URL = '/ainote/material'
 
 export const materialApi = {
   getMaterialList: (params?: MaterialListParams) =>

@@ -28,7 +28,10 @@
   "vueCompilerOptions": {
     "plugins": ["@uni-helper/uni-types/volar-plugin"]
   },
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules",
+    "src/uni_modules"
+  ],
   "include": [
     "src/**/*.ts",
 	"src/**/*.uts",

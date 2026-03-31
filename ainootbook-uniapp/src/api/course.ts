@@ -44,6 +44,7 @@ export interface CourseListParams {
   pageSize?: number
   courseName?: string
   teacherName?: string
+  [key: string]: unknown
 }
 
 export interface CourseListResult {
@@ -56,7 +57,7 @@ type CourseRequestOptions = Pick<
   'cache' | 'hideErrorToast' | 'retryCount' | 'retryDelay'
 >
 
-const BASE_URL = '/jeecg-boot/teaching/course'
+const BASE_URL = '/teaching/course'
 
 export const courseApi = {
   getCourseList: (params?: CourseListParams, options: CourseRequestOptions = {}) =>
@@ -72,7 +73,7 @@ export const courseApi = {
 
   getCourseDetail: (id: string, options: CourseRequestOptions = {}) =>
     http<CourseDetail | CourseApiResponse<CourseDetail>>({
-      url: `${BASE_URL}/detail`,
+      url: `${BASE_URL}/queryById`,
       method: 'GET',
       query: { id },
       cache: options.cache ?? true,

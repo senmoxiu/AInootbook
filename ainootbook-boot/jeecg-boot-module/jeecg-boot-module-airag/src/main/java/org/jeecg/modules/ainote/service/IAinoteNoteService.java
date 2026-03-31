@@ -12,6 +12,7 @@ import org.jeecg.modules.ainote.dto.AinoteNoteRegenerateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteShareCreateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteUpdateDTO;
 import org.jeecg.modules.ainote.entity.AinoteNote;
+import org.jeecg.modules.ainote.entity.AinoteNoteVersion;
 import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
@@ -83,6 +84,11 @@ public interface IAinoteNoteService extends IService<AinoteNote> {
      * 分页查询笔记版本历史
      */
     IPage<AinoteNoteVersionVO> queryVersionPage(String noteId, Integer pageNo, Integer pageSize);
+
+    /**
+     * 查询版本详情（含完整内容，仅 owner/admin）
+     */
+    AinoteNoteVersion queryVersionDetail(String versionId);
 
     /**
      * 安全导入Excel（强制覆盖敏感字段，仅管理员可用）

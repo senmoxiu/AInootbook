@@ -222,6 +222,16 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
             throw new JeecgBootException("数据不存在或无权限编辑");
         }
 
+        Integer currentVersion = existing.getCurrentVersion() != null ? existing.getCurrentVersion() : 1;
+        boolean contentUpdateRequested = dto.getNoteContent() != null;
+        if (contentUpdateRequested && dto.getBaseVersion() == null) {
+            throw new JeecgBootException("编辑笔记时baseVersion不能为空", HttpStatus.BAD_REQUEST.value());
+        }
+        if (dto.getBaseVersion() != null
+                && !Objects.equals(currentVersion, dto.getBaseVersion())) {
+            throw new JeecgBootException("笔记已被他人修改，请刷新后重试", HttpStatus.CONFLICT.value());
+        }
+
         AinoteNote note = new AinoteNote();
         note.setId(dto.getId());
         if (oConvertUtils.isNotEmpty(dto.getCourseId())) {
@@ -267,7 +277,6 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
         note.setUpdateBy(user.getId());
 
         // 版本管理：内容实际变更时推进版本号
-        Integer currentVersion = existing.getCurrentVersion() != null ? existing.getCurrentVersion() : 1;
         boolean contentActuallyChanged = dto.getNoteContent() != null
                 && !Objects.equals(oConvertUtils.getString(existing.getNoteContent(), ""), dto.getNoteContent());
         Integer newVersion = null;
@@ -281,7 +290,26 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
                 && !Objects.equals(dto.getIsPublic(), existing.getIsPublic());
         boolean isCourseIdChanged = oConvertUtils.isNotEmpty(dto.getCourseId())
                 && !Objects.equals(dto.getCourseId(), existing.getCourseId());
-        updateById(note);
+
+        boolean success = true;
+        if (dto.getBaseVersion() != null) {
+            UpdateWrapper<AinoteNote> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("id", dto.getId());
+            updateWrapper.eq("tenant_id", tenantId);
+            updateWrapper.ne("note_status", NOTE_STATUS_DELETED);
+            updateWrapper.eq("current_version", dto.getBaseVersion());
+            if (!isAdmin(user)) {
+                updateWrapper.eq("student_id", user.getId());
+            }
+            success = update(note, updateWrapper);
+            if (!success) {
+                throw new JeecgBootException("笔记已被他人修改，请刷新后重试", HttpStatus.CONFLICT.value());
+            }
+        } else if (!contentUpdateRequested) {
+            updateById(note);
+        } else {
+            throw new JeecgBootException("编辑笔记时baseVersion不能为空", HttpStatus.BAD_REQUEST.value());
+        }
 
         // 内容变更后保存新版本快照
         if (contentActuallyChanged && newVersion != null) {
@@ -941,5 +969,31 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
             return 0;
         }
         return tenantId;
+    }
+
+    @Override
+    public AinoteNoteVersion queryVersionDetail(String versionId) {
+        if (oConvertUtils.isEmpty(versionId)) {
+            return null;
+        }
+        AinoteNoteVersion version = ainoteNoteVersionService.getById(versionId);
+        if (version == null) {
+            return null;
+        }
+
+        LoginUser user = getCurrentUser();
+        Integer tenantId = getRequiredTenantId();
+        if (!Objects.equals(version.getTenantId(), tenantId)) {
+            return null;
+        }
+
+        QueryWrapper<AinoteNote> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", version.getNoteId());
+        wrapper.eq("tenant_id", tenantId);
+        wrapper.ne("note_status", NOTE_STATUS_DELETED);
+        if (!isAdmin(user)) {
+            wrapper.eq("student_id", user.getId());
+        }
+        return getOne(wrapper, false) != null ? version : null;
     }
 }

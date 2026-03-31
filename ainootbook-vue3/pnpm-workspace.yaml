@@ -1,2 +1,1 @@
-patchedDependencies:
-  '@jeecg/aiflow': patches/@jeecg__aiflow.patch
+packages: []

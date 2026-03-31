@@ -13,6 +13,7 @@ enum Api {
   exportXls = '/airag/prompts/exportXls',
 
   promptExperiment = '/airag/prompts/experiment',
+  promptGenerate = '/airag/app/prompt/generate',
 }
 /**
  * 导出api
@@ -70,4 +71,21 @@ export const saveOrUpdate = (params, isUpdate) => {
  */
 export const promptExperiment = (params) => {
   return defHttp.post({url: Api.promptExperiment, params},{ isTransformResponse: false });
+}
+/**
+ * 提示词生成（流式）
+ * @param params
+ */
+export const promptGenerate = (params) => {
+  return defHttp.post(
+    {
+      url: Api.promptGenerate + '?prompt=' + params.prompt,
+      adapter: 'fetch',
+      responseType: 'stream',
+      timeout: 5 * 60 * 1000,
+    },
+    {
+      isTransformResponse: false,
+    }
+  );
 }

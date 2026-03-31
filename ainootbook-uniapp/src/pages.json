@@ -24,22 +24,22 @@
     "spacing": "3px",
     "list": [
       {
-        "iconPath": "static/tabbar/tabbar-message-2.png",
-        "selectedIconPath": "static/tabbar/tabbar-message.png",
-        "pagePath": "pages/message/message",
-        "text": "消息"
-      },
-      {
         "iconPath": "static/tabbar/tabbar-home-2.png",
         "selectedIconPath": "static/tabbar/tabbar-home.png",
         "pagePath": "pages/index/index",
-        "text": "协作"
+        "text": "首页"
+      },
+      {
+        "iconPath": "static/tabbar/tabbar-study-2.png",
+        "selectedIconPath": "static/tabbar/tabbar-study.png",
+        "pagePath": "pages-study/course/list",
+        "text": "学习"
       },
       {
         "iconPath": "static/tabbar/tabbar-user-2.png",
         "selectedIconPath": "static/tabbar/tabbar-user.png",
         "pagePath": "pages/user/people",
-        "text": "个人"
+        "text": "我的"
       }
     ]
   },
@@ -55,13 +55,6 @@
         "app-plus": {
           "bounce": "none"
         }
-      }
-    },
-    {
-      "path": "pages/about/about",
-      "type": "page",
-      "style": {
-        "navigationBarTitleText": "关于"
       }
     },
     {
@@ -179,125 +172,7 @@
     },
     {
       "root": "pages-message",
-      "pages": [
-        {
-          "path": "chat/chat",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "聊天",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "chat/chatSetting",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "contacts/contacts",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "联系人",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "moreFunction/moreFunction",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "myGroup/addGroup",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "创建群组",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "myGroup/groupPage",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "myGroup/myGroup",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "personPage/personPage",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "tenant/tenant",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        }
-      ]
+      "pages": []
     },
     {
       "root": "pages-user",
@@ -358,104 +233,11 @@
     },
     {
       "root": "pages-work",
-      "pages": [
-        {
-          "path": "dragPage/index",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "仪表盘",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "onlinePage/onlineAdd",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "Online表单新增",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "onlinePage/onlineDetail",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "Online表单详情",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "onlinePage/onlineEdit",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "Online表单编辑",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        }
-      ]
+      "pages": []
     },
     {
       "root": "pages-sub",
-      "pages": [
-        {
-          "path": "online/online",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "online",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "online/onlineCard",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        },
-        {
-          "path": "online/onlineTable",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        }
-      ]
+      "pages": []
     },
     {
       "root": "pages-study",

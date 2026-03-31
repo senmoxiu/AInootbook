@@ -99,7 +99,7 @@ const dataSource = ref([
   {
     type: 'showInfo',
     label: '对外信息展示',
-    value: getSubStringText(userStore.userInfo.realname + (userStore.userInfo?.orgCodeTxt?`@${userStore.userInfo.orgCodeTxt}`:''), 11),
+    value: getSubStringText(userStore.userInfo.realname + ((userStore.userInfo as any)?.orgCodeTxt?`@${(userStore.userInfo as any).orgCodeTxt}`:''), 11),
   },
   { label: '手机', value: phone.value ,type: 'phone' },
   { label: '邮箱', value: email.value ,type: 'email'},

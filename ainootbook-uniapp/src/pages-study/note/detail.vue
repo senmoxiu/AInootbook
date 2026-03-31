@@ -165,7 +165,7 @@ const displayContent = computed(() => {
   if (isPreviewMode.value && previewVersion.value) {
     return {
       rendered: previewVersion.value.renderedContent || '',
-      raw: previewVersion.value.content || ''
+      raw: previewVersion.value.noteContent || ''
     }
   }
   return {
@@ -212,7 +212,6 @@ const handleDelete = () => {
     title: '确认删除',
     msg: '删除后将无法找回，是否确定删除该笔记？',
     confirmButtonText: '删除',
-    confirmButtonColor: '#ee0a24'
   }).then(async () => {
     try {
       const res = await noteApi.deleteNote(noteId.value)
@@ -378,7 +377,8 @@ async function handleSaveEdit() {
   try {
     const res = await noteApi.editNote({
       id: noteId.value,
-      noteContent: draftNoteContent.value
+      noteContent: draftNoteContent.value,
+      baseVersion: currentNote.value?.currentVersion
     })
     if (res.success) {
       toast.success('保存成功')

@@ -52,12 +52,9 @@ const queryList = (pageNo, pageSize) => {
 }
 
 
-// 跳转
-const handleGo = (item) => {
-  console.log("handleGo",item);
-  uni.navigateTo({
-	  url: '/pages-work/dragPage/index?id=' + item.id,
-	})
+// 跳转（pages-work 已删除，功能暂不可用）
+const handleGo = (_item) => {
+  uni.showToast({ title: '功能暂不可用', icon: 'none' })
 }
 </script>
 

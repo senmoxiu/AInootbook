@@ -5,7 +5,6 @@
 
 interface NavigateToOptions {
   url: "/pages/index/index" |
-       "/pages/about/about" |
        "/pages/annotation/annotationDetail" |
        "/pages/annotation/annotationList" |
        "/pages/login/login" |
@@ -15,26 +14,10 @@ interface NavigateToOptions {
        "/pages/user/people" |
        "/pages/workHome/workHome" |
        "/pages-home/home/home" |
-       "/pages-message/chat/chat" |
-       "/pages-message/chat/chatSetting" |
-       "/pages-message/contacts/contacts" |
-       "/pages-message/moreFunction/moreFunction" |
-       "/pages-message/myGroup/addGroup" |
-       "/pages-message/myGroup/groupPage" |
-       "/pages-message/myGroup/myGroup" |
-       "/pages-message/personPage/personPage" |
-       "/pages-message/tenant/tenant" |
        "/pages-user/location/location" |
        "/pages-user/organization/organization" |
        "/pages-user/userDetail/userDetail" |
        "/pages-user/userEdit/userEdit" |
-       "/pages-work/dragPage/index" |
-       "/pages-work/onlinePage/onlineAdd" |
-       "/pages-work/onlinePage/onlineDetail" |
-       "/pages-work/onlinePage/onlineEdit" |
-       "/pages-sub/online/online" |
-       "/pages-sub/online/onlineCard" |
-       "/pages-sub/online/onlineTable" |
        "/pages-study/course/courseList" |
        "/pages-study/course/detail" |
        "/pages-study/course/list" |
@@ -45,7 +28,7 @@ interface NavigateToOptions {
 interface RedirectToOptions extends NavigateToOptions {}
 
 interface SwitchTabOptions {
-  url: "/pages/message/message" | "/pages/index/index" | "/pages/user/people"
+  url: "/pages/index/index" | "/pages-study/course/list" | "/pages/user/people"
 }
 
 type ReLaunchOptions = NavigateToOptions | SwitchTabOptions;

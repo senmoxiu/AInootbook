@@ -1,25 +1,6 @@
 import type { AppRouteRecordRaw } from '/@/router/types';
 import { LAYOUT } from '/@/router/constant';
 
-export const AI_ROUTE: AppRouteRecordRaw = {
-  path: '',
-  name: 'ai-parent',
-  component: LAYOUT,
-  meta: {
-    title: 'ai',
-  },
-  children: [
-    {
-      path: '/ai',
-      name: 'ai',
-      component: () => import('/@/views/dashboard/ai/index.vue'),
-      meta: {
-        title: 'AI助手',
-      },
-    },
-  ],
-};
-
 /**
  * AI笔记详情路由（非菜单，带动态参数，必须注册为静态路由）
  * 菜单由 sys_permission 数据库控制；此处仅注册详情页 /ainote/note/view/:id
@@ -46,4 +27,4 @@ export const AINOTE_ROUTE: AppRouteRecordRaw = {
   ],
 };
 
-export const staticRoutesList = [AI_ROUTE, AINOTE_ROUTE];
+export const staticRoutesList = [AINOTE_ROUTE];

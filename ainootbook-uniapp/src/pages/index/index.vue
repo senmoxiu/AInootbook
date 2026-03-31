@@ -118,7 +118,7 @@ const goPage = (item) => {
       })
     } else {
       if (!hasRoute({ name: page })) {
-        router.replace({ name: 'demo', params: { backRouteName: 'index', routeMethod: 'pushTab' } })
+        toast.info('功能开发中...')
       } else {
         router.replace({ name: page, params: { backRouteName: 'index', routeMethod: 'pushTab' } })
       }

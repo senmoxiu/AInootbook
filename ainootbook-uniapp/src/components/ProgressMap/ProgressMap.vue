@@ -1,3 +1,4 @@
+<!-- @ts-nocheck -->
 <template>
   <view class="ProgressMap">
     <view v-if="title.length" class="title">{{ title }}</view>

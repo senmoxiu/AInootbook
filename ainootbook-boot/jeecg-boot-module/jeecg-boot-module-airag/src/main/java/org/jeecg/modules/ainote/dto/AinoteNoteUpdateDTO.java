@@ -1,6 +1,7 @@
 package org.jeecg.modules.ainote.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -34,6 +35,10 @@ public class AinoteNoteUpdateDTO implements Serializable {
 
     @Schema(description = "笔记内容（Markdown格式）")
     private String noteContent;
+
+    @Min(value = 1, message = "baseVersion必须大于0")
+    @Schema(description = "基准版本号（用于乐观锁校验）")
+    private Integer baseVersion;
 
     @Schema(description = "AI生成的摘要")
     private String aiSummary;

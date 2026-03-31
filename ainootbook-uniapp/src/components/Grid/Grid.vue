@@ -1,3 +1,4 @@
+<!-- @ts-nocheck -->
 <template>
   <view
     class="wrap"

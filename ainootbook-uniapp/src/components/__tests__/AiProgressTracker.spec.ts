@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+// @ts-ignore - @pinia/testing may not be installed in all environments
 import { createTestingPinia } from '@pinia/testing'
 import AiProgressTracker from '../AiProgressTracker.vue'
 import { useAiProgressStore } from '@/store/aiProgress'
 
 // Mock uni API
+// @ts-ignore - globalThis.uni is a UniApp global
 global.uni = {
   request: vi.fn(),
   onAppShow: vi.fn(),

@@ -1,7 +1,7 @@
 <template>
   <view class="note-card" @click="$emit('click', note)">
     <view class="note-card__header">
-      <text class="note-card__title">{{ note.title }}</text>
+      <text class="note-card__title">{{ note.noteTitle }}</text>
       <wd-tag v-if="note.isPublic" type="success" plain size="small">公开</wd-tag>
     </view>
 
@@ -16,8 +16,8 @@
       </view>
     </view>
 
-    <view v-if="note.summary" class="note-card__summary">
-      {{ note.summary }}
+    <view v-if="note.aiSummary" class="note-card__summary">
+      {{ note.aiSummary }}
     </view>
 
     <view class="note-card__footer">
