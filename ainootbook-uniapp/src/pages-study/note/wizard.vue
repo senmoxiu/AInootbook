@@ -54,11 +54,13 @@
 
       <!-- Step 3: AI 分析进度 -->
       <view v-show="store.step === 3" class="step-pane progress-pane">
-        <view class="progress-circle">
-          <wd-progress :percentage="aiProgress" color="#39b54a" />
-        </view>
-        <text class="progress-text">{{ aiStageText }}</text>
-        <text class="progress-sub">{{ aiProgress }}%</text>
+        <AiProgressTracker
+          v-if="store.step === 3"
+          :noteId="store.wizardData.noteId"
+          @complete="onAiComplete"
+          @failed="onAiFailed"
+          @cancelled="onAiCancelled"
+        />
       </view>
 
       <!-- Step 4: AI 整合内容 -->
@@ -123,6 +125,7 @@ import { noteApi } from '@/api/note'
 import type { Material } from '@/api/material'
 import MaterialUpload from '@/components/MaterialUpload.vue'
 import DaTree from '@/uni_modules/da-tree/index.vue'
+import AiProgressTracker from '@/components/AiProgressTracker.vue'
 
 const store = useNoteWizardStore()
 const message = useMessage()
@@ -130,12 +133,6 @@ const toast = useToast()
 
 const courseOptions = ref<Course[]>([])
 const chapterTree = ref<CourseChapter[]>([])
-
-// AI 分析状态
-const aiProgress = ref(0)
-const aiStages = ['读取素材...', '分析知识结构...', '提取关键内容...', '生成笔记初稿...', '格式化排版...']
-const aiStageText = ref(aiStages[0])
-let aiTimer: any = null
 
 const canNext = computed(() => {
   if (store.step === 1) {
@@ -148,13 +145,7 @@ onMounted(() => {
   checkDraft()
 })
 
-onUnmounted(() => {
-  // 组件卸载时清理定时器
-  if (aiTimer) {
-    clearInterval(aiTimer)
-    aiTimer = null
-  }
-})
+onUnmounted(() => {})
 
 const checkDraft = () => {
   const hasDraft = Object.keys(store.wizardData).length > 0 && store.step > 1
@@ -218,7 +209,6 @@ const onCourseConfirm = async (e: any) => {
 }
 
 const onChapterChange = (allCheckedKeys: any, currentItem: any) => {
-  // DaTree single selection returns array or object
   const item = Array.isArray(currentItem) ? currentItem[0] : currentItem
   if (item) {
     store.setWizardData({
@@ -262,7 +252,6 @@ const nextStep = async () => {
           noteTitle: '新建笔记'
         })
         if (res.success && res.result) {
-          // 后端返回的是 String (noteId)，不是对象
           const noteId = typeof res.result === 'string' ? res.result : res.result.id
           store.setWizardData({
             noteId: noteId,
@@ -288,11 +277,9 @@ const nextStep = async () => {
         title: '提示',
         msg: '尚未上传任何参考素材，直接生成可能效果不佳，是否继续？'
       }).then(() => {
-        store.setStep(3)
         startAiAnalysis()
       }).catch(() => {})
     } else {
-      store.setStep(3)
       startAiAnalysis()
     }
   } else if (store.step === 4) {
@@ -301,65 +288,78 @@ const nextStep = async () => {
   }
 }
 
-const startAiAnalysis = () => {
-  aiProgress.value = 0
-  aiStageText.value = aiStages[0]
+const startAiAnalysis = async () => {
+  try {
+    uni.showLoading({ title: '启动 AI 分析...' })
+    await noteApi.triggerGeneration(store.wizardData.noteId)
+    store.setStep(3)
+  } catch (err: any) {
+    toast.error(err.message || '触发生成失败')
+  } finally {
+    uni.hideLoading()
+  }
+}
 
-  if (aiTimer) clearInterval(aiTimer)
+const onAiComplete = async () => {
+  try {
+    uni.showLoading({ title: '正在获取内容...' })
+    const detail = await noteApi.getNoteDetail(store.wizardData.noteId)
+    const content = (detail as any).result?.noteContent || (detail as any).noteContent || '生成内容为空'
+    const version = (detail as any).result?.currentVersion || (detail as any).currentVersion || store.wizardData.currentVersion
+    store.setWizardData({
+      generatedContent: content,
+      currentVersion: version
+    })
+    store.setStep(4)
+  } catch (err: any) {
+    toast.error('获取笔记内容失败')
+    store.setStep(2)
+  } finally {
+    uni.hideLoading()
+  }
+}
 
-  const totalStages = aiStages.length
+const onAiFailed = (error: Error) => {
+  toast.error(error.message || '生成失败')
+  store.setStep(2)
+}
 
-  aiTimer = setInterval(async () => {
-    aiProgress.value += Math.floor(Math.random() * 8) + 4
-
-    if (aiProgress.value >= 100) {
-      clearInterval(aiTimer)
-      aiTimer = null
-      aiProgress.value = 100
-      aiStageText.value = '分析完成！'
-
-      try {
-        uni.showLoading({ title: '正在获取内容...' })
-        const res = await noteApi.regenerateNote({
-          noteId: store.wizardData.noteId,
-          baseVersion: store.wizardData.currentVersion || 1,
-          additionalContent: store.wizardData.additionalContent
-        })
-        if (res.success && res.result) {
-          // 后端返回 { version, noteContent }
-          store.setWizardData({
-            generatedContent: res.result.noteContent || '生成内容为空',
-            currentVersion: res.result.version || store.wizardData.currentVersion
-          })
-          setTimeout(() => {
-            store.setStep(4)
-          }, 800)
-        } else {
-          toast.error(res.message || '生成失败')
-          store.setStep(2)
-        }
-      } catch (err: any) {
-        toast.error(err.message || '生成异常')
-        store.setStep(2)
-      } finally {
-        uni.hideLoading()
-      }
-      return
-    }
-
-    const expectedStage = Math.floor((aiProgress.value / 100) * totalStages)
-    if (expectedStage < totalStages && expectedStage >= 0) {
-      aiStageText.value = aiStages[expectedStage]
-    }
-  }, 600)
+const onAiCancelled = () => {
+  toast.info('任务已取消')
+  store.setStep(2)
 }
 
 const regenerateContent = async () => {
   if (!store.wizardData.additionalContent) {
     return toast.warning('请输入补充说明')
   }
-  store.setStep(3)
-  startAiAnalysis()
+  uni.showLoading({ title: '重新生成中...', mask: true })
+  try {
+    const res = await noteApi.regenerateNote({
+      noteId: store.wizardData.noteId,
+      baseVersion: store.wizardData.currentVersion || 1,
+      additionalContent: store.wizardData.additionalContent
+    })
+    if (res && res.noteContent) {
+      store.setWizardData({
+        generatedContent: res.noteContent,
+        currentVersion: res.version || store.wizardData.currentVersion
+      })
+      toast.success('重新生成成功')
+    } else if (res && (res as any).result?.noteContent) {
+      store.setWizardData({
+        generatedContent: (res as any).result.noteContent,
+        currentVersion: (res as any).result.version || store.wizardData.currentVersion
+      })
+      toast.success('重新生成成功')
+    } else {
+      toast.error('重新生成失败')
+    }
+  } catch (err: any) {
+    toast.error(err.message || '重新生成失败')
+  } finally {
+    uni.hideLoading()
+  }
 }
 
 const saveNote = async () => {
@@ -393,12 +393,6 @@ const cancelWizard = () => {
     title: '确认取消',
     msg: '取消后将清空当前草稿，是否确认？'
   }).then(async () => {
-    // 清理定时器
-    if (aiTimer) {
-      clearInterval(aiTimer)
-      aiTimer = null
-    }
-    // 删除后端草稿
     if (store.wizardData.noteId) {
       await noteApi.deleteNote(store.wizardData.noteId)
     }

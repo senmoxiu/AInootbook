@@ -34,6 +34,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useMessage } from 'wot-design-uni'
 import { useAiProgressStore } from '@/store/aiProgress'
+import { noteApi } from '@/api/note'
 
 const props = defineProps<{
   noteId: string
@@ -64,7 +65,7 @@ let isBackground = false
 let startTime = 0
 let networkRetryCount = 0
 
-const MAX_TIMEOUT = 10 * 60 * 1000
+const MAX_TIMEOUT = 5 * 60 * 1000
 
 const updateProgressState = (newProgress: number, newStatus: string) => {
   if (newProgress >= progress.value) {
@@ -108,7 +109,7 @@ const getPollInterval = () => {
   return 2000
 }
 
-const fetchProgress = () => {
+const fetchProgress = async () => {
   if (status.value === 'completed' || status.value === 'failed') {
     return
   }
@@ -119,45 +120,36 @@ const fetchProgress = () => {
     return
   }
 
-  uni.request({
-    url: `/ainote/note/progress?noteId=${props.noteId}`,
-    method: 'GET',
-    success: (res: UniApp.RequestSuccessCallbackResult) => {
-      networkRetryCount = 0
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        const responseData = res.data as Record<string, any> || {}
-        const data = responseData.result || responseData.data || responseData
-        const newProgress = data.progress || 0
-        const newStatus = data.status || 'processing'
+  try {
+    const res = await noteApi.getProgress(props.noteId)
+    networkRetryCount = 0
 
-        if (newProgress === progress.value) {
-          noChangeCount++
-        }
+    // Handle nested result if it exists (some APIs return { success: true, result: {...} })
+    const responseData = res as any
+    const data = responseData.result || responseData.data || responseData
+    const newProgress = data.progress || 0
+    const newStatus = data.status || 'processing'
 
-        updateProgressState(newProgress, newStatus)
-
-        if (newStatus === 'completed' || newProgress >= 100) {
-          status.value = 'completed'
-          progress.value = 100
-          emit('complete')
-          store.removeTask(props.noteId)
-        } else if (newStatus === 'failed') {
-          status.value = 'failed'
-          emit('failed', new Error('Task failed from server'))
-        } else {
-          scheduleNextPoll()
-        }
-      } else if (res.statusCode >= 400 && res.statusCode < 500) {
-        status.value = 'failed'
-        emit('failed', new Error(`Client error: ${res.statusCode}`))
-      } else if (res.statusCode >= 500) {
-        handleNetworkError()
-      }
-    },
-    fail: () => {
-      handleNetworkError()
+    if (newProgress === progress.value) {
+      noChangeCount++
     }
-  })
+
+    updateProgressState(newProgress, newStatus)
+
+    if (newStatus === 'completed' || newProgress >= 100) {
+      status.value = 'completed'
+      progress.value = 100
+      emit('complete')
+      store.removeTask(props.noteId)
+    } else if (newStatus === 'failed') {
+      status.value = 'failed'
+      emit('failed', new Error('Task failed from server'))
+    } else {
+      scheduleNextPoll()
+    }
+  } catch (err: any) {
+    handleNetworkError()
+  }
 }
 
 const handleNetworkError = () => {
@@ -194,28 +186,18 @@ const handleCancel = () => {
     msg: '是否确认取消当前 AI 生成任务？',
     confirmButtonText: '确定',
     cancelButtonText: '暂不取消'
-  }).then(() => {
+  }).then(async () => {
     stopPolling()
-    uni.request({
-      url: '/ainote/note/cancelGeneration',
-      method: 'POST',
-      data: { noteId: props.noteId },
-      success: (res: UniApp.RequestSuccessCallbackResult) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          status.value = 'failed'
-          store.removeTask(props.noteId)
-          emit('cancelled')
-          uni.navigateBack()
-        } else {
-          uni.showToast({ title: '取消请求失败', icon: 'none' })
-          scheduleNextPoll()
-        }
-      },
-      fail: () => {
-        uni.showToast({ title: '取消请求失败', icon: 'none' })
-        scheduleNextPoll()
-      }
-    })
+    try {
+      await noteApi.cancelGeneration(props.noteId)
+      status.value = 'failed'
+      store.removeTask(props.noteId)
+      emit('cancelled')
+      uni.navigateBack()
+    } catch (err: any) {
+      uni.showToast({ title: '取消请求失败', icon: 'none' })
+      scheduleNextPoll()
+    }
   }).catch(() => {})
 }
 

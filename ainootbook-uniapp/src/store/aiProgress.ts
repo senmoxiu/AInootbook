@@ -14,5 +14,6 @@ export const useAiProgressStore = defineStore('aiProgress', {
     removeTask(noteId: string) {
       delete this.tasks[noteId]
     }
-  }
+  },
+  persist: true
 })

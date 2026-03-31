@@ -1,20 +1,6 @@
 import { http } from '@/utils/request'
 
-export interface Note {
-  id: string
-  title: string
-  content?: string
-  renderedContent?: string
-  summary?: string
-  courseId?: string
-  courseName?: string
-  chapterId?: string
-  chapterName?: string
-  currentVersion?: number
-  isPublic?: boolean
-  createTime?: string
-  updateTime?: string
-}
+export interface Note { id: string; noteTitle: string; noteContent?: string; renderedContent?: string; aiSummary?: string; keywords?: string; courseId?: string; courseName?: string; chapterId?: string; chapterName?: string; currentVersion?: number; noteStatus?: number; isPublic?: boolean; createTime?: string; updateTime?: string; }
 
 export interface NoteListParams {
   pageNo?: number
@@ -29,14 +15,7 @@ export interface NoteListResult {
   total: number
 }
 
-export interface NoteVersion {
-  id: string
-  noteId: string
-  version: number
-  content: string
-  renderedContent?: string
-  createTime: string
-}
+export interface NoteVersion { id?: string; noteId?: string; versionNumber?: number; noteContent?: string; aiSummary?: string; keywords?: string; createTime?: string; createBy?: string; }
 
 const BASE_URL = '/jeecg-boot/ainote/note'
 
@@ -57,12 +36,7 @@ export const noteApi = {
       cache: true
     }),
 
-  addNote: (data: Partial<Note>) =>
-    http<{ success: boolean; message: string; result?: Note }>({
-      url: `${BASE_URL}/add`,
-      method: 'POST',
-      data
-    }),
+  addNote: (data: Partial<Note>) => http<{success: boolean; message: string; result: string | { id: string }}>({ url: ${BASE_URL}/add, method: 'POST', data }).then(res => res.result && typeof res.result === 'string' ? res.result : ((res.result as any)?.id || '')),
 
   editNote: (data: Partial<Note>) =>
     http<{ success: boolean; message: string }>({
@@ -78,18 +52,20 @@ export const noteApi = {
       query: { id }
     }),
 
-  regenerateNote: (data: { noteId: string; baseVersion: number; additionalContent?: string }) =>
-    http<{ success: boolean; message: string; result?: { generationId: string } }>({
-      url: `${BASE_URL}/regenerate`,
-      method: 'POST',
-      data
-    }),
+  regenerateNote: (data: { noteId: string; baseVersion: number; additionalContent?: string }) => http<{success: boolean; message: string; result: { version: number; noteContent: string }}>({ url: ${BASE_URL}/regenerate, method: 'POST', data }).then(res => res.result),
 
-  getNoteVersions: (noteId: string) =>
-    http<{ success: boolean; result: NoteVersion[] }>({
+  getNoteVersions: (params: { noteId: string; pageNo?: number; pageSize?: number }) =>
+    http<{ success: boolean; result: { records: NoteVersion[]; total: number } }>({
       url: `${BASE_URL}/versions`,
       method: 'GET',
-      query: { noteId },
+      query: params,
+      cache: true
+    }),
+
+  getNoteVersionDetail: (versionId: string) =>
+    http<NoteVersion>({
+      url: `${BASE_URL}/version/${versionId}`,
+      method: 'GET',
       cache: true
     }),
 
@@ -98,5 +74,26 @@ export const noteApi = {
       url: `${BASE_URL}/rollback`,
       method: 'POST',
       data
+    }),
+
+  triggerGeneration: (generationId: string) =>
+    http<string>({
+      url: `${BASE_URL}/triggerGeneration`,
+      method: 'POST',
+      query: { noteId: generationId }
+    }),
+
+  getProgress: (generationId: string) =>
+    http<{ progress: number; status: 'idle' | 'processing' | 'completed' | 'failed'; errorMsg?: string }>({
+      url: `${BASE_URL}/progress`,
+      method: 'GET',
+      query: { noteId: generationId }
+    }),
+
+  cancelGeneration: (generationId: string) =>
+    http<string>({
+      url: `${BASE_URL}/cancelGeneration`,
+      method: 'POST',
+      query: { noteId: generationId }
     }),
 }

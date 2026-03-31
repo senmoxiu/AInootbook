@@ -1,14 +1,9 @@
 <template>
   <view class="note-detail-page">
-      <!-- AI 进度跟踪 -->
-      <view v-if="isGenerating" class="progress-container">
-        <AiProgressTracker :noteId="noteId" @complete="handleGenerationComplete" @failed="handleGenerationFailed" />
-      </view>
-
-      <scroll-view v-else scroll-y class="detail-scroll">
+      <scroll-view scroll-y class="detail-scroll">
         <view class="note-header">
           <view class="title-section">
-            <text class="title">{{ currentNote?.title || '加载中...' }}</text>
+            <text class="title">{{ currentNote?.noteTitle || '加载中...' }}</text>
             <view class="meta">
               <text class="time">{{ currentNote?.updateTime || currentNote?.createTime || '' }}</text>
               <text class="version" v-if="currentNote?.currentVersion">V{{ currentNote.currentVersion }}</text>
@@ -41,9 +36,14 @@
 
         <!-- 笔记内容 -->
         <view class="content-section">
-          <MarkdownViewer 
-            :htmlContent="displayContent.rendered" 
-            :rawContent="displayContent.raw" 
+          <MarkdownViewer
+            v-if="mode === 'preview'"
+            :htmlContent="displayContent.rendered"
+            :rawContent="displayContent.raw"
+          />
+          <MarkdownEditorLite
+            v-else
+            v-model="draftNoteContent"
           />
         </view>
         
@@ -52,18 +52,30 @@
       </scroll-view>
 
       <!-- 底部操作栏 -->
-      <view class="footer-actions" v-if="!isGenerating">
+      <view class="footer-actions">
         <view class="action-item" @click="handleDelete">
           <wd-icon name="delete" size="20px" />
           <text>删除</text>
+        </view>
+        <view v-if="mode === 'preview'" class="action-item" @click="handleEdit">
+          <wd-icon name="edit" size="20px" />
+          <text>编辑</text>
+        </view>
+        <view v-else class="action-item" @click="handleCancelEdit">
+          <wd-icon name="close" size="20px" />
+          <text>取消</text>
         </view>
         <view class="action-item" @click="showVersionHistory">
           <wd-icon name="history" size="20px" />
           <text>历史</text>
         </view>
-        <view class="action-item primary" @click="openRegeneratePopup">
+        <view v-if="mode === 'preview'" class="action-item primary" @click="openRegeneratePopup">
           <wd-icon name="refresh" size="20px" color="#fff" />
           <text>重新生成</text>
+        </view>
+        <view v-else class="action-item primary" @click="handleSaveEdit">
+          <wd-icon name="check" size="20px" color="#fff" />
+          <text>保存</text>
         </view>
       </view>
 
@@ -132,7 +144,7 @@ import { useMessage, useToast } from 'wot-design-uni'
 import { noteApi, type Note, type NoteVersion } from '@/api/note'
 import { materialApi, type Material } from '@/api/material'
 import MarkdownViewer from '@/components/MarkdownViewer.vue'
-import AiProgressTracker from '@/components/AiProgressTracker.vue'
+import MarkdownEditorLite from '@/components/MarkdownEditorLite.vue'
 
 const message = useMessage()
 const toast = useToast()
@@ -141,7 +153,9 @@ const noteId = ref('')
 const currentNote = ref<Note | null>(null)
 const materials = ref<Material[]>([])
 const versions = ref<NoteVersion[]>([])
-const isGenerating = ref(false)
+const mode = ref<'preview' | 'edit'>('preview')
+const draftNoteContent = ref('')
+const saving = ref(false)
 
 // 预览历史版本相关
 const previewVersion = ref<NoteVersion | null>(null)
@@ -156,7 +170,7 @@ const displayContent = computed(() => {
   }
   return {
     rendered: currentNote.value?.renderedContent || '',
-    raw: currentNote.value?.content || ''
+    raw: currentNote.value?.noteContent || ''
   }
 })
 
@@ -192,17 +206,6 @@ const loadData = async () => {
   }
 }
 
-// 世代完成回调
-const handleGenerationComplete = () => {
-  isGenerating.value = false
-  loadData()
-}
-
-const handleGenerationFailed = () => {
-  isGenerating.value = false
-  toast.error('生成失败')
-}
-
 // 删除笔记
 const handleDelete = () => {
   message.confirm({
@@ -228,9 +231,9 @@ const handleDelete = () => {
 // 版本历史
 const showVersionHistory = async () => {
   try {
-    const res = await noteApi.getNoteVersions(noteId.value)
+    const res = await noteApi.getNoteVersions({ noteId: noteId.value, pageNo: 1, pageSize: 20 })
     if (res.success) {
-      versions.value = res.result || []
+      versions.value = res.result?.records || []
       showVersions.value = true
     }
   } catch (error) {
@@ -280,22 +283,26 @@ const openRegeneratePopup = () => {
 const confirmRegenerate = async () => {
   if (regenerateLoading.value) return
   regenerateLoading.value = true
+  uni.showLoading({ title: '重新生成中...', mask: true })
   try {
     const res = await noteApi.regenerateNote({
       noteId: noteId.value,
       baseVersion: currentNote.value?.currentVersion || 1,
       additionalContent: additionalContent.value
     })
-    if (res.success) {
+    // 假设 res 是 { version, noteContent }
+    if (res) {
       showRegenerate.value = false
-      isGenerating.value = true
       previewVersion.value = null
+      toast.success('重新生成成功')
+      await loadData()
     } else {
-      toast.error(res.message || '启动重新生成失败')
+      toast.error('启动重新生成失败')
     }
-  } catch (error) {
-    toast.error('网络请求失败')
+  } catch (error: any) {
+    toast.error(error.message || '重新生成失败')
   } finally {
+    uni.hideLoading()
     regenerateLoading.value = false
   }
 }
@@ -353,6 +360,38 @@ const getMaterialIcon = (type: string) => {
   if (['mp4', 'mov', 'webm'].includes(t)) return '/static/video.png'
   if (['mp3', 'wav', 'aac'].includes(t)) return '/static/audio.png'
   return '/static/file.png'
+}
+
+function handleEdit() {
+  draftNoteContent.value = currentNote.value?.noteContent || ''
+  mode.value = 'edit'
+}
+
+function handleCancelEdit() {
+  mode.value = 'preview'
+  draftNoteContent.value = ''
+}
+
+async function handleSaveEdit() {
+  if (saving.value) return
+  saving.value = true
+  try {
+    const res = await noteApi.editNote({
+      id: noteId.value,
+      noteContent: draftNoteContent.value
+    })
+    if (res.success) {
+      toast.success('保存成功')
+      mode.value = 'preview'
+      await loadData()
+    } else {
+      toast.error(res.message || '保存失败')
+    }
+  } catch (error: any) {
+    toast.error(error.message || '网络请求失败')
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
