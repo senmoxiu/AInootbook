@@ -135,9 +135,9 @@ public class Swagger3Config implements WebMvcConfigurer {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("JeecgBoot 后台服务API接口文档")
+                        .title("AI 课堂笔记智能整理系统 API 接口文档")
                         .version("3.9.1")
-                        .contact(new Contact().name("北京国炬信息技术有限公司").url("www.jeccg.com").email("jeecgos@163.com"))
+                        .contact(new Contact().name("AInootbook").url("").email(""))
                         .description("后台API接口")
                         .termsOfService("NO terms of service")
                         .license(new License().name("Apache 2.0").url("http://www.apache.org/licenses/LICENSE-2.0.html")))

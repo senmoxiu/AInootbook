@@ -21,6 +21,7 @@ import org.jeecg.modules.airag.teaching.mapper.AinoteCourseSelectionMapper;
 import org.jeecg.modules.airag.teaching.service.IAinoteCourseSelectionService;
 import org.jeecg.modules.airag.teaching.service.IAinoteTeachingService;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
+import org.jeecg.modules.ainote.util.RoleUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ public class AinoteCourseSelectionServiceImpl
         if (tenantId != null) {
             wrapper.eq("tenant_id", tenantId);
         }
-        Set<String> roles = parseRoles(user.getRoleCode());
+        Set<String> roles = RoleUtils.parseRoles(user.getRoleCode());
         if (roles.contains("admin")) {
             // admin 仅租户隔离，无需额外过滤
             return;
@@ -74,7 +75,7 @@ public class AinoteCourseSelectionServiceImpl
 
         // 确定学生ID：admin 可指定，否则取当前登录用户
         String studentId = dto.getStudentId();
-        Set<String> roles = parseRoles(user.getRoleCode());
+        Set<String> roles = RoleUtils.parseRoles(user.getRoleCode());
         if (!roles.contains("admin") || studentId == null || studentId.isBlank()) {
             studentId = user.getId();
         }
@@ -165,16 +166,6 @@ public class AinoteCourseSelectionServiceImpl
             Page<AinoteCourseSelectionVO> page,
             QueryWrapper<AinoteCourseSelection> wrapper) {
         return baseMapper.querySelectionVoPage(page, wrapper);
-    }
-
-    /**
-     * 解析角色编码字符串为 Set，按逗号分割后精确匹配
-     */
-    private Set<String> parseRoles(String roleCode) {
-        if (roleCode == null || roleCode.isBlank()) {
-            return Collections.emptySet();
-        }
-        return new HashSet<>(Arrays.asList(roleCode.split(",")));
     }
 
     /**

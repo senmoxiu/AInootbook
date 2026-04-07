@@ -182,7 +182,7 @@ mybatis-plus:
     #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     # 返回类型为Map,显示null对应的字段
     call-setters-on-nulls: true
-#jeecg专用配置
+#平台专用配置
 minidao:
   base-package: org.jeecg.modules.jmreport.*,org.jeecg.modules.drag.*
 jeecg:
@@ -265,12 +265,12 @@ jeecg:
     # 地域信息
     region: ap-beijing
   # 在线预览文件服务器地址配置
-  file-view-domain: http://fileview.jeecg.com
+  file-view-domain: http://127.0.0.1:8012
   # minio文件上传
   minio:
-    minio_url: http://127.0.0.1:9000
-    minio_name: admin
-    minio_pass: password
+    minio_url: http://47.110.68.172:19000
+    minio_name: minio
+    minio_pass: H3jL2ZnPrKBeXBef
     bucketName: aibook
   #大屏报表参数设置
   jmreport:

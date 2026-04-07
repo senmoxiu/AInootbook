@@ -19,6 +19,7 @@ import org.jeecg.modules.airag.teaching.entity.AinoteTeaching;
 import org.jeecg.modules.airag.teaching.mapper.AinoteTeachingMapper;
 import org.jeecg.modules.airag.teaching.service.IAinoteTeachingService;
 import org.jeecg.modules.airag.teaching.vo.AinoteTeachingVO;
+import org.jeecg.modules.ainote.util.RoleUtils;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.SysDepartModel;
 import org.springframework.dao.DuplicateKeyException;
@@ -186,14 +187,8 @@ public class AinoteTeachingServiceImpl extends ServiceImpl<AinoteTeachingMapper,
      * 判断是否为教师角色
      */
     private boolean isTeacherRole(LoginUser user) {
-        // 根据角色编码判断，假设教师角色编码为 "teacher"
-        String roleCode = user.getRoleCode();
-        if (roleCode == null) {
-            return false;
-        }
-        // 按逗号分割后精确匹配，避免子串误判
-        Set<String> roles = new HashSet<>(Arrays.asList(roleCode.split(",")));
-        return roles.contains("teacher") && !roles.contains("admin");
+        return RoleUtils.hasRole(user.getRoleCode(), "teacher")
+                && !RoleUtils.hasRole(user.getRoleCode(), "admin");
     }
 
     /**

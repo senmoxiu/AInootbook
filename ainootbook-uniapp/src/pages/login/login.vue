@@ -16,7 +16,7 @@
     <view class="page-container">
       <view class="text-center">
         <image :src="compLogo" mode="aspectFit" class="logo"></image>
-        <view class="title text-shadow">{{ compTitle || 'JEECG BOOT' }}</view>
+        <view class="title text-shadow">{{ compTitle || 'AI 课堂笔记' }}</view>
         <view class="enter-area">
           <view v-if="loginWay == 1" class="account-login-area">
             <view class="box account">
@@ -113,7 +113,7 @@ defineOptions({
   },
 })
 const router = useRouter()
-const defLogo = 'https://static.jeecg.com/files/app_logo.png'
+const defLogo = '/static/logo.png'
 const shape = ref()
 const loading = ref(false)
 const userName = ref()
@@ -127,19 +127,17 @@ let smsCountInterval = null
 const toggleDelay = ref(false)
 const version = ref('')
 const compLogo = ref(defLogo)
-const compTitle = ref('Jeecg Uniapp')
+const compTitle = ref('AI 课堂笔记')
 const paramsStore = useParamsStore()
 paramsStore.reset()
 // 是否开启本地路由配置
 let isLocalConfig = getApp().globalData.isLocalConfig;
 if (import.meta.env.MODE === 'development') {
-  userName.value = 'admin'
-  password.value = '123456'
+  // 开发环境不预填账号
 }
 
 if (import.meta.env.MODE === 'production') {
-  userName.value = 'jeecg'
-  password.value = 'jeecg#123456'
+  // 生产环境不预填账号
 }
 
 const isSendSMSEnable = computed(() => {
@@ -324,7 +322,7 @@ const loadConfig = () => {
       let info = res.result
       if (info) {
         compLogo.value = getFileAccessHttpUrl(info.appLogo) || defLogo
-        compTitle.value = info.appTitle || 'JEECG-BOOT'
+        compTitle.value = info.appTitle || 'AI 课堂笔记'
       } else {
         compLogo.value = defLogo
       }

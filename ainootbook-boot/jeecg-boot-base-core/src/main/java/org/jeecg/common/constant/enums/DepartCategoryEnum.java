@@ -10,10 +10,14 @@ import org.jeecg.common.util.oConvertUtils;
 */
 public enum DepartCategoryEnum {
     
+    DEPART_CATEGORY_SCHOOL("部门类型：学校","学校","1"),
     DEPART_CATEGORY_COMPANY("部门类型：公司","公司","1"),
     DEPART_CATEGORY_DEPART("部门类型：部门","部门","2"),
     DEPART_CATEGORY_POST("部门类型：岗位","岗位","3"),
-    DEPART_CATEGORY_SUB_COMPANY("部门类型：子公司","子公司","4");
+    DEPART_CATEGORY_SUB_COMPANY("部门类型：子公司","子公司","4"),
+    DEPART_CATEGORY_COLLEGE("部门类型：学院","学院","5"),
+    DEPART_CATEGORY_MAJOR("部门类型：专业","专业","6"),
+    DEPART_CATEGORY_CLASS("部门类型：班级","班级","7");
 
     DepartCategoryEnum(String described, String name, String value) {
         this.value = value;

@@ -233,25 +233,7 @@ if (isLocalConfig) {
     {
       id: 1,
       type: 'image',
-      url: 'https://static.jeecg.com/upload/test/banner0_1595850438042.jpeg',
-      link: '',
-    },
-    {
-      id: 2,
-      type: 'image',
-      url: 'https://static.jeecg.com/upload/test/banner2_1595818081327.jpg',
-      link: '',
-    },
-    {
-      id: 3,
-      type: 'image',
-      url: 'https://static.jeecg.com/upload/test/oabanner-2_1595648520760.png',
-      link: '',
-    },
-    {
-      id: 4,
-      type: 'image',
-      url: 'https://static.jeecg.com/upload/test/banner5_1595818089013.jpeg',
+      url: '/static/banner/banner_default.png',
       link: '',
     },
   ]

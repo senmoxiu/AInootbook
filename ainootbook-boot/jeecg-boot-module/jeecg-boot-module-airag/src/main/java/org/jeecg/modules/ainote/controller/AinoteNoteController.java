@@ -28,6 +28,7 @@ import org.jeecg.modules.ainote.entity.AinoteNote;
 import org.jeecg.modules.ainote.entity.AinoteNoteVersion;
 import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
+import org.jeecg.modules.ainote.util.RoleUtils;
 import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
@@ -333,7 +334,7 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
 
         // 检查是否为管理员
         String roleCode = user.getRoleCode();
-        boolean isAdmin = roleCode != null && Arrays.asList(roleCode.split(",")).contains("admin");
+        boolean isAdmin = RoleUtils.hasRole(roleCode, "admin");
         if (!isAdmin) {
             return Result.error("导入功能仅限管理员使用");
         }
@@ -369,12 +370,12 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         }
 
         String roleCode = oConvertUtils.getString(user.getRoleCode(), "");
-        if (searchScope == NoteSearchScope.ALL && !roleCode.contains("admin")) {
+        if (searchScope == NoteSearchScope.ALL && !RoleUtils.hasRole(roleCode, "admin")) {
             return Result.error("ALL 范围仅管理员可用");
         }
         if (searchScope == NoteSearchScope.COURSE
-                && !roleCode.contains("teacher")
-                && !roleCode.contains("admin")) {
+                && !RoleUtils.hasRole(roleCode, "teacher")
+                && !RoleUtils.hasRole(roleCode, "admin")) {
             return Result.error("COURSE 范围仅教师可用");
         }
 

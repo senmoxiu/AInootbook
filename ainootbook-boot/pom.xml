@@ -14,9 +14,9 @@
 	</developers>
 
 	<scm>
-		<connection>http://www.jeecg.com</connection>
-		<developerConnection>http://guojusoft.com</developerConnection>
-		<url>http://www.jeecg.com/vip</url>
+		<connection>https://github.com/ainootbook</connection>
+		<developerConnection>https://github.com/ainootbook</developerConnection>
+		<url>https://github.com/ainootbook</url>
 	</scm>
 	
   	<parent>

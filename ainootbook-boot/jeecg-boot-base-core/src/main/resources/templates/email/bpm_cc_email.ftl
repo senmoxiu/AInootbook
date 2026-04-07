@@ -6,7 +6,7 @@
 <body>
 <div  class="box-content">
     <div  class="info-top">
-        <img src="https://www.jeecg.com/images/logo.png" style="float: left; margin: 0 10px 0 0; width: 32px;height:32px" /><div style="color:#fff"><strong>【重要】流程抄送的通知</strong></div>
+        <div style="color:#fff"><strong>【重要】流程抄送的通知</strong></div>
     </div>
     <div class="info-wrap">
         <div class="tips" style="padding:15px;">
@@ -49,7 +49,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="footer">北京国炬平台</div>
+        <div class="footer">AInootbook 系统</div>
     </div>
     <div style="margin-top: 60px;margin-bottom: 10px;">
         <span style="font-size: 13px; font-weight: bold; color: #666;">温馨提醒</span>
@@ -59,7 +59,7 @@
     </div>
     <div style="width: 600px; margin: 0 auto;  margin-top: 50px; font-size: 12px; -webkit-font-smoothing: subpixel-antialiased; text-size-adjust: 100%;">
         <p style="text-align: center; line-height: 20.4px; text-size-adjust: 100%; font-family: 'Microsoft YaHei'!important; padding: 0px !important; margin: 0px !important; color: #7e8890 !important;">
-            <span class="appleLinks">Copyright © 2023-2024 北京国炬信息技术有限公司. 保留所有权利。</span>
+            <span class="appleLinks">Copyright © 2024-2026 AInootbook. 保留所有权利。</span>
         </p>
         <p style="text-align: center;line-height: 20.4px; text-size-adjust: 100%; font-family: 'Microsoft YaHei'!important; padding: 0px !important; margin: 0px; color: #7e8890 !important; margin-top: 10px;">
             <span class="appleLinks">邮件由系统自动发送，请勿直接回复本邮件！</span>

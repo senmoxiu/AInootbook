@@ -12,7 +12,7 @@ export const HOME_PAGE = "/pages/index/index"
 /**
  * 组件名称前缀
  */
-export const COMP_NAME_PREFIX = 'jeecg-drag';
+export const COMP_NAME_PREFIX = 'ainote-drag';
 //首页配置项缓存时间10分钟
 export const HOME_CONFIG_EXPIRED_TIME = 10*60
 export const phone = '---'

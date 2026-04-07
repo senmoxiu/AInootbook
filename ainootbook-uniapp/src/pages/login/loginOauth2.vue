@@ -3,7 +3,7 @@
     <!-- 登录加载弹窗 -->
     <view class="cu-load load-modal">
       <image
-        src="https://static.jeecg.com/files/app_logo.png"
+        src="/static/logo.png"
         mode="aspectFit"
         class="round"
       ></image>

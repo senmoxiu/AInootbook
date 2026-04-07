@@ -28,6 +28,7 @@ import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteAiTaskService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
 import org.jeecg.modules.ainote.service.IAinoteNoteVersionService;
+import org.jeecg.modules.ainote.util.RoleUtils;
 import org.jeecg.modules.ainote.service.MarkdownPrecompileService;
 import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
@@ -845,12 +846,7 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
     }
 
     private boolean isAdmin(LoginUser user) {
-        String roleCode = user.getRoleCode();
-        if (roleCode == null) {
-            return false;
-        }
-        Set<String> roles = new HashSet<>(Arrays.asList(roleCode.split(",")));
-        return roles.contains("admin");
+        return RoleUtils.hasRole(user.getRoleCode(), "admin");
     }
 
     private Integer getCurrentTenantId() {

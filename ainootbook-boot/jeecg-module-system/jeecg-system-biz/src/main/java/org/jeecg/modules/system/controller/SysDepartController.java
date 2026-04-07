@@ -52,7 +52,7 @@ import java.util.*;
 
 /**
  * <p>
- * 部门表 前端控制器
+ * 组织管理 前端控制器
  * <p>
  * 
  * @Author: Steve @Since： 2019-01-22
@@ -409,14 +409,14 @@ public class SysDepartController {
 		// 代码逻辑说明: 【TV360X-1671】部门管理不支持选中的记录导出---
 		List<SysDepartExportVo> sysDepartExportVos = sysDepartService.getExportDepart(tenantId,idList);
         //导出文件名称
-        mv.addObject(NormalExcelConstants.FILE_NAME, "部门列表");
+        mv.addObject(NormalExcelConstants.FILE_NAME, "组织列表");
         mv.addObject(NormalExcelConstants.CLASS, SysDepartExportVo.class);
         LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         ExportParams exportParams = new ExportParams("导入规则：\n" +
-                "1、标题为第三行，部门路径和部门名称的标题不允许修改，否则会匹配失败；第四行为数据填写范围;\n" +
-                "2、部门路径用英文字符/分割，部门名称为部门路径的最后一位;\n" +
-                "3、部门从一级名称开始创建，如果有同级就需要多添加一行，如研发部/研发一部;研发部/研发二部;\n" +
-                "4、自定义的部门编码需要满足规则才能导入。如一级部门编码为A01,那么子部门为A01A01,同级子部门为A01A02,编码固定为三位，首字母为A-Z,后两位为数字0-99，依次递增;", "导出人:" + user.getRealname(), "导出信息", ExcelType.XSSF);
+                "1、标题为第三行，组织路径和组织名称的标题不允许修改，否则会匹配失败；第四行为数据填写范围;\n" +
+                "2、组织路径用英文字符/分割，组织名称为组织路径的最后一位;\n" +
+                "3、组织从一级名称开始创建，如果有同级就需要多添加一行，如研发部/研发一部;研发部/研发二部;\n" +
+                "4、自定义的组织编码需要满足规则才能导入。如一级组织编码为A01,那么子组织为A01A01,同级子组织为A01A02,编码固定为三位，首字母为A-Z,后两位为数字0-99，依次递增;", "导出人:" + user.getRealname(), "导出信息", ExcelType.XSSF);
         exportParams.setTitleHeight((short)70);
         exportParams.setStyle(ExcelExportSysUserStyle.class);
         mv.addObject(NormalExcelConstants.PARAMS, exportParams);
@@ -666,10 +666,10 @@ public class SysDepartController {
 		List<ExportDepartVo> pageList = sysDepartService.getExcelDepart(tenantId);
 		//Step.2 AutoPoi 导出Excel
 		//导出文件名称
-		mv.addObject(NormalExcelConstants.FILE_NAME, "部门列表");
+		mv.addObject(NormalExcelConstants.FILE_NAME, "组织列表");
 		mv.addObject(NormalExcelConstants.CLASS, ExportDepartVo.class);
 		LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("部门列表数据", "导出人:"+user.getRealname(), "导出信息"));
+		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("组织列表数据", "导出人:"+user.getRealname(), "导出信息"));
 		mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
 		return mv;
 	}
@@ -755,7 +755,7 @@ public class SysDepartController {
     /**
      * 根据部门id获取部门下的岗位id
      *
-     * @param depIds 当前选择的公司、子公司、部门id
+     * @param depIds 当前选择的学校、学院、组织id
      * @return
      */
     @GetMapping("/getDepPostIdByDepId")
@@ -775,7 +775,7 @@ public class SysDepartController {
     @RequiresRoles({"admin"})
     public Result<String> updateChangeDepart(@RequestBody SysChangeDepartVo changeDepartVo) {
         sysDepartService.updateChangeDepart(changeDepartVo);
-    	return Result.ok("调整部门位置成功！");
+    	return Result.ok("调整组织位置成功！");
     }
 
     /**

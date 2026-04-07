@@ -1,0 +1,43 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": [
+    "src/typings.d.ts",
+    "src/api/note.ts",
+    "src/api/course.ts",
+    "src/api/material.ts",
+    "src/store/aiProgress.ts",
+    "src/store/note.ts",
+    "src/utils/request.ts",
+    "src/utils/filePicker.ts",
+    "src/common/renderUtils.ts",
+    "src/components/registerGlobComp.ts",
+    "src/components/__tests__/AiProgressTracker.spec.ts",
+    "src/utils/__tests__/request.spec.ts"
+  ],
+  "include": [
+    "src/api/*.ts",
+    "src/store/aiProgress.ts",
+    "src/store/note.ts",
+    "src/store/course.ts",
+    "src/utils/request.ts",
+    "src/utils/filePicker.ts",
+    "src/common/renderUtils.ts",
+    "src/components/registerGlobComp.ts",
+    "src/components/AiProgressTracker.vue",
+    "src/components/MaterialUpload.vue",
+    "src/components/MarkdownViewer.vue",
+    "src/components/MarkdownEditor.vue",
+    "src/components/MarkdownEditorLite.vue",
+    "src/components/__tests__/*.ts",
+    "src/utils/__tests__/*.ts",
+    "src/pages-study/**/*.vue",
+    "src/pages-study/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/uni_modules"
+  ]
+}

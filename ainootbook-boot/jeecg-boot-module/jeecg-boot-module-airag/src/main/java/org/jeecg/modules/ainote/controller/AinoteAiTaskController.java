@@ -23,6 +23,7 @@ import org.jeecg.modules.ainote.entity.AinoteNote;
 import org.jeecg.modules.ainote.service.IAinoteAiTaskService;
 import org.jeecg.modules.ainote.service.IAinoteMaterialService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
+import org.jeecg.modules.ainote.util.RoleUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -315,12 +316,7 @@ public class AinoteAiTaskController extends JeecgController<AinoteAiTask, IAinot
     }
 
     private boolean isAdmin(LoginUser user) {
-        String roleCode = user.getRoleCode();
-        if (roleCode == null) {
-            return false;
-        }
-        Set<String> roles = new HashSet<>(Arrays.asList(roleCode.split(",")));
-        return roles.contains("admin");
+        return RoleUtils.hasRole(user.getRoleCode(), "admin");
     }
 
     private Integer getRequiredTenantId() {

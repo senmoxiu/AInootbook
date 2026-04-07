@@ -33,7 +33,7 @@ public class SysDepart implements Serializable {
 	/**父机构ID*/
 	private String parentId;
 	/**机构/部门名称*/
-	@Excel(name="机构/部门名称",width=15)
+	@Excel(name="组织名称",width=15)
 	private String departName;
 	/**机构/部门路径名称（非持久化字段）*/
 	@TableField(exist = false)
@@ -49,13 +49,13 @@ public class SysDepart implements Serializable {
 	/**描述*/
 	@Excel(name="描述",width=15)
 	private String description;
-	/**机构类别 1=公司，2=组织机构，3=岗位 4=子公司*/
-	@Excel(name="机构类别",width=15,dicCode="org_category")
+	/**组织类别 1=学校，2=组织单元，3=岗位，4=子公司，5=学院，6=专业，7=班级*/
+	@Excel(name="组织类别",width=15,dicCode="org_category")
 	private String orgCategory;
 	/**机构类型*/
 	private String orgType;
-	/**机构编码*/
-	@Excel(name="机构编码",width=15)
+	/**组织编码*/
+	@Excel(name="组织编码",width=15)
 	private String orgCode;
 	/**手机号*/
 	@Excel(name="手机号",width=15)
