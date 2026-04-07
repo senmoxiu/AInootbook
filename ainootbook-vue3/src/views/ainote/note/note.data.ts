@@ -1,5 +1,6 @@
 import { BasicColumn, FormSchema } from '/@/components/Table';
 import { render } from '/@/utils/common/renderUtils';
+import { getCourseList } from '/@/api/ainote/course.api';
 
 /**
  * 笔记表格列定义
@@ -52,6 +53,53 @@ export const columns: BasicColumn[] = [
 ];
 
 /**
+ * 教师端笔记表格列定义
+ */
+export const teacherColumns: BasicColumn[] = [
+  {
+    title: '笔记标题',
+    dataIndex: 'noteTitle',
+    width: 200,
+    align: 'left',
+  },
+  {
+    title: '学生姓名',
+    dataIndex: 'studentName',
+    width: 120,
+  },
+  {
+    title: '课程名称',
+    dataIndex: 'courseName',
+    width: 150,
+  },
+  {
+    title: '笔记状态',
+    dataIndex: 'noteStatus',
+    width: 100,
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'ainote_note_status');
+    },
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    width: 150,
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updateTime',
+    width: 150,
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    width: 100,
+    fixed: 'right',
+    flag: 'ACTION',
+  },
+];
+
+/**
  * 笔记搜索表单 Schema
  */
 export const searchFormSchema: FormSchema[] = [
@@ -77,6 +125,30 @@ export const searchFormSchema: FormSchema[] = [
     componentProps: {
       dictCode: 'yn',
     },
+    colProps: { span: 6 },
+  },
+];
+
+/**
+ * 教师端笔记搜索表单 Schema
+ */
+export const teacherSearchFormSchema: FormSchema[] = [
+  {
+    label: '课程',
+    field: 'courseId',
+    component: 'ApiSelect',
+    componentProps: {
+      api: getCourseList,
+      labelField: 'courseName',
+      valueField: 'id',
+      resultField: 'records',
+    },
+    colProps: { span: 6 },
+  },
+  {
+    label: '学生姓名',
+    field: 'studentName',
+    component: 'Input',
     colProps: { span: 6 },
   },
 ];

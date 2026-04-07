@@ -26,6 +26,16 @@ const ainote: AppRouteModule = {
         currentActiveMenu: '/ainote/note',
       },
     },
+    {
+      path: 'note/teacher',
+      name: 'AinoteTeacherNote',
+      component: () => import('/@/views/ainote/note/teacher-view/index.vue'),
+      meta: {
+        title: '学生笔记',
+        hideMenu: true,
+        currentActiveMenu: '/ainote/note',
+      },
+    },
   ],
 };
 

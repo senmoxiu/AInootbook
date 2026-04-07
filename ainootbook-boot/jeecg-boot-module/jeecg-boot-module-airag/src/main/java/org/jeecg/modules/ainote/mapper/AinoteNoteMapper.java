@@ -1,12 +1,15 @@
 package org.jeecg.modules.ainote.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.jeecg.modules.ainote.entity.AinoteNote;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
+import org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO;
 import org.jeecg.modules.ainote.vo.SemanticSearchResultDTO;
 
 import java.util.Date;
@@ -125,4 +128,13 @@ public interface AinoteNoteMapper extends BaseMapper<AinoteNote> {
     })
     List<String> selectTeacherCourseIds(@Param("teacherId") String teacherId,
                                         @Param("tenantId") Integer tenantId);
+
+    /**
+     * 分页查询教师名下学生笔记
+     */
+    IPage<AinoteTeacherNoteVO> queryTeacherNotePage(Page<AinoteTeacherNoteVO> page,
+                                                    @Param("teacherId") String teacherId,
+                                                    @Param("tenantId") Integer tenantId,
+                                                    @Param("courseId") String courseId,
+                                                    @Param("studentName") String studentName);
 }

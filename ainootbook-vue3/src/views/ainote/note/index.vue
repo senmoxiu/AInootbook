@@ -1,9 +1,9 @@
 <template>
   <div>
-    <!-- 智能搜索区域 -->
-    <div v-if="searchMode === 'smart'" class="p-4 mb-4 bg-white rounded">
+    <div v-if="searchMode === 'smart'" class="smart-search-panel">
       <a-alert v-if="searchDisabled" type="warning" message="请先在AI配置页配置知识库" show-icon class="!mb-4" />
       <a-space>
+        <RobotOutlined class="ai-icon" />
         <a-select v-model:value="searchScope" :options="scopeOptions" placeholder="搜索范围" style="width: 160px" />
         <a-input
           v-model:value="searchQuery"
@@ -23,10 +23,10 @@
           <a-radio-button value="normal">普通</a-radio-button>
           <a-radio-button value="smart">智能</a-radio-button>
         </a-radio-group>
-        <a-button type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined">新增</a-button>
-        <a-button type="primary" @click="batchHandleDelete" preIcon="ant-design:delete-outlined">批量删除</a-button>
+        <a-button v-if="!isTeacher" type="primary" @click="handleCreate" preIcon="ant-design:plus-outlined">新增</a-button>
+        <a-button v-if="!isTeacher" type="primary" @click="batchHandleDelete" preIcon="ant-design:delete-outlined">批量删除</a-button>
         <a-button type="primary" @click="onExportXls" preIcon="ant-design:download-outlined">导出</a-button>
-        <a-upload name="file" :showUploadList="false" :customRequest="onImportXls">
+        <a-upload v-if="!isTeacher" name="file" :showUploadList="false" :customRequest="onImportXls">
           <a-button type="primary" preIcon="ant-design:upload-outlined">导入</a-button>
         </a-upload>
       </template>
@@ -75,6 +75,7 @@
   import { useRouter } from 'vue-router';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStore } from '/@/store/modules/user';
+  import { RobotOutlined } from '@ant-design/icons-vue';
   import { columns, searchFormSchema } from './note.data';
   import { getNoteList, deleteNote, batchDeleteNote, exportNoteXls, importNoteExcel, searchNotes, semanticSearchNotes } from '/@/api/ainote/note.api';
   import { getAiConfig } from '/@/api/ainote/aiConfig.api';
@@ -90,6 +91,7 @@
   const searchDisabled = ref(false);
 
   const roleCode = computed(() => userStore.getUserInfo?.roleCode || '');
+  const isTeacher = computed(() => roleCode.value.includes('teacher'));
 
   const scopeOptions = computed(() => {
     const roles = roleCode.value.split(',');
@@ -217,3 +219,28 @@
     reload();
   }
 </script>
+
+<style lang="less" scoped>
+  .smart-search-panel {
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+
+    .ai-icon {
+      font-size: 20px;
+      color: #fff;
+    }
+
+    :deep(.ant-select-selector),
+    :deep(.ant-input),
+    :deep(.ant-btn) {
+      background: rgba(255, 255, 255, 0.95);
+    }
+    :deep(.ant-btn-primary) {
+      background: rgba(255, 255, 255, 0.95);
+      color: #764ba2;
+    }
+  }
+</style>

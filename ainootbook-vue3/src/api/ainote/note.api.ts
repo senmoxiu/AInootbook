@@ -19,6 +19,7 @@ enum Api {
   progress = '/ainote/note/progress',
   search = '/ainote/note/search',
   semanticSearch = '/ainote/note/semanticSearch',
+  teacherList = '/ainote/note/teacherList',
 }
 
 /** 笔记记录 */
@@ -77,6 +78,13 @@ export interface NoteProgressResult {
  */
 export const getNoteList = (params: Record<string, unknown>) => {
   return defHttp.get<{ records: NoteRecord[]; total: number }>({ url: Api.list, params });
+};
+
+/**
+ * 教师端笔记分页列表
+ */
+export const getTeacherNoteList = (params: Record<string, unknown>) => {
+  return defHttp.get<{ records: NoteRecord[]; total: number }>({ url: Api.teacherList, params });
 };
 
 /**

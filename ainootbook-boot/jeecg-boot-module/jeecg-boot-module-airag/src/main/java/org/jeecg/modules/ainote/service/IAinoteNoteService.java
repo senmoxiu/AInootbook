@@ -2,6 +2,7 @@ package org.jeecg.modules.ainote.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareVO;
+import org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO;
 
 import java.util.List;
 
@@ -79,6 +81,12 @@ public interface IAinoteNoteService extends IService<AinoteNote> {
      * 查询公开笔记广场（仅展示公开笔记，带租户隔离）
      */
     IPage<AinoteNote> queryPublicNotes(Integer pageNo, Integer pageSize, String keyword);
+
+    /**
+     * 分页查询教师名下学生笔记
+     */
+    IPage<AinoteTeacherNoteVO> queryTeacherNotePage(Page<AinoteTeacherNoteVO> page, String teacherId,
+                                                    Integer tenantId, String courseId, String studentName);
 
     /**
      * 分页查询笔记版本历史

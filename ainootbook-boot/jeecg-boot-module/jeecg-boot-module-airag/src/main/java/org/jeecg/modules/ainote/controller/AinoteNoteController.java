@@ -34,6 +34,7 @@ import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareVO;
 import org.jeecg.modules.ainote.vo.AinoteProgressVO;
+import org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO;
 import org.jeecg.modules.ainote.vo.SemanticSearchResultDTO;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -243,6 +244,30 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         return Result.OK(pageList);
     }
 
+    @Operation(summary = "教师笔记列表（仅教师可用）")
+    @GetMapping(value = "/teacherList")
+    @RequiresPermissions("ainote:note:teacherList")
+    public Result<IPage<AinoteTeacherNoteVO>> teacherList(
+            @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "courseId", required = false) String courseId,
+            @RequestParam(name = "studentName", required = false) String studentName,
+            HttpServletRequest req) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
+            return Result.error("用户未登录");
+        }
+        String tenantIdStr = TokenUtils.getTenantIdByRequest(req);
+        Integer tenantId = oConvertUtils.isNotEmpty(tenantIdStr) ? Integer.parseInt(tenantIdStr) : 0;
+        String roleCode = oConvertUtils.getString(user.getRoleCode(), "");
+        if (!RoleUtils.hasRole(roleCode, "teacher") && !RoleUtils.hasRole(roleCode, "admin")) {
+            return Result.error(403, "无权限");
+        }
+        IPage<AinoteTeacherNoteVO> pageList = ainoteNoteService.queryTeacherNotePage(
+                new Page<>(pageNo, pageSize), user.getId(), tenantId, courseId, studentName);
+        return Result.OK(pageList);
+    }
+
     @Operation(summary = "查询笔记版本历史")
     @GetMapping(value = "/versions")
     @RequiresPermissions("ainote:note:list")
@@ -373,10 +398,17 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         if (searchScope == NoteSearchScope.ALL && !RoleUtils.hasRole(roleCode, "admin")) {
             return Result.error("ALL 范围仅管理员可用");
         }
-        if (searchScope == NoteSearchScope.COURSE
-                && !RoleUtils.hasRole(roleCode, "teacher")
-                && !RoleUtils.hasRole(roleCode, "admin")) {
-            return Result.error("COURSE 范围仅教师可用");
+        if (searchScope == NoteSearchScope.COURSE) {
+            String tenantIdStr2 = TokenUtils.getTenantIdByRequest(request);
+            Integer tenantId2 = oConvertUtils.isNotEmpty(tenantIdStr2) ? Integer.parseInt(tenantIdStr2) : 0;
+            boolean isTeacherLike = RoleUtils.hasRole(roleCode, "teacher")
+                    || RoleUtils.hasRole(roleCode, "admin")
+                    || !ainoteNoteService.queryTeacherNotePage(
+                            new Page<>(1, 1), user.getId(), tenantId2, null, null)
+                    .getRecords().isEmpty();
+            if (!isTeacherLike) {
+                return Result.error("COURSE 范围仅教师可用");
+            }
         }
 
         int safeTopN = (topN == null || topN <= 0) ? 20 : Math.min(topN, 50);

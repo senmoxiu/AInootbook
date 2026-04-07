@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.ainote.mapper.AinoteNoteMapper">
+
+    <select id="queryTeacherNotePage" resultType="org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO">
+        SELECT
+            n.id,
+            n.note_title AS noteTitle,
+            n.student_id AS studentId,
+            su.realname AS studentName,
+            n.course_id AS courseId,
+            c.course_name AS courseName,
+            n.note_status AS noteStatus,
+            n.is_public AS isPublic,
+            n.current_version AS currentVersion,
+            n.view_count AS viewCount,
+            n.like_count AS likeCount,
+            n.create_time AS createTime,
+            n.update_time AS updateTime
+        FROM ainote_note n
+        JOIN ainote_teaching t ON t.id = n.teaching_id
+        LEFT JOIN sys_user su ON su.id = n.student_id
+        LEFT JOIN ainote_course c ON c.id = n.course_id
+        WHERE t.teacher_id = #{teacherId}
+          AND n.tenant_id = #{tenantId}
+          AND n.note_status <> 3
+        <if test="courseId != null and courseId != ''">
+          AND n.course_id = #{courseId}
+        </if>
+        <if test="studentName != null and studentName != ''">
+          AND su.realname LIKE CONCAT('%', #{studentName}, '%')
+        </if>
+    </select>
+
+</mapper>

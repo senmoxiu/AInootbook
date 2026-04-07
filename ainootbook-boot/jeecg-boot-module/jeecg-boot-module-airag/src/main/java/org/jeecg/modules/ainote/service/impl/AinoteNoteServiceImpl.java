@@ -34,6 +34,7 @@ import org.jeecg.modules.ainote.vo.AinoteNoteRegenerateVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteVersionVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareVO;
+import org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,20 +143,25 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
     }
 
     /**
-     * WR-07 + WR-06: 检查用户是否为教师，使用参数化查询
+     * WR-07: 检查用户是否存在教师授课记录
      */
     private boolean isTeacher(String userId, Integer tenantId) {
         try {
-            QueryWrapper<AinoteNote> checkWrapper = new QueryWrapper<>();
-            // 使用 apply + 参数化占位符防止 SQL 注入
-            checkWrapper.apply(
-                    "EXISTS (SELECT 1 FROM ainote_teaching t WHERE t.teacher_id = {0} AND t.tenant_id = {1} LIMIT 1)",
-                    userId, tenantId);
-            return baseMapper.selectCount(checkWrapper) > 0;
+            return existsTeachingRecord(userId, tenantId);
         } catch (Exception e) {
             log.debug("检查教师身份失败，可能 teaching 表不存在: {}", e.getMessage());
             return false;
         }
+    }
+
+    private boolean isTeacherLike(String userId, Integer tenantId) {
+        LoginUser user = getCurrentUser();
+        return RoleUtils.hasRole(user.getRoleCode(), "teacher") || isTeacher(userId, tenantId);
+    }
+
+    private boolean existsTeachingRecord(String userId, Integer tenantId) {
+        List<String> courseIds = baseMapper.selectTeacherCourseIds(userId, tenantId);
+        return courseIds != null && !courseIds.isEmpty();
     }
 
     @Override
@@ -717,6 +723,12 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
 
         Page<AinoteNote> page = new Page<>(pageNo, pageSize);
         return page(page, wrapper);
+    }
+
+    @Override
+    public IPage<AinoteTeacherNoteVO> queryTeacherNotePage(Page<AinoteTeacherNoteVO> page, String teacherId,
+                                                           Integer tenantId, String courseId, String studentName) {
+        return baseMapper.queryTeacherNotePage(page, teacherId, tenantId, courseId, studentName);
     }
 
     @Override
