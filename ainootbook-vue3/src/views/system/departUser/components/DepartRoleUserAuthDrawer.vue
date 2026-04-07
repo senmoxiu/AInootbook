@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer title="部门角色分配" :width="365" @close="onClose" @register="registerDrawer">
+  <BasicDrawer title="组织角色分配" :width="365" @close="onClose" @register="registerDrawer">
     <a-spin :spinning="loading">
       <template v-if="desformList.length > 0">
         <a-checkbox-group v-model:value="designNameValue">

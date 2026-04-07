@@ -11,7 +11,7 @@
               <DepartFormTab :data="departData" :rootTreeData="rootTreeData" @success="onSuccess" />
             </div>
           </a-tab-pane>
-          <a-tab-pane tab="部门权限" key="role-info">
+          <a-tab-pane tab="组织权限" key="role-info">
             <div style="padding: 0 20px 20px">
               <DepartRuleTab :data="departData" />
             </div>
@@ -26,12 +26,12 @@
               <DepartUserList :data="departData" :key="reRender"></DepartUserList>
             </div>
           </a-tab-pane>
-          <a-tab-pane tab="部门负责人" key="departmentHead">
+          <a-tab-pane tab="组织负责人" key="departmentHead">
             <DepartmentHeadList :data="departData"></DepartmentHeadList>
           </a-tab-pane>
         </a-tabs>
         <div v-show="departData == null" style="padding-top: 40px">
-          <a-empty description="尚未选择部门" />
+          <a-empty description="尚未选择组织" />
         </div>
       </div>
     </a-col>

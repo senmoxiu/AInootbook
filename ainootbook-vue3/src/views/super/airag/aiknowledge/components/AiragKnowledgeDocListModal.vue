@@ -39,13 +39,11 @@
                   <span style="line-height: 18px; font-weight: 500; color: #676f83; font-size: 12px">
                     创建文档
                     <a-tooltip title="知识库文档">
-                      <a
-                        style="color: unset"
-                        href="https://help.jeecg.com/aigc/guide/knowledge#4-%E7%9F%A5%E8%AF%86%E5%BA%93%E6%96%87%E6%A1%A3"
-                        target="_blank"
+                      <span
+                        style="color: unset; cursor: help"
                       >
                         <Icon style="position: relative; top: 1px" icon="ant-design:question-circle-outlined" size="14"></Icon>
-                      </a>
+                      </span>
                     </a-tooltip>
                   </span>
                   <div class="add-knowledge-doc" @click="handleCreateText">

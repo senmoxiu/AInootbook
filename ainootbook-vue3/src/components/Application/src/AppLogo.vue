@@ -1,5 +1,4 @@
 <!--
- * @Author: Jeecg
  * @Description: logo component
 -->
 <template>

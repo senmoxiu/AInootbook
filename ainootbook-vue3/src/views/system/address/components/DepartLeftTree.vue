@@ -148,7 +148,7 @@
       try {
         loading.value = true;
         treeData.value = [];
-        let result = await searchByKeywords({ keyWord: value, orgCategory: '1,2,4' });
+        let result = await searchByKeywords({ keyWord: value, orgCategory: '1,2,5,6,7' });
         if (Array.isArray(result)) {
           treeData.value = result;
         }

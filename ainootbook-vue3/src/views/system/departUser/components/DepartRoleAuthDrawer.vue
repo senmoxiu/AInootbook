@@ -1,7 +1,7 @@
 <template>
   <BasicDrawer :width="650" :loading="loading" showFooter okText="保存并关闭" @ok="onSubmit(true)" @close="onClose" @register="registerDrawer">
     <template #title>
-      部门角色权限配置
+      组织角色权限配置
       <a-dropdown>
         <Icon icon="ant-design:more-outlined" class="more-icon" />
         <template #overlay>
@@ -22,7 +22,7 @@
       <a-spin :spinning="loading">
         <template v-if="treeData.length > 0">
           <BasicTree
-            title="所拥有的部门权限"
+            title="所拥有的组织权限"
             checkable
             :treeData="treeData"
             :checkedKeys="checkedKeys"
@@ -40,7 +40,7 @@
             </template>
           </BasicTree>
         </template>
-        <a-empty v-else description="无可配置部门权限" />
+        <a-empty v-else description="无可配置组织权限" />
       </a-spin>
     </div>
 

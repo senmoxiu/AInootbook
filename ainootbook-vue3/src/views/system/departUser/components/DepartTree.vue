@@ -7,8 +7,8 @@
     </div>
     <a-spin :spinning="loading">
       <template v-if="userIdentity === '2'">
-        <a-input-search placeholder="按部门名称搜索…" style="margin-bottom: 10px" @search="onSearch" />
-        <!--组织机构树-->
+        <a-input-search placeholder="按组织名称搜索…" style="margin-bottom: 10px" @search="onSearch" />
+        <!--组织架构树-->
         <BasicTree
           v-if="!treeReloading"
           :toolbar="false"
@@ -116,7 +116,7 @@
   // 添加子级部门
   function onAddChildDepart() {
     if (selectedKeys.value && selectedKeys.value.length === 0) {
-      createMessage.warning('请先选择一个部门');
+      createMessage.warning('请先选择一个组织');
       return;
     }
     const record = { parentId: selectedKeys.value[0] };
@@ -126,11 +126,11 @@
   // 编辑部门
   function editDepart() {
     if (selectedKeys.value && selectedKeys.value.length === 0) {
-      createMessage.warning('请先选择一个部门');
+      createMessage.warning('请先选择一个组织');
       return;
     }
     if (myDepIds.value.includes(selectedKeys.value[0])) {
-      createMessage.warning('不能编辑负责部门');
+      createMessage.warning('不能编辑负责组织');
       return;
     }
     console.log('selectedNode', selectedNode.value);
@@ -141,7 +141,7 @@
   async function onDeleteBatch() {
     const idList = checkedKeys.value;
     if (myDepIds.value.includes(idList[0])) {
-      createMessage.warning('不能删除负责部门');
+      createMessage.warning('不能删除负责组织');
       return;
     }
     if (idList.length > 0) {
@@ -183,7 +183,7 @@
           if (Array.isArray(result)) {
             treeData.value = result;
           } else {
-            createMessage.warning('未查询到部门信息');
+            createMessage.warning('未查询到组织信息');
             treeData.value = [];
           }
         })

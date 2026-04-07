@@ -5,12 +5,12 @@
     <div class="aui-logo" v-if="!getIsMobile">
       <div>
         <h3>
-          <img :src="logoImg" alt="jeecg" />
+          <img :src="logoImg" alt="AInootbook" />
         </h3>
       </div>
     </div>
     <div v-else class="aui-phone-logo">
-      <img :src="logoImg" alt="jeecg" />
+      <img :src="logoImg" alt="AInootbook" />
     </div>
     <div v-show="type === 'login'">
       <div class="aui-content">
@@ -18,7 +18,7 @@
           <div class="aui-form">
             <div class="aui-image">
               <div class="aui-image-text">
-                <img :src="adTextImg" />
+                <h2 style="color: #fff; font-size: 28px; font-weight: 600;">AI 课堂笔记智能整理系统</h2>
               </div>
             </div>
             <div class="aui-formBox">
@@ -137,12 +137,13 @@
                 </div>
               </div>
               <a-form @keyup.enter.native="loginHandleClick">
-                <div class="aui-flex aui-third-text">
+                <!-- 第三方登录已禁用 -->
+                <div v-if="false" class="aui-flex aui-third-text">
                   <div class="aui-flex-box aui-third-border">
                     <span>{{ t('sys.login.otherSignIn') }}</span>
                   </div>
                 </div>
-                <div class="aui-flex" :class="`${prefixCls}-sign-in-way`">
+                <div v-if="false" class="aui-flex" :class="`${prefixCls}-sign-in-way`">
                   <div class="aui-flex-box">
                     <div class="aui-third-login">
                       <a title="github" @click="onThirdLogin('github')"><GithubFilled /></a>
@@ -200,7 +201,6 @@
   import MiniRegister from './MiniRegister.vue';
   import MiniCodelogin from './MiniCodelogin.vue';
   import logoImg from '/@/assets/loginmini/icon/jeecg_logo.png';
-  import adTextImg from '/@/assets/loginmini/icon/jeecg_ad_text.png';
   import { AppLocalePicker, AppDarkModeToggle } from '/@/components/Application';
   import { useLocaleStore } from '/@/store/modules/locale';
   import { createLocalStorage } from '/@/utils/cache';
@@ -270,14 +270,14 @@
       type: Boolean,
     },
   });
-  //**********************查询部门逻辑begin**********************************************
-  //用户部门
+  //**********************查询院系逻辑begin**********************************************
+  //用户院系
   const departList = ref([]);
-  //部门显示
+  //院系显示
   const showDepart = computed(() => {
     return departList.value.length > 1;
   });
-  //获取部门缩写
+  //获取院系缩写
   const getShortDeptName = computed(() => {
     return (deptName) => {
       if (!deptName) return '';
@@ -297,7 +297,7 @@
     }
   );
   /**
-   * 监听账号变化，清除部门信息
+   * 监听账号变化，清除院系信息
    */
   watch(
     () => [formData.username, phoneFormData.mobile, activeIndex.value],
@@ -324,7 +324,7 @@
       if (!isValidAccount && !isValidPhone) {
         return;
       }
-      //查询部门信息前，优先进行账户校验
+      //查询院系信息前，优先进行账户校验
       if (departList.value && departList.value.length == 0) {
         let params = { ...finalFormData, loginType: activeIndex.value === 'accountLogin' ? 'account' : 'phone' };
         if (loginType == 'account') {
@@ -340,9 +340,9 @@
         );
         if (res.success && res.result) {
           let { departs, currentOrgCode } = res.result;
-          // 判断当前部门是否在所属的部门列表中
+          // 判断当前院系是否在所属的院系列表中
           if (departs && departs.length > 0) {
-            // 代码逻辑说明: JHHB-790 用户部门变更，会出现这个情况（因为之前设置的这里只切换部门，过滤了公司和岗位信息）
+            // 代码逻辑说明: JHHB-790 用户院系变更，会出现这个情况（因为之前设置的这里只切换院系，过滤了学校和职务信息）
             const hasCurrentDepart = departs.some((item) => item.orgCode == currentOrgCode);
             formData.loginOrgCode = hasCurrentDepart ? currentOrgCode : null;
             phoneFormData.loginOrgCode = hasCurrentDepart ? currentOrgCode : null;
@@ -361,7 +361,7 @@
       }
     }, 500);
   }
-  //**********************查询部门逻辑end*************************************************
+  //**********************查询院系逻辑end*************************************************
   /**
    * 获取验证码
    */

@@ -6,13 +6,9 @@
           <span v-if="dataIndex === 'list' || dataIndex === 'add'" :class="dataIndex === 'list' ? '' : 'add-header-title pointer'" @click="goToList">
             选择供应商
             <a-tooltip title="供应商文档" v-if="dataIndex === 'list'">
-              <a
-                style="color: #333333"
-                href="https://help.jeecg.com/aigc/guide/model/#2-%E4%BE%9B%E5%BA%94%E5%95%86%E9%80%89%E6%8B%A9"
-                target="_blank"
-              >
+              <span style="color: #333333; cursor: help">
                 <Icon style="position: relative; left: -2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
-              </a>
+              </span>
             </a-tooltip>
           </span>
           <span v-if="dataIndex === 'add'" class="add-header-title"> > </span>
@@ -43,14 +39,12 @@
             <span style="display: flex">
               基础信息
               <a-tooltip title="基础信息文档">
-                <a
+                <span
                   @click.stop
-                  style="color: unset"
-                  href="https://help.jeecg.com/aigc/guide/model/#31-%E5%A1%AB%E5%86%99%E5%9F%BA%E7%A1%80%E4%BF%A1%E6%81%AF"
-                  target="_blank"
+                  style="color: unset; cursor: help"
                 >
                   <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
-                </a>
+                </span>
               </a-tooltip>
             </span>
           </template>
@@ -100,14 +94,9 @@
             <span style="display: flex">
               高级配置
               <a-tooltip title="高级配置文档">
-                <a
-                  @click.stop
-                  style="color: unset"
-                  href="https://help.jeecg.com/aigc/guide/model/#32-%E9%85%8D%E7%BD%AE%E9%AB%98%E7%BA%A7%E5%8F%82%E6%95%B0"
-                  target="_blank"
-                >
+                <span @click.stop style="color: unset; cursor: help">
                   <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
-                </a>
+                </span>
               </a-tooltip>
             </span>
           </template>

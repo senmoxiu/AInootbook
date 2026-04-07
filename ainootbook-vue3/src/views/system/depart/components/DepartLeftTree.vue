@@ -41,8 +41,8 @@
       </template>
     </a-alert>
     <a-spin :spinning="loading">
-      <a-input-search placeholder="按部门名称搜索…" style="margin-bottom: 10px" @search="onSearch" />
-      <!--组织机构树-->
+      <a-input-search placeholder="按组织名称搜索…" style="margin-bottom: 10px" @search="onSearch" />
+      <!--组织架构树-->
       <template v-if="treeData.length > 0">
         <a-tree
           v-if="!treeReloading"
@@ -77,7 +77,7 @@
 
               <template #overlay>
                 <a-menu @click="">
-                  <a-menu-item key="1" @click="onAddChildDepart(dataRef)" v-if="data.orgCategory !== '3'">添加下级</a-menu-item>
+                  <a-menu-item key="1" @click="onAddChildDepart(dataRef)" v-if="data.orgCategory !== '3' && data.orgCategory !== '7'">添加下级</a-menu-item>
                   <a-menu-item key="2" @click="visibleTreeKey = treeKey">
                     <span style="color: red">删除</span>
                   </a-menu-item>
@@ -91,16 +91,17 @@
     </a-spin>
     <DepartFormModal :rootTreeData="treeData" @register="registerModal" @success="loadRootTreeData" />
   </a-card>
-  <a-modal v-model:open="tipShow" :footer="null" title="部门规则说明" :width="800">
+  <a-modal v-model:open="tipShow" :footer="null" title="组织规则说明" :width="800">
     <ul class="departmentalRulesTip">
-      <li>当前部门机构设置支持集团组织架构，第一级默认为公司，下级可创建子公司、部门和岗位。</li>
+      <li>当前组织设置支持校园组织架构，第一级默认为学校，下级可创建学院、组织单元和岗位。</li>
       <li><br /></li>
-      <li>1、岗位下不能添加下级。</li>
-      <li>2、部门下不能直接添加子公司。</li>
-      <li>3、子公司下可继续添加子公司。</li>
-      <li>4、岗位需配置职务级别，岗位的级别高低和上下级关系均以职务级别及上级岗位设置为准。</li>
-      <li>5、董事长岗位仅可选择上级公司（子公司或总公司）各部门的所有岗位为上级岗位。</li>
-      <li>6、非董事长岗位仅可选择当前父级部门及本部门内级别更高的岗位为上级岗位。</li>
+      <li>1、岗位/班级下不能添加下级。</li>
+      <li>2、组织单元下不能直接添加学院。</li>
+      <li>3、学院下可添加专业、组织单元和岗位。</li>
+      <li>4、专业下可添加班级和岗位。</li>
+      <li>5、岗位需配置职务级别，岗位的级别高低和上下级关系均以职务级别及上级岗位设置为准。</li>
+      <li>6、最高岗位仅可选择上级组织（学院或学校）各组织单元的所有岗位为上级岗位。</li>
+      <li>7、非最高岗位仅可选择当前父级组织及本组织内级别更高的岗位为上级岗位。</li>
       <li><br /></li>
       <li><b>特别说明：</b>董事长相关逻辑为固定写死，职务等级“董事长”的表述请勿修改。</li>
     </ul>
@@ -258,11 +259,11 @@
   // 添加子级部门
   function onAddChildDepart(data = currentDepart.value) {
     if (data == null) {
-      createMessage.warning('请先选择一个部门');
+      createMessage.warning('请先选择一个组织');
       return;
     }
-    if (data.orgCategory === '3') {
-      createMessage.warning('岗位下无法添加子级！');
+    if (data.orgCategory === '3' || data.orgCategory === '7') {
+      createMessage.warning('岗位/班级下无法添加子级！');
       return;
     }
     const record = { parentId: data.id, orgCategory: data.orgCategory };
@@ -275,7 +276,7 @@
       try {
         loading.value = true;
         treeData.value = [];
-        let result = await searchByKeywords({ keyWord: value, orgCategory: '1,2,3,4' });
+        let result = await searchByKeywords({ keyWord: value, orgCategory: '1,2,3,5,6,7' });
         if (Array.isArray(result)) {
           treeData.value = result;
         }
@@ -362,7 +363,7 @@
     if (checkedKeys.value && checkedKeys.value.length > 0) {
       params['selections'] = checkedKeys.value.join(',');
     }
-    handleExportXls('部门信息', Api.exportXlsUrl, params);
+    handleExportXls('组织信息', Api.exportXlsUrl, params);
   }
 
   /**
@@ -421,7 +422,7 @@
               margin: '0',
             },
           },
-          '移动后：机构编码会改变，历史业务数据保留原机构编码，此操作不可撤销！'
+          '移动后：组织编码会改变，历史业务数据保留原组织编码，此操作不可撤销！'
         ),
       ]),
       okText: '确认',
@@ -430,7 +431,7 @@
         updateChangeDepart({ dragId: dragKey, dropId: dropKey, dropPosition: dropPosition, sort: info.dropPosition })
           .then((res) => {
             if (res.success) {
-              createMessage.success('部门顺序调整成功');
+              createMessage.success('组织顺序调整成功');
               //重新加载树
               treeData.value = [];
               selectedKeys.value = [];

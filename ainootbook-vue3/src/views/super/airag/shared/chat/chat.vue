@@ -10,8 +10,8 @@
         </div>
         <div class="header-actions">
           <div v-if="showAdvertising" class="header-advertisint">
-            AI客服由
-            <a style="color: #4183c4; margin-left: 2px; margin-right: 2px" href="https://jeecg.com/aigcIndex" target="_blank"> JEECG AI </a>
+            AI 助手由
+            <span style="color: #4183c4; margin-left: 2px; margin-right: 2px"> AInootbook AI </span>
             提供
           </div>
         </div>

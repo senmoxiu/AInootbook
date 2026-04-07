@@ -4,7 +4,7 @@
       <div class="aui-form">
         <div class="aui-image">
           <div class="aui-image-text">
-            <img :src="adTextImg" alt="" />
+            <h2 style="color: #fff; font-size: 28px; font-weight: 600;">AI 课堂笔记智能整理系统</h2>
           </div>
         </div>
         <div class="aui-formBox">
@@ -99,7 +99,6 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getCaptcha, passwordChange, phoneVerify } from '/@/api/sys/user';
   import logoImg from '/@/assets/loginmini/icon/jeecg_logo.png';
-  import adTextImg from '/@/assets/loginmini/icon/jeecg_ad_text.png';
   import successImg from '/@/assets/loginmini/icon/icon-success.png';
   import CaptchaModal from '@/components/jeecg/captcha/CaptchaModal.vue';
   import { useModal } from '@/components/Modal';

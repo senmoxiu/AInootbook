@@ -160,10 +160,41 @@
     return result;
   }
 
-  // 搜索组织树
+  // 搜索关键词
+  const searchValue = ref('');
+
+  // 搜索组织树（前端过滤 + 自动展开匹配节点）
   function onSearch(value: string) {
-    // TODO: 实现搜索功能
-    console.log('搜索:', value);
+    searchValue.value = value;
+    if (!value) {
+      loadTreeData();
+      return;
+    }
+    const matched = filterTreeByKeyword(treeData.value, value);
+    treeData.value = matched;
+    expandedKeys.value = getAllKeys(matched);
+  }
+
+  // 按关键词过滤树节点
+  function filterTreeByKeyword(nodes: any[], keyword: string): any[] {
+    const result: any[] = [];
+    for (const node of nodes) {
+      const children = node.children ? filterTreeByKeyword(node.children, keyword) : [];
+      if ((node.title || '').includes(keyword) || children.length > 0) {
+        result.push({ ...node, children: children.length > 0 ? children : undefined });
+      }
+    }
+    return result;
+  }
+
+  // 获取树所有 key（用于展开）
+  function getAllKeys(nodes: any[]): string[] {
+    const keys: string[] = [];
+    for (const node of nodes) {
+      keys.push(node.key);
+      if (node.children) keys.push(...getAllKeys(node.children));
+    }
+    return keys;
   }
 
   // 树节点选择事件

@@ -21,7 +21,7 @@
         </template>
       </BasicTree>
     </template>
-    <a-empty v-else description="无可配置部门权限" />
+    <a-empty v-else description="无可配置组织权限" />
 
     <div class="j-box-bottom-button offset-20" style="margin-top: 30px">
       <div class="j-box-bottom-button-float" :class="[`${prefixCls}`]">

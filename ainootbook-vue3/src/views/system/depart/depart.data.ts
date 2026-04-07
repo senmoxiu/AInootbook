@@ -11,32 +11,32 @@ import {
 import { h, ref } from 'vue';
 
 const { createMessage: $message } = useMessage();
-//部门名称
+//组织名称
 const departNamePath = ref<Record<string, string>>({});
 
-// 部门基础表单
+// 组织基础表单
 export function useBasicFormSchema(treeData) {
   const basicFormSchema: FormSchema[] = [
     {
       field: 'departName',
-      label: '机构名称',
+      label: '组织名称',
       component: 'Input',
       componentProps: {
-        placeholder: '请输入机构/部门名称',
+        placeholder: '请输入组织名称',
       },
-      rules: [{ required: true, message: '机构名称不能为空' }],
+      rules: [{ required: true, message: '组织名称不能为空' }],
     },
     {
       field: 'departNameAbbr',
-      label: '机构简称',
+      label: '组织简称',
       component: 'Input',
       componentProps: {
-        placeholder: '请输入机构/部门简称',
+        placeholder: '请输入组织简称',
       }
     },
     {
       field: 'parentId',
-      label: '上级部门',
+      label: '上级组织',
       component: 'TreeSelect',
       componentProps: {
         treeData: [],
@@ -52,23 +52,24 @@ export function useBasicFormSchema(treeData) {
                 departNamePath.value[value]
             );
           }
-          getDepartPathNameByOrgCode('', label, option.id).then((data) => {
+          getDepartPathNameByOrgCode('', label, option?.id).then((data) => {
             departNamePath.value[value] = data;
           });
+          return h('span', { style: { marginLeft: '10px' } }, label);
         },
       },
     },
     {
       field: 'orgCode',
-      label: '机构编码',
+      label: '组织编码',
       component: 'Input',
       componentProps: {
-        placeholder: '请输入机构编码',
+        placeholder: '请输入组织编码',
       },
     },
     {
       field: 'orgCategory',
-      label: '机构类型',
+      label: '组织类型',
       component: 'RadioButtonGroup',
       componentProps: { options: [] },
     },
@@ -76,7 +77,7 @@ export function useBasicFormSchema(treeData) {
       field: 'positionId',
       label: '职务级别',
       component: 'JDictSelectTag',
-      componentProps: ({ formModel, formActionType }) => {
+      componentProps: ({ formModel }) => {
         return {
           dictCode: "sys_position,name,id, 1=1 order by post_level asc",
           getPopupContainer: ()=> document.body,
@@ -160,19 +161,30 @@ export function useBasicFormSchema(treeData) {
   return { basicFormSchema };
 }
 
-// 机构类型选项
+// 组织类型选项（对齐后端枚举：1=学校,2=组织单元,3=岗位,5=学院,6=专业,7=班级）
 export const orgCategoryOptions = {
-  // 一级部门
-  root: [{ value: '1', label: '公司' }],
-  // 子级部门
+  // 根组织
+  root: [{ value: '1', label: '学校' }],
+  // 学校下级：学院、组织单元、岗位
   child: [
-    { value: '4', label: '子公司' },
-    { value: '2', label: '部门' },
+    { value: '5', label: '学院' },
+    { value: '2', label: '组织单元' },
     { value: '3', label: '岗位' },
   ],
-  //部门岗位
+  // 学院下级：专业、组织单元、岗位
+  childCollege: [
+    { value: '6', label: '专业' },
+    { value: '2', label: '组织单元' },
+    { value: '3', label: '岗位' },
+  ],
+  // 专业下级：班级、岗位
+  childMajor: [
+    { value: '7', label: '班级' },
+    { value: '3', label: '岗位' },
+  ],
+  //组织岗位
   childDepartPost: [
-    { value: '2', label: '部门' },
+    { value: '2', label: '组织单元' },
     { value: '3', label: '岗位' },
   ],
   //岗位

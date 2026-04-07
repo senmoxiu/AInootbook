@@ -127,7 +127,7 @@
   // 创建用户
   function createUser() {
     if (!departId.value) {
-      createMessage.warning('请先选择一个部门');
+      createMessage.warning('请先选择一个组织');
     } else {
       openDrawer(true, {
         isUpdate: false,
@@ -168,7 +168,7 @@
   // 批量取消关联部门和用户之间的关系
   async function unlinkDepartUser(idList, confirm) {
     if (!departId.value) {
-      createMessage.warning('请先选择一个部门');
+      createMessage.warning('请先选择一个组织');
     } else {
       setLoading(true);
       let userIds = unref(idList).join(',');
@@ -223,7 +223,7 @@
    */
   function getDropDownAction(record): ActionItem[] {
     return [
-      { label: '部门角色', onClick: showDepartRole.bind(null, record) },
+      { label: '组织角色', onClick: showDepartRole.bind(null, record) },
       { label: '用户详情', onClick: showUserDetail.bind(null, record) },
       {
         label: '取消关联',

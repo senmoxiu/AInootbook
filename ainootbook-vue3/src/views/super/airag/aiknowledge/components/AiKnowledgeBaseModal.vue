@@ -5,9 +5,9 @@
         <span style="display: flex">
           {{ title }}
           <a-tooltip title="AI知识库文档">
-            <a style="color: unset" href="https://help.jeecg.com/aigc/guide/knowledge" target="_blank">
+            <span style="color: unset; cursor: help">
               <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
-            </a>
+            </span>
           </a-tooltip>
         </span>
       </template>

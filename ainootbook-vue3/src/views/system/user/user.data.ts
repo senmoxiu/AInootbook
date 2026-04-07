@@ -53,7 +53,7 @@ export const columns: BasicColumn[] = [
     }
   },
   {
-    title: '部门',
+    title: '组织',
     width: 150,
     resizable: true,
     dataIndex: 'belongDepIds',
@@ -65,7 +65,7 @@ export const columns: BasicColumn[] = [
     }
   },
   {
-    title: '负责部门',
+    title: '负责组织',
     width: 150,
     resizable: true,
     dataIndex: 'departIds',
@@ -175,11 +175,11 @@ export const searchFormSchema: FormSchema[] = [
    //colProps: { span: 6 },
   },
   {
-    label: '所属部门',
+    label: '所属组织',
     field: 'departId',
     component: 'JSelectDept',
     componentProps: {
-      placeholder: '请选择所属部门',
+      placeholder: '请选择所属组织',
       showButton: false,
       checkStrictly: true
     },
@@ -272,7 +272,7 @@ export const formSchema: FormSchema[] = [
     },
   },
   {
-    label: '所属部门',
+    label: '所属组织',
     field: 'selecteddeparts',
     component: 'JSelectDept',
     componentProps: ({ formActionType, formModel }) => {
@@ -372,7 +372,7 @@ export const formSchema: FormSchema[] = [
     },
   },
   {
-    label: '负责部门',
+    label: '负责组织',
     field: 'departIds',
     component: 'Select',
     componentProps: {
@@ -554,7 +554,7 @@ export const userTenantColumns: BasicColumn[] = [
     width: 100,
   },
   {
-    title: '部门',
+    title: '组织',
     width: 150,
     dataIndex: 'orgCodeTxt',
   },

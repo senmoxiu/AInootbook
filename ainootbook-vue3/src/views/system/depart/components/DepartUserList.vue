@@ -105,7 +105,7 @@
   // 创建用户
   async function createUser() {
     if (!departId.value) {
-      createMessage.warning('请先选择一个部门');
+      createMessage.warning('请先选择一个组织');
     } else {
       let mainDepPostId = '';
       let selecteddeparts = departId.value;

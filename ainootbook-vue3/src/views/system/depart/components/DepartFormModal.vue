@@ -56,6 +56,14 @@
     let isChild = unref(data?.isChild);
     let categoryOptions = isChild ? orgCategoryOptions.child : orgCategoryOptions.root;
 
+    if (data.record?.orgCategory && data.record?.orgCategory === '5') {
+      // 学院下级：专业、组织单元、岗位
+      categoryOptions = orgCategoryOptions.childCollege;
+    }
+    if (data.record?.orgCategory && data.record?.orgCategory === '6') {
+      // 专业下级：班级、岗位
+      categoryOptions = orgCategoryOptions.childMajor;
+    }
     if (data.record?.orgCategory && data.record?.orgCategory === '2') {
       categoryOptions = orgCategoryOptions.childDepartPost;
     }
@@ -91,14 +99,12 @@
     if (typeof record !== 'object') {
       record = {};
     }
-    let orgCategory = data.record?.orgCategory;
-    let company = orgCategory === '1' || orgCategory === '4';
     delete data.record?.orgCategory;
-    // 赋默认值
+    // 赋默认值：统一默认选第一个选项
     record = Object.assign(
       {
         departOrder: 0,
-        orgCategory: company ? categoryOptions[1].value : categoryOptions[0].value,
+        orgCategory: categoryOptions[0].value,
       },
       record
     );

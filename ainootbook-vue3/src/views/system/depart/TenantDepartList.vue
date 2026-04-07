@@ -20,7 +20,7 @@
           </a-tab-pane>
         </a-tabs>
         <div v-show="departData == null" style="padding-top: 40px">
-          <a-empty description="尚未选择部门" />
+          <a-empty description="尚未选择组织" />
         </div>
       </div>
     </a-col>
@@ -78,7 +78,7 @@
 
   onMounted(() => {
     //提示信息
-    tenantSaasMessage('租户部门');
+    tenantSaasMessage('租户组织');
   });
 </script>
 

@@ -112,7 +112,7 @@
     {
       id: '2008448202536456193',
       name: 'Chat2BI',
-      icon: 'https://minio.jeecg.com/otatest/chatShow_1769395642452.png',
+      icon: '',
       prologue: '你好，我是Chat2BI 图表生成智能体。',
       flowId: '2008379264947519489',
       type: 'chatFLow',
@@ -121,7 +121,7 @@
     {
       id: '2008090512835629057',
       name: 'AI绘画',
-      icon: 'https://minio.jeecg.com/otatest/AiWrite_1769395779558.png',
+      icon: '',
       prologue: '你好，我是 AI绘图智能体。',
       presetQuestion:
         '[{"key":1,"descr":"请生成一张具有日本风格的动漫成年女孩。","update":true}, {"key":2,"descr":"请生成一幅中国神话故事中，手持武器的哪吒形象。","update":true}]',

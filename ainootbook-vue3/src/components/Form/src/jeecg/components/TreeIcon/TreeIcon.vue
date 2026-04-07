@@ -2,7 +2,7 @@
   <div>
     <svg
       class="svg-company"
-      v-if="orgCategory && (orgCategory === '1' || orgCategory === '4')"
+      v-if="orgCategory && (orgCategory === '1')"
       viewBox="0 0 1024 1024"
       xmlns="http://www.w3.org/2000/svg"
       width="256"
@@ -18,7 +18,7 @@
         fill="#333333"
       ></path>
     </svg>
-    <svg class="svg-depart" v-if="orgCategory === '2'" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="256" height="256">
+    <svg class="svg-depart" v-if="orgCategory === '2' || orgCategory === '5'" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="256" height="256">
       <path
         d="M192 384H64V64h320v320H256v256h128v128h384V512h-128V192h320v320h-128v320H384v128H64v-320h128V384z m128 320H128v192h192v-192z m576-448h-192v192h192V256zM320 128H128v192h192V128z"
         p-id="8946"
@@ -26,7 +26,7 @@
     </svg>
     <svg
       class="svg-post"
-      v-if="orgCategory === '3'"
+      v-if="orgCategory === '3' || orgCategory === '6' || orgCategory === '7'"
       viewBox="0 0 1024 1024"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"

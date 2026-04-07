@@ -17,7 +17,7 @@ export const userInfoColumns: BasicColumn[] = [
     width: 180,
   },
   {
-    title: '部门',
+    title: '组织',
     dataIndex: 'orgCode',
     width: 200,
   },
@@ -42,20 +42,20 @@ export const userInfoSearchFormSchema: FormSchema[] = [
   },
 ];
 
-// 部门角色 columns
+// 组织角色 columns
 export const departRoleColumns: BasicColumn[] = [
   {
-    title: '部门角色名称',
+    title: '组织角色名称',
     dataIndex: 'roleName',
     width: 100,
   },
   {
-    title: '部门角色编码',
+    title: '组织角色编码',
     dataIndex: 'roleCode',
     width: 100,
   },
   {
-    title: '部门',
+    title: '组织',
     dataIndex: 'departId_dictText',
     width: 100,
   },
@@ -66,16 +66,16 @@ export const departRoleColumns: BasicColumn[] = [
   },
 ];
 
-// 部门角色查询条件表单
+// 组织角色查询条件表单
 export const departRoleSearchFormSchema: FormSchema[] = [
   {
     field: 'roleName',
-    label: '部门角色名称',
+    label: '组织角色名称',
     component: 'Input',
   },
 ];
 
-// 部门角色弹窗form表单
+// 组织角色弹窗form表单
 export const departRoleModalFormSchema: FormSchema[] = [
   {
     label: 'id',
@@ -85,28 +85,28 @@ export const departRoleModalFormSchema: FormSchema[] = [
   },
   {
     field: 'roleName',
-    label: '部门角色名称',
+    label: '组织角色名称',
     component: 'Input',
     rules: [
-      { required: true, message: '部门角色名称不能为空！' },
+      { required: true, message: '组织角色名称不能为空！' },
       { min: 2, max: 30, message: '长度在 2 到 30 个字符', trigger: 'blur' },
     ],
   },
   {
     field: 'roleCode',
-    label: '部门角色编码',
+    label: '组织角色编码',
     component: 'Input',
     dynamicDisabled: ({ values }) => {
       return !!values.id;
     },
     dynamicRules: ({ model }) => {
       return [
-        { required: true, message: '部门角色编码不能为空！' },
+        { required: true, message: '组织角色编码不能为空！' },
         { min: 0, max: 64, message: '长度不能超过 64 个字符', trigger: 'blur' },
         {
           validator: (_, value) => {
             if (/[\u4E00-\u9FA5]/g.test(value)) {
-              return Promise.reject('部门角色编码不可输入汉字！');
+              return Promise.reject('组织角色编码不可输入汉字！');
             }
             return new Promise((resolve, reject) => {
               let params = {
@@ -141,11 +141,11 @@ export function useBaseInfoForm(treeData: Ref<any[]>) {
   const descItems: DescItem[] = [
     {
       field: 'departName',
-      label: '机构名称',
+      label: '组织名称',
     },
     {
       field: 'parentId',
-      label: '上级部门',
+      label: '上级组织',
       render(val) {
         if (val) {
           let data = findTree(treeData.value, (item) => item.key == val);
@@ -156,22 +156,21 @@ export function useBaseInfoForm(treeData: Ref<any[]>) {
     },
     {
       field: 'orgCode',
-      label: '机构编码',
+      label: '组织编码',
     },
     {
       field: 'orgCategory',
-      label: '机构类型',
+      label: '组织类型',
       render(val) {
-        if (val === '1') {
-          return '公司';
-        } else if (val === '2') {
-          return '部门';
-        } else if (val === '3') {
-          return '岗位';
-        } else if(val === '4'){
-          return '子公司';
-        }
-        return val;
+        const map: Record<string, string> = {
+          '1': '学校',
+          '2': '组织单元',
+          '3': '岗位',
+          '5': '学院',
+          '6': '专业',
+          '7': '班级',
+        };
+        return map[val] ?? val;
       },
     },
     {

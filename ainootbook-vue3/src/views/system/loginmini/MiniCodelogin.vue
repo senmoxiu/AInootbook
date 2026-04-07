@@ -4,7 +4,7 @@
       <div class="aui-form">
         <div class="aui-image">
           <div class="aui-image-text">
-            <img :src="adTextImg" alt="" />
+            <h2 style="color: #fff; font-size: 28px; font-weight: 600;">AI 课堂笔记智能整理系统</h2>
           </div>
         </div>
         <div class="aui-formBox aui-formEwm">
@@ -25,12 +25,13 @@
               </div>
             </form>
           </div>
-          <div class="aui-flex aui-third-text">
+          <!-- 第三方登录已禁用 -->
+          <div v-if="false" class="aui-flex aui-third-text">
             <div class="aui-flex-box aui-third-border">
               <span>{{ t('sys.login.otherSignIn') }}</span>
             </div>
           </div>
-          <div class="aui-flex" :class="`${prefixCls}-sign-in-way`">
+          <div v-if="false" class="aui-flex" :class="`${prefixCls}-sign-in-way`">
             <div class="aui-flex-box">
               <div class="aui-third-login">
                 <a href="" title="github" @click="onThirdLogin('github')"><GithubFilled /></a>
@@ -67,7 +68,6 @@
   import { QrCode } from '/@/components/Qrcode/index';
   import ThirdModal from '/@/views/sys/login/ThirdModal.vue';
   import logoImg from '/@/assets/loginmini/icon/jeecg_logo.png';
-  import adTextImg from '/@/assets/loginmini/icon/jeecg_ad_text.png';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';

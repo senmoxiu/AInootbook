@@ -23,9 +23,9 @@
           <div>
             提示词编排
             <a-tooltip title="AI应用文档">
-              <a style="color: unset" href="https://help.jeecg.com/aigc/guide/app" target="_blank">
+              <span style="color: unset; cursor: help">
                 <Icon style="position: relative; left: 2px; top: 1px" icon="ant-design:question-circle-outlined"></Icon>
-              </a>
+              </span>
             </a-tooltip>
           </div>
           <div style="display: flex">
