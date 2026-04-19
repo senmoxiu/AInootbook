@@ -94,13 +94,10 @@ import {
   ACCESS_TOKEN,
   USER_NAME,
   USER_INFO,
-  APP_ROUTE,
-  APP_CONFIG,
-  HOME_CONFIG_EXPIRED_TIME,
   HOME_PAGE,
 } from '@/common/constants'
 
-import { cache, getFileAccessHttpUrl } from '@/common/uitls'
+import { getFileAccessHttpUrl } from '@/common/uitls'
 import { useRouter } from '@/plugin/uni-mini-router'
 import { useParamsStore } from '@/store/page-params'
 
@@ -130,8 +127,6 @@ const compLogo = ref(defLogo)
 const compTitle = ref('AI 课堂笔记')
 const paramsStore = useParamsStore()
 paramsStore.reset()
-// 是否开启本地路由配置
-let isLocalConfig = getApp().globalData.isLocalConfig;
 if (import.meta.env.MODE === 'development') {
   // 开发环境不预填账号
 }
@@ -222,7 +217,6 @@ const accountLogin = () => {
         })
         appConfig()
         departConfig()
-        router.pushTab({ path: HOME_PAGE })
       } else {
         toast.warning(res.message)
       }
@@ -295,25 +289,8 @@ const departConfig = () => {
   appQueryUser()
 }
 const appConfig = () => {
-  if (isLocalConfig) {
-    toast.success('登录成功!')
-    router.pushTab({ path: HOME_PAGE })
-  } else {
-    http
-      .get('/eoa/sysAppConfig/queryAppConfigRoute')
-      .then((res: any) => {
-        if (res.success) {
-          cache(APP_ROUTE, res.result.route, HOME_CONFIG_EXPIRED_TIME)
-          cache(APP_CONFIG, res.result.config, HOME_CONFIG_EXPIRED_TIME)
-        }
-        toast.success('登录成功!')
-        router.pushTab({ path: HOME_PAGE })
-      })
-      .catch((err) => {
-        toast.success('登录成功!')
-        router.pushTab({ path: HOME_PAGE })
-      })
-  }
+  toast.success('登录成功!')
+  router.pushTab({ path: HOME_PAGE })
 }
 
 const loadConfig = () => {
@@ -347,10 +324,7 @@ const checkAccount = () => {}
 checkToken()
 checkAccount()
 // #endif
-// @ts-ignore
-if (isLocalConfig === false) {
-  loadConfig()
-}
+loadConfig()
 </script>
 
 <style lang="scss" scoped>

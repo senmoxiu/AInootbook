@@ -1,10 +1,8 @@
 declare module 'vue' {
   export interface GlobalComponents {
-BottomOperate: typeof import('./BottomOperate/BottomOperate.vue')['default']
 Breadcrumb: typeof import('./Breadcrumb/Breadcrumb.vue')['default']
 CategorySelect: typeof import('./CategorySelect/CategorySelect.vue')['default']
 DateTime: typeof import('./DateTime/DateTime.vue')['default']
-Grid: typeof import('./Grid/Grid.vue')['default']
 ImgPreview: typeof import('./ImgPreview/ImgPreview.vue')['default']
 LFile: typeof import('./LFile/LFile.vue')['default']
 PageLayout: typeof import('./PageLayout/PageLayout.vue')['default']

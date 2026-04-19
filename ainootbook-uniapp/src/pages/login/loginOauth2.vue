@@ -16,10 +16,10 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from '@/plugin/uni-mini-router'
 import { useToast } from 'wot-design-uni'
-import { ACCESS_TOKEN, APP_ROUTE, APP_CONFIG, HOME_PAGE, HOME_CONFIG_EXPIRED_TIME} from '@/common/constants'
+import { ACCESS_TOKEN, HOME_PAGE} from '@/common/constants'
 import { useUserStore } from '@/store/user'
 import { useParamsStore } from '@/store/page-params'
-import {isOAuth2AppEnv, getUrlParams, cache} from '@/common/uitls'
+import {isOAuth2AppEnv, getUrlParams} from '@/common/uitls'
 import { getEnvBaseUrl } from '@/utils'
 import { http } from '@/utils/http'
 //import { requestAuthCode } from "dingtalk-jsapi";
@@ -29,7 +29,6 @@ const toast = useToast()
 const userStore = useUserStore()
 const paramsStore = useParamsStore()
 const loading = ref(false)
-const isLocalConfig = true
 //操作环境
 const env = ref({
   thirdType:'',
@@ -190,22 +189,11 @@ const goRedirectUrl = () => {
 }
 
 const appConfig = () => {
-  if(isLocalConfig){
-    toast.success('登录成功!')
+  toast.success('登录成功!')
+  if (redirectUrl.value) {
+    goRedirectUrl()
+  } else {
     router.pushTab({ path: HOME_PAGE })
-  }else{
-    http.get('/eoa/sysAppConfig/queryAppConfigRoute').then((res: any) => {
-      if (res.success) {
-        cache(APP_ROUTE, res.result.route, HOME_CONFIG_EXPIRED_TIME)
-        cache(APP_CONFIG, res.result.config, HOME_CONFIG_EXPIRED_TIME)
-        toast.success('登录成功!')
-        if (redirectUrl.value) {
-          goRedirectUrl()
-        } else {
-          router.pushTab({ path: HOME_PAGE })
-        }
-      }
-    })
   }
 }
 

@@ -63,11 +63,7 @@ export default ({ command, mode }) => {
         // homePage 通过 vue 文件的 route-block 的type="home"来设定
         // pages 目录为 src/pages，分包目录不能配置在pages目录下
         subPackages: [
-          'src/pages-home',
-          'src/pages-message',
           'src/pages-user',
-          'src/pages-work',
-          'src/pages-sub',
           'src/pages-study',
         ], // 是个数组，可以配置多个，但是不能为pages里面的目录
         dts: 'src/types/uni-pages.d.ts',
@@ -155,6 +151,12 @@ export default ({ command, mode }) => {
       host: '0.0.0.0',
       hmr: true,
       port: Number.parseInt(VITE_APP_PORT, 10),
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+        'Surrogate-Control': 'no-store',
+      },
       // 仅 H5 端生效，其他端不生效（其他端走build，不走devServer)
       proxy: JSON.parse(VITE_APP_PROXY)
         ? {
@@ -165,6 +167,22 @@ export default ({ command, mode }) => {
             },
           }
         : undefined,
+    },
+    optimizeDeps: {
+      // 默认不要在开发环境每次启动都强制重建依赖缓存，否则会稳定触发
+      // "Forced re-optimization of dependencies" 与浏览器侧的缓存失效重载。
+      // 真的遇到缓存损坏时，优先执行 `pnpm clean:cache` 后重启，或临时设置
+      // `VITE_FORCE_OPTIMIZE_DEPS=true` 做一次强制预构建。
+      force: process.env.VITE_FORCE_OPTIMIZE_DEPS === 'true',
+      // 这些依赖在页面懒加载后才首次命中时，会触发二次 optimizeDeps 并导致整页 reload。
+      // 提前纳入预构建，减少启动后 "optimized dependencies changed. reloading"。
+      include: [
+        'md5',
+        'spark-md5',
+        'wot-design-uni',
+        'wot-design-uni/components/common/props',
+        'wot-design-uni/components/common/util',
+      ],
     },
     build: {
       // 方便非h5端调试

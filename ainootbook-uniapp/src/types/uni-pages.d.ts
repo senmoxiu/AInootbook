@@ -5,15 +5,9 @@
 
 interface NavigateToOptions {
   url: "/pages/index/index" |
-       "/pages/annotation/annotationDetail" |
-       "/pages/annotation/annotationList" |
        "/pages/login/login" |
        "/pages/login/loginOauth2" |
-       "/pages/message/message" |
-       "/pages/more/more" |
        "/pages/user/people" |
-       "/pages/workHome/workHome" |
-       "/pages-home/home/home" |
        "/pages-user/location/location" |
        "/pages-user/organization/organization" |
        "/pages-user/userDetail/userDetail" |

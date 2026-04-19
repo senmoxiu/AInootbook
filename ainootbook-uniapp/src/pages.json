@@ -58,32 +58,6 @@
       }
     },
     {
-      "path": "pages/annotation/annotationDetail",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
-      "path": "pages/annotation/annotationList",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "我的消息",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
       "path": "pages/login/login",
       "type": "page",
       "style": {
@@ -100,32 +74,6 @@
       "type": "page"
     },
     {
-      "path": "pages/message/message",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
-      "path": "pages/more/more",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "更多",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
-    },
-    {
       "path": "pages/user/people",
       "type": "page",
       "layout": "default",
@@ -137,43 +85,9 @@
           "bounce": "none"
         }
       }
-    },
-    {
-      "path": "pages/workHome/workHome",
-      "type": "page",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "工作台",
-        "navigationStyle": "custom",
-        "disableScroll": true,
-        "app-plus": {
-          "bounce": "none"
-        }
-      }
     }
   ],
   "subPackages": [
-    {
-      "root": "pages-home",
-      "pages": [
-        {
-          "path": "home/home",
-          "type": "page",
-          "layout": "default",
-          "style": {
-            "navigationBarTitleText": "",
-            "disableScroll": true,
-            "app-plus": {
-              "bounce": "none"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "root": "pages-message",
-      "pages": []
-    },
     {
       "root": "pages-user",
       "pages": [
@@ -230,14 +144,6 @@
           }
         }
       ]
-    },
-    {
-      "root": "pages-work",
-      "pages": []
-    },
-    {
-      "root": "pages-sub",
-      "pages": []
     },
     {
       "root": "pages-study",

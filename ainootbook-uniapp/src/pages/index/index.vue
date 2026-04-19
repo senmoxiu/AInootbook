@@ -5,333 +5,327 @@
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '首页',
-    disableScroll: true, // 微信禁止页面滚动
+    disableScroll: true,
     'app-plus': {
-      bounce: 'none', // 禁用 iOS 弹性效果
+      bounce: 'none',
     },
   },
 }
 </route>
 <template>
   <PageLayout :navbarShow="false">
-    <!--轮播图-->
-    <!-- prettier-ignore -->
-    <swiper class="swiper" :indicator-dots="true" :circular="true" :autoplay="true" :interval="5000" :duration="500">
-      <!--本地配置轮播图-->
-      <swiper-item v-for="(item, index) in swiperList" :key="index" v-if="isLocalConfig">
-        <image :src="item.url" mode="aspectFill" v-if="item.type == 'image'"></image>
-        <video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false"  objectFit="cover"  v-if="item.type == 'video'"></video>
-      </swiper-item>
-      <!--线上配置轮播图-->
-      <swiper-item v-for="(item, index) in carouselList" :key="index" v-if="!isLocalConfig">
-        <image :src="getFileAccessHttpUrl(item)" mode="aspectFill"></image>
-      </swiper-item>
-    </swiper>
-    <scroll-view class="scrollView" :scroll-y="true" scroll-with-animation>
-      <!--常用服务-->
-      <view class="serveBox">
-        <view class="title">
-          <view class="dot"></view>
-          <wd-text text="常用服务"></wd-text>
+    <scroll-view class="home-scroll" :scroll-y="true">
+      <!-- 顶部欢迎区 -->
+      <view class="header-area">
+        <view class="greeting">
+          <view class="greeting-text">
+            <text class="hello">你好，</text>
+            <text class="username">{{ userStore.userInfo.realname || '同学' }}</text>
+          </view>
+          <text class="subtitle">今天也要好好学习哦</text>
         </view>
-        <Grid :column="4" v-model="usList" @itemClik="goPage"></Grid>
+        <image class="avatar" :src="avatarUrl" mode="aspectFill" @error="onAvatarError" />
       </view>
-      <!--其他服务-->
-      <view class="serveBox">
-        <view class="title">
-          <view class="dot"></view>
-          <wd-text text="其他服务"></wd-text>
+
+      <!-- 快捷入口 -->
+      <view class="section">
+        <view class="section-title">快捷入口</view>
+        <view class="shortcut-grid">
+          <view class="shortcut-item" @click="goStudy">
+            <view class="shortcut-icon study-icon">
+              <wd-icon name="books" size="28px" color="#0081ff" />
+            </view>
+            <text class="shortcut-label">我的课程</text>
+          </view>
+          <view class="shortcut-item" @click="goNoteList">
+            <view class="shortcut-icon note-icon">
+              <wd-icon name="edit-outline" size="28px" color="#07c160" />
+            </view>
+            <text class="shortcut-label">我的笔记</text>
+          </view>
+          <view class="shortcut-item" @click="goNoteWizard">
+            <view class="shortcut-icon ai-icon">
+              <wd-icon name="add-circle" size="28px" color="#ff6b35" />
+            </view>
+            <text class="shortcut-label">AI 创建</text>
+          </view>
+          <view class="shortcut-item" @click="goProfile">
+            <view class="shortcut-icon user-icon">
+              <wd-icon name="user" size="28px" color="#9b59b6" />
+            </view>
+            <text class="shortcut-label">个人中心</text>
+          </view>
         </view>
-        <Grid :column="4" v-model="osList" @itemClik="goPage"></Grid>
+      </view>
+
+      <!-- 最近笔记 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-title">最近笔记</text>
+          <text class="section-more" @click="goNoteList">查看全部</text>
+        </view>
+        <view v-if="recentNotes.length === 0" class="empty-tip">
+          <wd-icon name="file-text" size="40px" color="#ccc" />
+          <text class="empty-text">暂无笔记，去创建第一篇吧</text>
+        </view>
+        <view v-else class="note-list">
+          <view
+            v-for="note in recentNotes"
+            :key="note.id"
+            class="note-card"
+            @click="goNoteDetail(note.id)"
+          >
+            <view class="note-card-header">
+              <text class="note-title">{{ note.noteTitle }}</text>
+              <text class="note-status" :class="statusClass(note.noteStatus)">
+                {{ statusLabel(note.noteStatus) }}
+              </text>
+            </view>
+            <text class="note-summary">{{ note.aiSummary || '暂无摘要' }}</text>
+            <view class="note-card-footer">
+              <text class="note-course">{{ note.courseName || '未关联课程' }}</text>
+              <text class="note-time">{{ formatTime(note.updateTime) }}</text>
+            </view>
+          </view>
+        </view>
       </view>
     </scroll-view>
   </PageLayout>
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref} from 'vue'
-import { TestEnum } from '@/typings'
-import { us, os } from '@/common/work'
-// 获取当前运行平台
-import PLATFORM from '@/utils/platform'
-import { cache, getFileAccessHttpUrl, hasRoute } from '@/common/uitls'
-import { onLaunch, onShow, onHide, onLoad, onReady } from '@dcloudio/uni-app'
-import { useToast, useMessage, useNotify } from 'wot-design-uni'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from '@/plugin/uni-mini-router'
-import Grid from '@/components/Grid/Grid.vue'
-
-import {
-  ACCESS_TOKEN,
-  USER_NAME,
-  USER_INFO,
-  APP_ROUTE,
-  APP_CONFIG,
-  HOME_CONFIG_EXPIRED_TIME,
-} from '@/common/constants'
-import { http } from '@/utils/http'
+import { useUserStore } from '@/store/user'
+import { noteApi, type Note } from '@/api/note'
+import { getFileAccessHttpUrl } from '@/common/uitls'
 
 defineOptions({
   name: 'index',
   options: {
-    // apply-shared‌：当前页面样式会影响到子组件样式.(小程序)
-    // shared‌：当前页面样式影响到子组件，子组件样式也会影响到当前页面.(小程序)
     styleIsolation: 'shared',
   },
 })
-const toast = useToast()
+
 const router = useRouter()
-// 获取屏幕边界到安全区域距离
-const { safeAreaInsets } = uni.getSystemInfoSync()
-const isLocalConfig = getApp().globalData.isLocalConfig;
-const carouselList = ref([])
-const swiperList = ref([])
-const middleApps = ref([])
-const usList = ref([])
-const osList = ref([])
-const msgCount = ref(0)
-const dot = ref({ mailHome: false })
-const goPage = (item) => {
-  let page = item.routeIndex
-  console.log('-----------page------------', page)
-  if (!page) {
-    toast.info('该功能暂未实现')
-  } else {
-    if (['other', 'common'].includes(page)) {
-      goPageMore(page)
-      return
-    }
-    if (page === 'annotationList') {
-      msgCount.value = 0
-    }
-    dot.value[page] = false
-    if (page.indexOf('/app/online') == 0) {
-      let code = page.substring(page.lastIndexOf('/') + 1)
-      let real = { desformCode: code, desformName: item.title }
-      uni.navigateTo({
-        url: '/pages/check/onlineForm/add?item=' + encodeURIComponent(JSON.stringify(real)),
-      })
-    } else if (page.indexOf('/app/desform') == 0) {
-      let code = page.substring(page.lastIndexOf('/') + 1)
-      let real = { desformCode: code, desformName: item.title }
-      uni.navigateTo({
-        url: '/pages/check/designForm/designForm?item=' + encodeURIComponent(JSON.stringify(real)),
-      })
-    } else {
-      if (!hasRoute({ name: page })) {
-        toast.info('功能开发中...')
-      } else {
-        router.replace({ name: page, params: { backRouteName: 'index', routeMethod: 'pushTab' } })
-      }
-    }
-  }
-}
-const getAppConfigRoute = () => {
-  //判断是否过期
-  let config = cache(APP_CONFIG)
-  if (config) {
-    homeConfig()
-  } else {
-    //更新首页配置
-    http.get('/eoa/sysAppConfig/queryAppConfigRoute').then((res: any) => {
-      console.log('更新首页配置res', res)
-      let result = res
-      if (result.success) {
-        cache(APP_ROUTE, result.result.route, HOME_CONFIG_EXPIRED_TIME)
-        cache(APP_CONFIG, result.result.config, HOME_CONFIG_EXPIRED_TIME)
-        homeConfig()
-      }
-    })
-  }
-}
-//跳转路由
-const goTo = (name) => {
-  router.push({ name })
-}
-//加载首页配置
-const homeConfig = async () => {
-  const indexRouteList = cache(APP_ROUTE);
-  const appConfig = cache(APP_CONFIG);
-  nextTick(() => {
-    usList.value = indexRouteList.filter((item) => item.type == 'common').map(item=>{
-      return {
-        ...item,
-        text: item.title,
-        img: item.icon,
-        itemKey: item.routeIndex,
-      };
-    });
-    osList.value = indexRouteList.filter((item) => item.type == 'other').map(item=>{
-      return {
-        ...item,
-        text: item.title,
-        img: item.icon,
-        itemKey: item.routeIndex,
-      };
-    });
-    middleApps.value = indexRouteList.filter((item) => item.type == 'approve').map(item=>{
-      return {
-        ...item,
-        text: item.title,
-        img: item.icon,
-        itemKey: item.routeIndex,
-      };
-    });
-    let carouselImgStr = appConfig[0].carouselImgJson;
-    const carouselImgArr = carouselImgStr && carouselImgStr.length > 0 ? carouselImgStr.split(',') : [];
-    carouselList.value = carouselImgArr;
-    usList.value.push({
-      text: '更多',
-      img: '/static/index/128/more.png',
-      routeIndex: 'common',
-      itemKey: 'common',
-    })
-    osList.value.push({
-      text: '更多',
-      img: '/static/index/128/more.png',
-      routeIndex: 'other',
-      itemKey: 'other',
-    })
-  })
-}
-const goPageMore = (page) => {
-  router.replace({ name: 'more', params: { backRouteName: 'index', type: page } })
-}
-onLoad(() => {
-  console.log('index页面：onLoad')
-})
-onReady(() => {
-  console.log('index页面：onReady')
+const userStore = useUserStore()
+const recentNotes = ref<Note[]>([])
+const avatarError = ref(false)
+
+const avatarUrl = computed(() => {
+  if (avatarError.value || !userStore.userInfo.avatar) return '/static/logo.png'
+  return getFileAccessHttpUrl(userStore.userInfo.avatar) || '/static/logo.png'
 })
 
-if (isLocalConfig) {
-  usList.value = us.data.map((item) => ({
-    ...item,
-    text: item.title,
-    img: item.icon,
-    itemKey: item.routeIndex,
-  }))
-  osList.value = os.data.map((item) => ({
-    ...item,
-    text: item.title,
-    img: item.icon,
-    itemKey: item.routeIndex,
-  }))
-  usList.value.push({
-    text: '更多',
-    img: '/static/index/128/more.png',
-    routeIndex: 'common',
-    itemKey: 'common',
-  })
-  osList.value.push({
-    text: '更多',
-    img: '/static/index/128/more.png',
-    routeIndex: 'other',
-    itemKey: 'other',
-  })
-
-  swiperList.value = [
-    {
-      id: 1,
-      type: 'image',
-      url: '/static/banner/banner_default.png',
-      link: '',
-    },
-  ]
-} else {
-  getAppConfigRoute()
+const onAvatarError = () => {
+  avatarError.value = true
 }
+
+const statusLabel = (status?: number) => {
+  const map: Record<number, string> = { 0: '草稿', 1: '生成中', 2: '已完成', 3: '失败' }
+  return map[status ?? 0] ?? '草稿'
+}
+
+const statusClass = (status?: number) => {
+  const map: Record<number, string> = { 0: 'draft', 1: 'processing', 2: 'done', 3: 'failed' }
+  return map[status ?? 0] ?? 'draft'
+}
+
+const formatTime = (time?: string) => {
+  if (!time) return ''
+  return time.slice(0, 10)
+}
+
+const goStudy = () => router.pushTab({ path: '/pages-study/course/list' })
+const goNoteList = () => router.push({ name: 'study-note-list' })
+const goNoteWizard = () => router.push({ name: 'study-note-wizard' })
+const goNoteDetail = (id: string) => router.push({ name: 'study-note-detail', params: { id } })
+const goProfile = () => router.pushTab({ path: '/pages/user/people' })
+
+onMounted(async () => {
+  try {
+    const res = await noteApi.getNoteList({ pageNo: 1, pageSize: 5 })
+    recentNotes.value = (res as any)?.result?.records ?? []
+  } catch {
+    recentNotes.value = []
+  }
+})
 </script>
 
 <style lang="scss" scoped>
-.swiper {
-  height: 375upx;
-  flex: none;
-  image,
-  video {
-    width: 100%;
-    display: block;
-    height: 100%;
-    margin: 0;
+.home-scroll {
+  background-color: #f4f7f9;
+  min-height: 100vh;
+}
+
+.header-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60upx 40upx 40upx;
+  background: linear-gradient(135deg, #0081ff 0%, #0066cc 100%);
+
+  .greeting {
+    .hello {
+      font-size: 32upx;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .username {
+      font-size: 36upx;
+      font-weight: 600;
+      color: #fff;
+    }
+    .subtitle {
+      display: block;
+      font-size: 26upx;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 8upx;
+    }
   }
-  :deep(.uni-swiper-dot) {
-    transition: all 400ms ease;
-    background-color: rgba(255, 255, 255, 0.4);
-    width: 5px;
-    height: 5px;
+
+  .avatar {
+    width: 100upx;
+    height: 100upx;
     border-radius: 50%;
-    margin: 0 4px;
-  }
-  :deep(.uni-swiper-dot-active) {
-    background-color: rgba(255, 255, 255, 1);
-    width: 16px;
-    border-radius: 2px;
+    border: 3px solid rgba(255, 255, 255, 0.5);
   }
 }
-.scrollView {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background-color: #f1f1f1;
-  :deep(.wd-row) {
-    background-color: #fff;
-    margin-bottom: 32upx;
-    .wd-col {
-      .box {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        &:first-child {
-          border-right: 1px solid rgba(165, 165, 165, 0.1);
-        }
-        .wd-img {
-          margin: 20upx;
-          margin-left: 0;
-        }
-        .textBox {
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          .wd-text {
-            color: #666;
-            &:last-child {
-              font-weight: 200;
-            }
-          }
-        }
-      }
+
+.section {
+  margin: 24upx 24upx 0;
+  background: #fff;
+  border-radius: 16upx;
+  padding: 32upx;
+
+  .section-title {
+    font-size: 30upx;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 24upx;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24upx;
+
+    .section-more {
+      font-size: 26upx;
+      color: #0081ff;
     }
   }
-  .serveBox {
-    margin-bottom: 32upx;
-    background-color: #fff;
-    &:last-child {
-      .title {
-        .dot {
-          background-color: #fbbd08;
-        }
-      }
-    }
-    :deep(.wd-grid-item) {
-      &:not(.enabled) {
-        // filter: grayscale(1);
-      }
-    }
-    .title {
+}
+
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16upx;
+
+  .shortcut-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12upx;
+
+    .shortcut-icon {
+      width: 100upx;
+      height: 100upx;
+      border-radius: 24upx;
       display: flex;
       align-items: center;
-      padding-left: 30upx;
-      height: 52px;
-      .dot {
-        width: 14upx;
-        height: 14upx;
-        background-color: #0081ff;
-        border-radius: 100%;
-        margin-right: 20upx;
-      }
-      .wd-text {
-        color: #666;
-        font-size: 15px;
-      }
+      justify-content: center;
+
+      &.study-icon { background: #e8f4ff; }
+      &.note-icon  { background: #e8f9ee; }
+      &.ai-icon    { background: #fff0ea; }
+      &.user-icon  { background: #f3eaff; }
+    }
+
+    .shortcut-label {
+      font-size: 24upx;
+      color: #555;
+    }
+  }
+}
+
+.empty-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40upx 0;
+  gap: 16upx;
+
+  .empty-text {
+    font-size: 26upx;
+    color: #aaa;
+  }
+}
+
+.note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20upx;
+}
+
+.note-card {
+  padding: 24upx;
+  background: #f8fafc;
+  border-radius: 12upx;
+  border-left: 4px solid #0081ff;
+
+  .note-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10upx;
+
+    .note-title {
+      font-size: 28upx;
+      font-weight: 500;
+      color: #222;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .note-status {
+      font-size: 22upx;
+      padding: 4upx 12upx;
+      border-radius: 20upx;
+      margin-left: 12upx;
+      flex-shrink: 0;
+
+      &.draft      { background: #f0f0f0; color: #888; }
+      &.processing { background: #fff7e6; color: #fa8c16; }
+      &.done       { background: #f6ffed; color: #52c41a; }
+      &.failed     { background: #fff1f0; color: #f5222d; }
+    }
+  }
+
+  .note-summary {
+    font-size: 24upx;
+    color: #888;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12upx;
+  }
+
+  .note-card-footer {
+    display: flex;
+    justify-content: space-between;
+
+    .note-course {
+      font-size: 22upx;
+      color: #0081ff;
+    }
+
+    .note-time {
+      font-size: 22upx;
+      color: #bbb;
     }
   }
 }

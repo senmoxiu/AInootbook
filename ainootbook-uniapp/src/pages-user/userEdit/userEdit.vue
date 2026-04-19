@@ -14,7 +14,7 @@
 </route>
 
 <template>
-  <PageLayout navTitle="编辑资料" backRouteName="userDetail">
+  <PageLayout navTitle="编辑资料" backRouteName="user-userDetail-userDetail">
     <wd-form custom-class="pt3" ref="form" :model="model">
       <wd-cell-group border>
         <wd-input
@@ -168,7 +168,7 @@ function handleSubmit() {
               toast.success('修改成功~')
               setTimeout(() => {
                 userStore.editUserInfo({ ...data })
-                router.replaceAll({ name: 'people' })
+                router.replaceAll({ name: 'user-people' })
               }, 1e3)
             } else {
               toast.warning(res.message)

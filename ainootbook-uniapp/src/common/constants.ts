@@ -2,8 +2,6 @@ export const ACCESS_TOKEN = 'Access-Token'
 export const USER_NAME = 'login_username'
 export const USER_INFO = 'login_user_info'
 export const NAV_BAR_COLOR = 'bg-gradual-blue'
-export const APP_ROUTE = 'app_route_list'
-export const APP_CONFIG = 'app_config'
 export const X_TENANT_ID = 'X-Tenant-Id'
 export const X_Low_App_ID = 'X-Low-App-ID'
 export const TENANT_LIST = 'tenant_list'
@@ -13,11 +11,6 @@ export const HOME_PAGE = "/pages/index/index"
  * 组件名称前缀
  */
 export const COMP_NAME_PREFIX = 'ainote-drag';
-//首页配置项缓存时间10分钟
-export const HOME_CONFIG_EXPIRED_TIME = 10*60
-export const phone = '---'
-export const email = '---'
-export const company = '---'
 
 
 const STORAGE_OPTIONS = {

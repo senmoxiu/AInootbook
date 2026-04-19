@@ -16,6 +16,7 @@
     "dev:app-android": "uni -p app-android",
     "dev:app-ios": "uni -p app-ios",
     "dev:custom": "uni -p",
+    "clean:cache": "node ./scripts/clear-vite-cache.cjs",
     "dev": "uni",
     "dev:h5": "uni",
     "dev:h5:ssr": "uni --ssr",

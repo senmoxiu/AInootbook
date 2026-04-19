@@ -15,7 +15,7 @@
 <template>
   <PageLayout
     navTitle="用户详情"
-    backRouteName="people"
+    backRouteName="user-people"
     routeMethod="pushTab"
     navRightText="编辑"
     @navRight="handleNavRight"
@@ -51,7 +51,6 @@
 import { useToast, useMessage, useNotify, dayjs } from 'wot-design-uni'
 import { useRouter } from '@/plugin/uni-mini-router'
 import { useUserStore } from '@/store/user'
-import defaultAvatar from './components/avatar.vue'
 import { getFileAccessHttpUrl } from '@/common/uitls'
 
 defineOptions({
@@ -68,7 +67,7 @@ const columns = [
   { label: '女', value: 2 },
 ]
 const handleNavRight = () => {
-  router.push({ name: 'userEdit' })
+  router.push({ name: 'user-userEdit-userEdit' })
 }
 const getSex = (val) => {
   return columns.find((item) => item.value === val)['label']
