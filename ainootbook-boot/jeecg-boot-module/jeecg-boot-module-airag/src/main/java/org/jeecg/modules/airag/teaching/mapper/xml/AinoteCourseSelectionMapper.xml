@@ -41,4 +41,32 @@
         LEFT JOIN sys_depart d  ON cs.depart_id   = d.id
     </select>
 
+    <select id="queryAvailableTeachings" resultType="org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO">
+        SELECT
+            t.id               AS teachingId,
+            c.course_name      AS courseName,
+            c.course_code      AS courseCode,
+            u.realname         AS teacherName,
+            d.depart_name      AS departName,
+            t.semester         AS semester,
+            t.academic_year    AS academicYear
+        FROM ainote_teaching t
+        INNER JOIN ainote_course c ON t.course_id = c.id
+        INNER JOIN sys_user u ON t.teacher_id = u.id
+        LEFT JOIN sys_depart d ON t.depart_id = d.id
+        WHERE t.status = 1
+          AND t.tenant_id = #{tenantId}
+          AND NOT EXISTS (
+              SELECT 1
+              FROM ainote_course_selection cs
+              WHERE cs.teaching_id = t.id
+                AND cs.student_id = #{studentId}
+                AND cs.tenant_id = #{tenantId}
+                AND cs.status = 1
+          )
+        <if test="courseName != null and courseName != ''">
+          AND c.course_name LIKE CONCAT('%', #{courseName}, '%')
+        </if>
+    </select>
+
 </mapper>

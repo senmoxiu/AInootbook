@@ -19,6 +19,7 @@ import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.airag.teaching.dto.AinoteCourseSelectionAddDTO;
 import org.jeecg.modules.airag.teaching.dto.AinoteCourseSelectionEditDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
+import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.service.IAinoteCourseSelectionService;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,18 @@ public class AinoteCourseSelectionController
         Page<AinoteCourseSelectionVO> page = new Page<>(pageNo, pageSize);
         IPage<AinoteCourseSelectionVO> pageList = selectionService.querySelectionVoPage(page, queryWrapper);
         return Result.OK(pageList);
+    }
+
+    @Operation(summary = "查询可选教学任务（学生选课用）")
+    @GetMapping("/available")
+    @RequiresPermissions("teaching:selection:list")
+    public Result<IPage<AvailableTeachingVO>> available(
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String courseName) {
+        Page<AvailableTeachingVO> page = new Page<>(pageNo, pageSize);
+        IPage<AvailableTeachingVO> result = selectionService.queryAvailableTeachings(page, courseName);
+        return Result.OK(result);
     }
 
     @Operation(summary = "通过id查询")

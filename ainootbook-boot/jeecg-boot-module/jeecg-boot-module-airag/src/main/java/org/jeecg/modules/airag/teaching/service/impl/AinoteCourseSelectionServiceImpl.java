@@ -20,6 +20,7 @@ import org.jeecg.modules.airag.teaching.entity.AinoteTeaching;
 import org.jeecg.modules.airag.teaching.mapper.AinoteCourseSelectionMapper;
 import org.jeecg.modules.airag.teaching.service.IAinoteCourseSelectionService;
 import org.jeecg.modules.airag.teaching.service.IAinoteTeachingService;
+import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
 import org.jeecg.modules.ainote.util.RoleUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -166,6 +167,20 @@ public class AinoteCourseSelectionServiceImpl
             Page<AinoteCourseSelectionVO> page,
             QueryWrapper<AinoteCourseSelection> wrapper) {
         return baseMapper.querySelectionVoPage(page, wrapper);
+    }
+
+    @Override
+    public IPage<AvailableTeachingVO> queryAvailableTeachings(Page<AvailableTeachingVO> page,
+                                                              String courseName) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
+            throw new JeecgBootException("用户未登录");
+        }
+        Integer tenantId = getCurrentTenantId();
+        if (tenantId == null) {
+            throw new JeecgBootException("获取租户信息失败");
+        }
+        return baseMapper.queryAvailableTeachings(page, user.getId(), tenantId, courseName);
     }
 
     /**

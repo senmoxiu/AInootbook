@@ -21,6 +21,7 @@ public interface AinoteNoteVersionMapper extends BaseMapper<AinoteNoteVersion> {
     @Select({
             "<script>",
             "SELECT",
+            "  id,",
             "  version_number AS version,",
             "  ai_summary AS summary,",
             "  keywords,",

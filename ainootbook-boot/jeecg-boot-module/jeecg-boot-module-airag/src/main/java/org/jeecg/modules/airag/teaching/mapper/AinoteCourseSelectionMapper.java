@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
+import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
 
 /**
@@ -22,4 +23,13 @@ public interface AinoteCourseSelectionMapper extends BaseMapper<AinoteCourseSele
     IPage<AinoteCourseSelectionVO> querySelectionVoPage(
             Page<AinoteCourseSelectionVO> page,
             @Param("ew") com.baomidou.mybatisplus.core.conditions.Wrapper<AinoteCourseSelection> ew);
+
+    /**
+     * 分页查询学生可选教学任务
+     */
+    IPage<AvailableTeachingVO> queryAvailableTeachings(
+            Page<AvailableTeachingVO> page,
+            @Param("studentId") String studentId,
+            @Param("tenantId") Integer tenantId,
+            @Param("courseName") String courseName);
 }

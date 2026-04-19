@@ -1,50 +1,42 @@
-package org.jeecg.modules.ainote.entity;
+package org.jeecg.modules.ainote.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-import org.jeecg.common.aspect.annotation.Dict;
-import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 笔记表实体类
+ * 笔记详情视图（包含关联表字段）
  */
 @Data
-@TableName("ainote_note")
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
-@Schema(description = "笔记表")
-public class AinoteNote implements Serializable {
+@Schema(description = "笔记详情信息")
+public class AinoteNoteDetailVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @TableId(type = IdType.ASSIGN_ID)
     @Schema(description = "笔记ID")
     private String id;
 
     @Schema(description = "学生ID")
     private String studentId;
 
-    @Dict(dictTable = "ainote_course", dicCode = "id", dicText = "course_name")
     @Schema(description = "课程ID")
     private String courseId;
 
-    @Dict(dictTable = "ainote_chapter", dicCode = "id", dicText = "chapter_name")
+    @Schema(description = "课程名称")
+    private String courseName;
+
     @Schema(description = "章节ID")
     private String chapterId;
+
+    @Schema(description = "章节名称")
+    private String chapterName;
 
     @Schema(description = "教学ID")
     private String teachingId;
 
-    @Excel(name = "笔记标题", width = 30)
     @Schema(description = "笔记标题")
     private String noteTitle;
 
@@ -57,20 +49,18 @@ public class AinoteNote implements Serializable {
     @Schema(description = "AI生成的摘要")
     private String aiSummary;
 
-    @Excel(name = "关键词", width = 20)
     @Schema(description = "关键词（逗号分隔）")
     private String keywords;
 
     @Schema(description = "当前版本号")
     private Integer currentVersion;
 
-    @Excel(name = "笔记状态", width = 10, dicCode = "ainote_note_status")
-    @Dict(dicCode = "ainote_note_status")
     @Schema(description = "笔记状态：1-草稿，2-已完成，3-已删除")
     private Integer noteStatus;
 
-    @Excel(name = "是否公开", width = 10, dicCode = "yn")
-    @Dict(dicCode = "yn")
+    @Schema(description = "笔记状态文本")
+    private String noteStatusText;
+
     @Schema(description = "是否公开：0-私有，1-公开")
     private Integer isPublic;
 
@@ -80,10 +70,11 @@ public class AinoteNote implements Serializable {
     @Schema(description = "点赞次数")
     private Integer likeCount;
 
-    @Excel(name = "创建人", width = 15)
-    @Dict(dictTable = "sys_user", dicCode = "id", dicText = "realname")
-    @Schema(description = "创建人")
+    @Schema(description = "创建人username")
     private String createBy;
+
+    @Schema(description = "创建人姓名")
+    private String createByName;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

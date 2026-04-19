@@ -26,6 +26,7 @@ import org.jeecg.modules.ainote.dto.AinoteNoteUpdateDTO;
 import org.jeecg.modules.ainote.enums.NoteSearchScope;
 import org.jeecg.modules.ainote.entity.AinoteNote;
 import org.jeecg.modules.ainote.entity.AinoteNoteVersion;
+import org.jeecg.modules.ainote.mapper.AinoteNoteMapper;
 import org.jeecg.modules.ainote.service.IAinoteAiConfigService;
 import org.jeecg.modules.ainote.service.IAinoteNoteService;
 import org.jeecg.modules.ainote.util.RoleUtils;
@@ -36,6 +37,8 @@ import org.jeecg.modules.ainote.vo.AinoteNoteShareVO;
 import org.jeecg.modules.ainote.vo.AinoteProgressVO;
 import org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO;
 import org.jeecg.modules.ainote.vo.SemanticSearchResultDTO;
+import org.jeecg.modules.ainote.vo.AinoteNoteDetailVO;
+import org.jeecg.modules.ainote.vo.AinoteNoteListVO;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
@@ -78,37 +81,54 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
 
     /**
      * 分页列表查询
-     * TODO: 优化建议 - 列表接口返回大字段（noteContent LONGTEXT）可能影响性能
-     * 建议后续创建 AinoteNoteListVO，仅返回必要字段（标题、摘要、状态、时间、计数等）
      */
     @Operation(summary = "分页列表查询")
     @GetMapping(value = "/list")
-    public Result<IPage<AinoteNote>> queryPageList(
+    public Result<IPage<AinoteNoteListVO>> queryPageList(
             AinoteNote ainoteNote,
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest req) {
-        QueryWrapper<AinoteNote> queryWrapper =
-                QueryGenerator.initQueryWrapper(ainoteNote, req.getParameterMap());
-        // 应用数据权限过滤（租户隔离 + owner/public + 教师规则）
-        ainoteNoteService.applyDataPermission(queryWrapper);
-        // 列表查询排除大字段以提升性能
-        queryWrapper.select(AinoteNote.class, info ->
-                !"note_content".equals(info.getColumn())
-                        && !"rendered_content".equals(info.getColumn()));
-        Page<AinoteNote> page = new Page<>(pageNo, pageSize);
-        IPage<AinoteNote> pageList = ainoteNoteService.page(page, queryWrapper);
+
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        String tenantIdStr = TokenUtils.getTenantIdByRequest(req);
+        Integer tenantId = oConvertUtils.isNotEmpty(tenantIdStr) ? Integer.parseInt(tenantIdStr) : 0;
+
+        // 手动构建带表别名的查询条件（因为 SQL 有 JOIN）
+        QueryWrapper<AinoteNote> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("n.tenant_id", tenantId);
+        queryWrapper.ne("n.note_status", 3);
+        queryWrapper.eq("n.student_id", user.getId());
+
+        // 前端搜索条件
+        if (oConvertUtils.isNotEmpty(ainoteNote.getNoteTitle())) {
+            queryWrapper.like("n.note_title", ainoteNote.getNoteTitle());
+        }
+        if (ainoteNote.getNoteStatus() != null) {
+            queryWrapper.eq("n.note_status", ainoteNote.getNoteStatus());
+        }
+        if (ainoteNote.getIsPublic() != null) {
+            queryWrapper.eq("n.is_public", ainoteNote.getIsPublic());
+        }
+
+        queryWrapper.orderByDesc("n.create_time");
+
+        Page<AinoteNoteListVO> page = new Page<>(pageNo, pageSize);
+        IPage<AinoteNoteListVO> pageList = ((AinoteNoteMapper) ainoteNoteService.getBaseMapper()).queryNoteListPage(page, queryWrapper);
         return Result.OK(pageList);
     }
 
     @Operation(summary = "通过id查询")
     @GetMapping(value = "/queryById")
-    public Result<AinoteNote> queryById(@RequestParam(name = "id") String id) {
+    public Result<AinoteNoteDetailVO> queryById(@RequestParam(name = "id") String id) {
+        // 先检查权限
         AinoteNote note = ainoteNoteService.getByIdWithPermission(id);
         if (note == null) {
             return Result.error("未找到对应数据或无权限访问");
         }
-        return Result.OK(note);
+        // 返回详情 VO（包含关联表字段）
+        AinoteNoteDetailVO detailVO = ((AinoteNoteMapper) ainoteNoteService.getBaseMapper()).queryNoteDetailById(id);
+        return Result.OK(detailVO);
     }
 
     @Operation(summary = "添加笔记")

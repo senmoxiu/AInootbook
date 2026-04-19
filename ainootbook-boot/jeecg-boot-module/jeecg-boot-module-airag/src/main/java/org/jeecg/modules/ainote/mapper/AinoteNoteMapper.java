@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.jeecg.modules.ainote.entity.AinoteNote;
+import org.jeecg.modules.ainote.vo.AinoteNoteDetailVO;
+import org.jeecg.modules.ainote.vo.AinoteNoteListVO;
 import org.jeecg.modules.ainote.vo.AinoteNoteShareDetailVO;
 import org.jeecg.modules.ainote.vo.AinoteTeacherNoteVO;
 import org.jeecg.modules.ainote.vo.SemanticSearchResultDTO;
@@ -137,4 +139,14 @@ public interface AinoteNoteMapper extends BaseMapper<AinoteNote> {
                                                     @Param("tenantId") Integer tenantId,
                                                     @Param("courseId") String courseId,
                                                     @Param("studentName") String studentName);
+
+    /**
+     * 通过ID查询笔记详情（包含关联表字段）
+     */
+    AinoteNoteDetailVO queryNoteDetailById(@Param("id") String id);
+
+    /**
+     * 分页查询笔记列表（包含关联表字段）
+     */
+    IPage<AinoteNoteListVO> queryNoteListPage(Page<?> page, @Param("ew") com.baomidou.mybatisplus.core.conditions.Wrapper<AinoteNote> queryWrapper);
 }

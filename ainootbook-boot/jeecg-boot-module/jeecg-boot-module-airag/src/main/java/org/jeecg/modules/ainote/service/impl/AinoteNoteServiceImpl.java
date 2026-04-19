@@ -16,6 +16,8 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.common.util.TokenUtils;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
+import org.jeecg.modules.airag.teaching.service.IAinoteCourseSelectionService;
 import org.jeecg.modules.ainote.dto.AinoteNoteCreateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteRegenerateDTO;
 import org.jeecg.modules.ainote.dto.AinoteNoteShareCreateDTO;
@@ -98,6 +100,9 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
     private MarkdownPrecompileService markdownPrecompileService;
 
     @Autowired
+    private IAinoteCourseSelectionService ainoteCourseSelectionService;
+
+    @Autowired
     private PlatformTransactionManager transactionManager;
 
     private final SecureRandom secureRandom = new SecureRandom();
@@ -173,7 +178,25 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
         note.setStudentId(user.getId());
         note.setCourseId(dto.getCourseId());
         note.setChapterId(dto.getChapterId());
-        note.setTeachingId(dto.getTeachingId());
+
+        // 自动回填 teachingId：优先使用前端传入值，否则从选课记录反查
+        String teachingId = dto.getTeachingId();
+        if (oConvertUtils.isEmpty(teachingId) && oConvertUtils.isNotEmpty(dto.getCourseId())) {
+            QueryWrapper<AinoteCourseSelection> selWrapper = new QueryWrapper<>();
+            selWrapper.eq("student_id", user.getId())
+                    .eq("course_id", dto.getCourseId())
+                    .eq("status", 1);
+            Integer tenantIdForSel = getCurrentTenantId();
+            if (tenantIdForSel != null) {
+                selWrapper.eq("tenant_id", tenantIdForSel);
+            }
+            selWrapper.last("LIMIT 1");
+            AinoteCourseSelection selection = ainoteCourseSelectionService.getOne(selWrapper, false);
+            if (selection != null) {
+                teachingId = selection.getTeachingId();
+            }
+        }
+        note.setTeachingId(teachingId);
         note.setNoteTitle(dto.getNoteTitle());
         note.setNoteContent(dto.getNoteContent());
         note.setAiSummary(dto.getAiSummary());

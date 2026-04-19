@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.ainote.mapper.AinoteStatisticsMapper">
+
+    <!-- 按章节分组统计笔记数量 -->
+    <select id="selectChapterStats" resultType="org.jeecg.modules.ainote.vo.AinoteChapterStatVO">
+        SELECT
+            ch.id            AS chapterId,
+            ch.chapter_name  AS chapterName,
+            ch.chapter_order AS chapterOrder,
+            COUNT(n.id)      AS uploadCount,
+            SUM(CASE WHEN n.note_status = 2 THEN 1 ELSE 0 END) AS completedCount,
+            SUM(CASE WHEN n.note_status = 1 THEN 1 ELSE 0 END) AS pendingCount,
+            SUM(CASE WHEN n.note_status = 4 THEN 1 ELSE 0 END) AS failedCount
+        FROM ainote_chapter ch
+        LEFT JOIN ainote_note n ON n.chapter_id = ch.id
+            AND n.tenant_id = #{tenantId}
+            AND n.note_status != 3
+        WHERE ch.course_id = #{courseId}
+        <if test="chapterId != null and chapterId != ''">
+            AND ch.id = #{chapterId}
+        </if>
+        GROUP BY ch.id, ch.chapter_name, ch.chapter_order
+        ORDER BY ch.chapter_order
+    </select>
+
+    <!-- 统计课程笔记总数 -->
+    <select id="countNotes" resultType="int">
+        SELECT COUNT(*) FROM ainote_note
+        WHERE course_id = #{courseId} AND tenant_id = #{tenantId} AND note_status != 3
+    </select>
+
+    <!-- 统计AI处理完成笔记数 -->
+    <select id="countCompletedNotes" resultType="int">
+        SELECT COUNT(*) FROM ainote_note
+        WHERE course_id = #{courseId} AND tenant_id = #{tenantId} AND note_status = 2
+    </select>
+
+    <!-- 统计素材总数 -->
+    <select id="countMaterials" resultType="int">
+        SELECT COUNT(*) FROM ainote_material m
+        JOIN ainote_note n ON n.id = m.note_id
+        WHERE n.course_id = #{courseId} AND n.tenant_id = #{tenantId}
+          AND n.note_status != 3 AND m.del_flag = 0
+    </select>
+
+    <!-- 统计参与学生数 -->
+    <select id="countStudents" resultType="int">
+        SELECT COUNT(DISTINCT student_id) FROM ainote_note
+        WHERE course_id = #{courseId} AND tenant_id = #{tenantId} AND note_status != 3
+    </select>
+
+    <!-- 按素材类型分组统计 -->
+    <select id="selectMaterialTypeStats" resultType="org.jeecg.modules.ainote.vo.AinoteCourseStatVO$MaterialTypeStatVO">
+        SELECT m.file_type AS materialType, COUNT(*) AS count
+        FROM ainote_material m
+        JOIN ainote_note n ON n.id = m.note_id
+        WHERE n.course_id = #{courseId} AND n.tenant_id = #{tenantId}
+          AND n.note_status != 3 AND m.del_flag = 0
+        GROUP BY m.file_type
+    </select>
+
+    <!-- 查询课程下所有笔记的关键词原始字段 -->
+    <select id="selectAllKeywords" resultType="java.lang.String">
+        SELECT keywords FROM ainote_note
+        WHERE course_id = #{courseId} AND tenant_id = #{tenantId}
+          AND note_status != 3 AND keywords IS NOT NULL AND keywords != ''
+    </select>
+
+</mapper>

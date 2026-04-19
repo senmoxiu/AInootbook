@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.airag.teaching.dto.AinoteCourseSelectionAddDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
+import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
 
 import java.util.List;
@@ -47,4 +48,11 @@ public interface IAinoteCourseSelectionService extends IService<AinoteCourseSele
     IPage<AinoteCourseSelectionVO> querySelectionVoPage(
             Page<AinoteCourseSelectionVO> page,
             QueryWrapper<AinoteCourseSelection> wrapper);
+
+    /**
+     * 分页查询当前学生可选教学任务
+     */
+    IPage<AvailableTeachingVO> queryAvailableTeachings(
+            Page<AvailableTeachingVO> page,
+            String courseName);
 }

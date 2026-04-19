@@ -23,13 +23,83 @@
         LEFT JOIN ainote_course c ON c.id = n.course_id
         WHERE t.teacher_id = #{teacherId}
           AND n.tenant_id = #{tenantId}
-          AND n.note_status <> 3
+          AND n.note_status != 3
         <if test="courseId != null and courseId != ''">
           AND n.course_id = #{courseId}
         </if>
         <if test="studentName != null and studentName != ''">
           AND su.realname LIKE CONCAT('%', #{studentName}, '%')
         </if>
+    </select>
+
+    <select id="queryNoteDetailById" resultType="org.jeecg.modules.ainote.vo.AinoteNoteDetailVO">
+        SELECT
+            n.id,
+            n.student_id AS studentId,
+            n.course_id AS courseId,
+            c.course_name AS courseName,
+            n.chapter_id AS chapterId,
+            ch.chapter_name AS chapterName,
+            n.teaching_id AS teachingId,
+            n.note_title AS noteTitle,
+            n.note_content AS noteContent,
+            n.rendered_content AS renderedContent,
+            n.ai_summary AS aiSummary,
+            n.keywords,
+            n.current_version AS currentVersion,
+            n.note_status AS noteStatus,
+            CASE n.note_status
+                WHEN 1 THEN '草稿'
+                WHEN 2 THEN '已完成'
+                WHEN 3 THEN '已删除'
+                ELSE '未知'
+            END AS noteStatusText,
+            n.is_public AS isPublic,
+            n.view_count AS viewCount,
+            n.like_count AS likeCount,
+            n.create_by AS createBy,
+            u.realname AS createByName,
+            n.create_time AS createTime,
+            n.update_by AS updateBy,
+            n.update_time AS updateTime,
+            n.sys_org_code AS sysOrgCode,
+            n.tenant_id AS tenantId
+        FROM ainote_note n
+        LEFT JOIN sys_user u ON u.id = n.student_id
+        LEFT JOIN ainote_course c ON c.id = n.course_id
+        LEFT JOIN ainote_chapter ch ON ch.id = n.chapter_id
+        WHERE n.id = #{id}
+    </select>
+
+    <select id="queryNoteListPage" resultType="org.jeecg.modules.ainote.vo.AinoteNoteListVO">
+        SELECT
+            n.id,
+            n.student_id AS studentId,
+            n.course_id AS courseId,
+            c.course_name AS courseName,
+            n.chapter_id AS chapterId,
+            n.note_title AS noteTitle,
+            n.ai_summary AS aiSummary,
+            n.keywords,
+            n.current_version AS currentVersion,
+            n.note_status AS noteStatus,
+            CASE n.note_status
+                WHEN 1 THEN '草稿'
+                WHEN 2 THEN '已完成'
+                WHEN 3 THEN '已删除'
+                ELSE '未知'
+            END AS noteStatusText,
+            n.is_public AS isPublic,
+            n.view_count AS viewCount,
+            n.like_count AS likeCount,
+            n.create_by AS createBy,
+            u.realname AS createByName,
+            n.create_time AS createTime,
+            n.update_time AS updateTime
+        FROM ainote_note n
+        LEFT JOIN sys_user u ON u.id = n.student_id
+        LEFT JOIN ainote_course c ON c.id = n.course_id
+        ${ew.customSqlSegment}
     </select>
 
 </mapper>
