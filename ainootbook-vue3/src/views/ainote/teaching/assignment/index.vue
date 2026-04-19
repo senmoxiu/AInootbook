@@ -28,25 +28,23 @@
             <a-button type="primary" @click="handleBatchConfig" preIcon="ant-design:setting-outlined">批量配置</a-button>
             <a-button type="primary" @click="batchHandleDelete" preIcon="ant-design:delete-outlined">批量删除</a-button>
           </template>
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'action'">
-              <TableAction
-                :actions="[
-                  {
-                    label: '编辑',
-                    onClick: handleEdit.bind(null, record),
+          <template #action="{ record }">
+            <TableAction
+              :actions="[
+                {
+                  label: '编辑',
+                  onClick: handleEdit.bind(null, record),
+                },
+                {
+                  label: '删除',
+                  color: 'error',
+                  popConfirm: {
+                    title: '是否确认删除',
+                    confirm: handleDelete.bind(null, record),
                   },
-                  {
-                    label: '删除',
-                    color: 'error',
-                    popConfirm: {
-                      title: '是否确认删除',
-                      confirm: handleDelete.bind(null, record),
-                    },
-                  },
-                ]"
-              />
-            </template>
+                },
+              ]"
+            />
           </template>
         </BasicTable>
       </a-card>

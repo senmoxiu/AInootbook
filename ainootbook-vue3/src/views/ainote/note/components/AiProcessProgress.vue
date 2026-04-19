@@ -62,6 +62,7 @@
         progress.value = res.progress ?? 0;
         if (res.status === 'completed') {
           status.value = 'completed';
+          emit('completed');
           return;
         } else if (res.status === 'failed') {
           status.value = 'failed';
@@ -73,7 +74,6 @@
         errorMsg.value = (error as Error).message || '获取进度失败';
         return;
       }
-      // IN-02: 上一个请求完成后再调度下一次，防止堆积
       timer = setTimeout(poll, 2000);
     }
     timer = setTimeout(poll, 2000);

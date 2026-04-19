@@ -93,7 +93,7 @@ export const formSchema: FormSchema[] = [
   {
     label: '课程',
     field: 'courseId',
-    component: 'JSelectMultiple',
+    component: 'JDictSelectTag',
     required: true,
     componentProps: {
       placeholder: '请选择课程',
@@ -103,7 +103,7 @@ export const formSchema: FormSchema[] = [
   {
     label: '教师',
     field: 'teacherId',
-    component: 'JSelectMultiple',
+    component: 'JDictSelectTag',
     required: true,
     componentProps: {
       placeholder: '请选择教师',
@@ -169,7 +169,7 @@ export const batchConfigFormSchema: FormSchema[] = [
   {
     label: '课程',
     field: 'courseId',
-    component: 'JSelectMultiple',
+    component: 'JDictSelectTag',
     required: true,
     componentProps: {
       placeholder: '请选择课程',

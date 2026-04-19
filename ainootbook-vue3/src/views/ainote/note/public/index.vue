@@ -23,7 +23,7 @@
                     <a-tag v-for="(kw, idx) in splitKeywords(note.keywords)" :key="`${note.id}-kw-${idx}`" color="blue">{{ kw }}</a-tag>
                   </div>
                   <div class="public-notes__meta">
-                    <span>{{ note.createBy || '未知作者' }}</span>
+                    <span>{{ note.createBy_dictText || note.createBy || '未知作者' }}</span>
                     <span>{{ note.createTime }}</span>
                   </div>
                 </div>
@@ -93,12 +93,16 @@
 
   function truncate(text: string | undefined, max: number): string {
     if (!text) return '';
-    return text.length > max ? text.slice(0, max) + '...' : text;
+    // 清除 Markdown 加粗符号
+    const cleaned = String(text).replace(/\*\*/g, '');
+    return cleaned.length > max ? cleaned.slice(0, max) + '...' : cleaned;
   }
 
   function splitKeywords(keywords: string | undefined): string[] {
     if (!keywords) return [];
-    return keywords
+    // 清除 JSON 数组符号和引号
+    const cleaned = String(keywords).replace(/[\[\]"']/g, '');
+    return cleaned
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);

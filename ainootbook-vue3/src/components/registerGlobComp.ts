@@ -57,7 +57,8 @@ import {
   Skeleton,
   Cascader,
   Rate,
-  Progress
+  Progress,
+  Segmented
 } from 'ant-design-vue';
 const compList = [AntButton.Group, Icon, AIcon, JUploadButton];
 
@@ -124,6 +125,7 @@ export function registerGlobComp(app: App) {
     .use(Skeleton)
     .use(Cascader)
     .use(Rate)
-    .use(Progress);
+    .use(Progress)
+    .use(Segmented);
     console.log("---初始化---， 全局注册Antd、仪表盘、流程设计器、online、流程等组件--------------")
 }

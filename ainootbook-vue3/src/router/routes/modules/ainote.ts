@@ -36,6 +36,15 @@ const ainote: AppRouteModule = {
         currentActiveMenu: '/ainote/note',
       },
     },
+    {
+      path: 'statistics',
+      name: 'AinoteStatistics',
+      component: () => import('/@/views/ainote/statistics/index.vue'),
+      meta: {
+        title: '笔记统计分析',
+        hideMenu: false,
+      },
+    },
   ],
 };
 

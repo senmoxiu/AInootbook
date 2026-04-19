@@ -11,6 +11,7 @@ enum Api {
   deleteBatch = '/teaching/selection/deleteBatch',
   queryById = '/teaching/selection/queryById',
   dropCourse = '/teaching/selection/dropCourse',
+  available = '/teaching/selection/available',
 }
 
 /** 分页查询选课列表 */
@@ -56,3 +57,6 @@ export const batchDeleteSelection = (params: { ids: string }, handleSuccess: () 
 
 /** 学生退课 */
 export const dropCourse = (params: { id: string }) => defHttp.post({ url: Api.dropCourse, params }, { joinParamsToUrl: true });
+
+/** 查询当前学期可选课程（排除已选） */
+export const getAvailableTeachings = (params: Record<string, unknown>) => defHttp.get({ url: Api.available, params });

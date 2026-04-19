@@ -14,18 +14,17 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '笔记状态',
-    dataIndex: 'noteStatus',
+    dataIndex: 'noteStatusText',
     width: 100,
-    customRender: ({ text }) => {
-      return render.renderDict(text, 'ainote_note_status');
-    },
   },
   {
     title: '是否公开',
     dataIndex: 'isPublic',
     width: 80,
     customRender: ({ text }) => {
-      return render.renderDict(text, 'yn');
+      if (text === 1 || text === '1') return '是';
+      if (text === 0 || text === '0') return '否';
+      return '-';
     },
   },
   {
@@ -33,17 +32,27 @@ export const columns: BasicColumn[] = [
     dataIndex: 'aiSummary',
     width: 300,
     ellipsis: true,
+    customRender: ({ text }) => {
+      if (!text) return '-';
+      // 清除 Markdown 加粗符号
+      return String(text).replace(/\*\*/g, '');
+    },
   },
   {
     title: '关键词',
     dataIndex: 'keywords',
     width: 200,
+    customRender: ({ text }) => {
+      if (!text) return '-';
+      // 清除 JSON 数组符号和引号
+      return String(text).replace(/[\[\]"']/g, '');
+    },
   },
   {
     title: '创建人',
-    dataIndex: 'createBy',
+    dataIndex: 'createByName',
     width: 120,
-    customRender: ({ record }) => (record as any).createBy_dictText || (record as any).createBy,
+    customRender: ({ record }) => (record as any).createByName || (record as any).createBy,
   },
   {
     title: '创建时间',
@@ -89,13 +98,6 @@ export const teacherColumns: BasicColumn[] = [
     title: '更新时间',
     dataIndex: 'updateTime',
     width: 150,
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: 100,
-    fixed: 'right',
-    flag: 'ACTION',
   },
 ];
 
@@ -187,11 +189,11 @@ export const createFormSchema: FormSchema[] = [
     label: '是否公开',
     field: 'isPublic',
     component: 'RadioButtonGroup',
-    defaultValue: '0',
+    defaultValue: 0,
     componentProps: {
       options: [
-        { label: '公开', value: '1' },
-        { label: '私密', value: '0' },
+        { label: '公开', value: 1 },
+        { label: '私密', value: 0 },
       ],
     },
   },
@@ -218,33 +220,31 @@ export const editFormSchema: FormSchema[] = [
     },
   },
   {
-    label: '笔记状态',
-    field: 'noteStatus',
+    label: '课程',
+    field: 'courseId',
     component: 'JDictSelectTag',
-    required: true,
     componentProps: {
-      dictCode: 'ainote_note_status',
-      placeholder: '请选择笔记状态',
+      dictCode: 'ainote_course,course_name,id',
+      placeholder: '所属课程',
+      disabled: true,
     },
+  },
+  {
+    label: '章节',
+    field: 'chapterId',
+    component: 'Input',
+    slot: 'chapterSelect',
   },
   {
     label: '是否公开',
     field: 'isPublic',
     component: 'RadioButtonGroup',
-    defaultValue: '0',
+    defaultValue: 0,
     componentProps: {
       options: [
-        { label: '公开', value: '1' },
-        { label: '私密', value: '0' },
+        { label: '公开', value: 1 },
+        { label: '私密', value: 0 },
       ],
-    },
-  },
-  {
-    label: '笔记内容',
-    field: 'noteContent',
-    component: 'JMarkdownEditor',
-    componentProps: {
-      placeholder: '请输入笔记内容（支持 Markdown）',
     },
   },
 ];

@@ -13,13 +13,18 @@ enum Api {
   exportXls = '/ainote/note/exportXls',
   importExcel = '/ainote/note/importExcel',
   share = '/ainote/note/share',
+  shareDetail = '/ainote/note/share',
   publicList = '/ainote/note/public',
   triggerGeneration = '/ainote/note/triggerGeneration',
   cancelGeneration = '/ainote/note/cancelGeneration',
+  regenerate = '/ainote/note/regenerate',
   progress = '/ainote/note/progress',
   search = '/ainote/note/search',
   semanticSearch = '/ainote/note/semanticSearch',
   teacherList = '/ainote/note/teacherList',
+  versions = '/ainote/note/versions',
+  versionDetail = '/ainote/note/version',
+  rollback = '/ainote/note/rollback',
 }
 
 /** 笔记记录 */
@@ -71,6 +76,35 @@ export interface NoteProgressResult {
   progress: number;
   status: 'idle' | 'processing' | 'completed' | 'failed';
   errorMsg?: string;
+}
+
+/** 笔记版本记录 */
+export interface NoteVersionRecord {
+  id?: string;
+  noteId?: string;
+  version: number;
+  noteTitle?: string;
+  noteContent?: string;
+  aiSummary?: string;
+  summary?: string;       // 后端 VO 字段名
+  keywords?: string;
+  createTime?: string;
+  createdAt?: string;     // 后端 VO 字段名
+  createBy?: string;
+  createdBy?: string;     // 后端 VO 字段名
+}
+
+/** AI 重新生成参数 */
+export interface RegenerateParams {
+  noteId: string;
+  baseVersion?: number;
+  additionalContent?: string;
+}
+
+/** AI 重新生成结果 */
+export interface RegenerateResult {
+  version: number;
+  noteContent: string;
 }
 
 /**
@@ -212,3 +246,46 @@ export const searchNotes = (params: { knowledgeId: string; q: string; topN?: num
 export const semanticSearchNotes = (params: SemanticSearchParams) => {
   return defHttp.get<SemanticSearchResultDTO[]>({ url: Api.semanticSearch, params });
 };
+
+/**
+ * 获取笔记版本列表
+ */
+export const getNoteVersions = (params: { noteId: string; pageNo?: number; pageSize?: number }) => {
+  return defHttp.get<{ records: NoteVersionRecord[]; total: number }>({ url: Api.versions, params });
+};
+
+/**
+ * 获取笔记版本详情
+ */
+export const getNoteVersionDetail = (versionId: string) => {
+  return defHttp.get<NoteVersionRecord>({ url: `${Api.versionDetail}/${versionId}` });
+};
+
+/**
+ * 回滚笔记到指定版本
+ */
+export const rollbackNote = (data: { noteId: string; targetVersion: number }) => {
+  return defHttp.post<void>({ url: Api.rollback, data });
+};
+
+/**
+ * AI 重新生成笔记
+ */
+export const regenerateNote = (data: RegenerateParams) => {
+  return defHttp.post<RegenerateResult>({ url: Api.regenerate, data });
+};
+
+/**
+ * 触发 AI 重新生成（异步任务）
+ */
+export const triggerRegeneration = (params: { noteId: string; knowledgeId: string }) => {
+  return defHttp.post<void>({ url: Api.regenerate, params });
+};
+
+//TODO：后续实现
+// /**
+//  * 获取分享详情
+//  */
+// export const getShareDetail = (shareCode: string) => {
+//   return defHttp.get<NoteRecord>({ url: `${Api.shareDetail}/${shareCode}` });
+// };

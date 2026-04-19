@@ -20,7 +20,7 @@
 <script lang="ts" setup>
   import { reactive, watch, onMounted } from 'vue';
   import { TreeSelect } from 'ant-design-vue';
-  import { queryDepartTreeSync } from '/@/api/common/api';
+  import { queryTreeList } from '/@/api/common/api';
 
   const SHOW_PARENT = TreeSelect.SHOW_PARENT;
 
@@ -55,7 +55,7 @@
   // 加载部门树数据
   async function loadTreeData() {
     try {
-      const result = await queryDepartTreeSync();
+      const result = await queryTreeList();
       if (result && Array.isArray(result)) {
         // 如果指定了 orgCategories，按条件过滤；否则展示所有节点
         state.treeData = props.orgCategories?.length ? filterAndTransformTree(result) : transformTree(result);

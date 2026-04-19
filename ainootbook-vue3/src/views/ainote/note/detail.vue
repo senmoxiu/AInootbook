@@ -4,18 +4,26 @@
     <a-card title="基本信息" :bordered="false" class="!mb-4">
       <a-descriptions :column="2" bordered>
         <a-descriptions-item label="笔记标题">{{ noteData.noteTitle }}</a-descriptions-item>
-        <a-descriptions-item label="笔记状态">{{ noteData.noteStatus }}</a-descriptions-item>
+        <a-descriptions-item label="笔记状态">{{ noteData.noteStatusText || noteData.noteStatus }}</a-descriptions-item>
         <a-descriptions-item label="是否公开">{{ noteData.isPublic == '1' ? '公开' : '私密' }}</a-descriptions-item>
-        <a-descriptions-item label="创建人">{{ noteData.createBy }}</a-descriptions-item>
+        <a-descriptions-item label="创建人">{{ noteData.createByName || noteData.createBy }}</a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ noteData.createTime }}</a-descriptions-item>
+        <a-descriptions-item label="课程">{{ noteData.courseName || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="章节">{{ noteData.chapterName || '-' }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
 
     <!-- AI 摘要与关键词 -->
     <a-card title="AI摘要与关键词" :bordered="false" class="!mb-4">
-      <div v-if="noteData.aiSummary" class="mb-2">{{ noteData.aiSummary }}</div>
+      <template #extra v-if="isOwner">
+        <a-space>
+          <a-button @click="handleOpenVersionHistory">版本历史</a-button>
+          <a-button type="primary" @click="handleOpenRegenerate">AI 重新生成</a-button>
+        </a-space>
+      </template>
+      <div v-if="noteData.aiSummary" class="mb-2">{{ cleanSummary }}</div>
       <div v-if="noteData.keywords">
-        <a-tag v-for="kw in keywordList" :key="kw" color="blue">{{ kw }}</a-tag>
+        <a-tag v-for="kw in cleanKeywords" :key="kw" color="blue">{{ kw }}</a-tag>
       </div>
       <a-empty v-if="!noteData.aiSummary && !noteData.keywords" description="暂无AI摘要" />
     </a-card>
@@ -23,8 +31,8 @@
     <!-- 笔记内容 -->
     <a-card title="笔记内容" :bordered="false" class="!mb-4">
       <template #extra>
-        <a-button v-if="mode === 'preview'" type="primary" @click="handleEdit">编辑</a-button>
-        <a-space v-else>
+        <a-button v-if="mode === 'preview' && isOwner" type="primary" @click="handleEdit">编辑</a-button>
+        <a-space v-else-if="mode === 'edit'">
           <a-button @click="handleCancel" :disabled="saving">取消</a-button>
           <a-button type="primary" @click="handleSave" :loading="saving">保存</a-button>
         </a-space>
@@ -34,8 +42,8 @@
       <a-empty v-else description="暂无内容" />
     </a-card>
 
-    <!-- 素材列表 -->
-    <a-card title="素材列表" :bordered="false" class="!mb-4">
+    <!-- 素材列表（仅创建者可见）-->
+    <a-card v-if="isOwner" title="素材列表" :bordered="false" class="!mb-4">
       <template #extra>
         <a-upload
           :customRequest="handleUpload"
@@ -71,13 +79,13 @@
       </a-table>
     </a-card>
 
-    <!-- AI 生成 -->
-    <a-card title="AI生成" :bordered="false" class="!mb-4">
+    <!-- AI 生成（仅创建者可见）-->
+    <a-card v-if="isOwner" title="AI生成" :bordered="false" class="!mb-4">
       <AiProcessProgress :noteId="noteId" knowledgeId="" @completed="loadNoteData" />
     </a-card>
 
-    <!-- 分享 -->
-    <a-card title="分享" :bordered="false" class="!mb-4">
+    <!-- 分享（仅创建者可见）-->
+    <!-- <a-card v-if="isOwner" title="分享" :bordered="false" class="!mb-4">
       <a-button type="primary" @click="handleShare" :loading="shareLoading">创建分享</a-button>
       <div v-if="shareResult.shareCode" class="mt-3">
         <a-alert type="success" show-icon>
@@ -86,12 +94,18 @@
           </template>
         </a-alert>
       </div>
-    </a-card>
+    </a-card> -->
 
     <!-- 图片预览 -->
     <a-modal v-model:open="previewVisible" title="图片预览" :footer="null" :width="800">
       <img :src="previewUrl" style="width: 100%" alt="素材预览" />
     </a-modal>
+
+    <!-- 版本历史抽屉 -->
+    <NoteVersionDrawer @register="registerVersionDrawer" @success="loadNoteData" />
+
+    <!-- AI 重新生成弹窗 -->
+    <NoteRegenerateModal @register="registerRegenerateModal" @success="loadNoteData" />
   </PageWrapper>
 </template>
 
@@ -99,17 +113,26 @@
   import { ref, computed, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import { useUserStore } from '/@/store/modules/user';
   import { PageWrapper } from '/@/components/Page';
   import { getNoteById, shareNote, editNote } from '/@/api/ainote/note.api';
   import { getMaterialList, uploadMaterial, getPresignedUrl, deleteMaterial } from '/@/api/ainote/material.api';
   import AiProcessProgress from './components/AiProcessProgress.vue';
   import { MarkdownViewer } from '/@/components/Markdown';
+  import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
   import { SoundOutlined, PictureOutlined, VideoCameraOutlined, FileTextOutlined } from '@ant-design/icons-vue';
   import xss from 'xss';
+  import NoteVersionDrawer from './NoteVersionDrawer.vue';
+  import NoteRegenerateModal from './NoteRegenerateModal.vue';
+  import { useDrawer } from '/@/components/Drawer';
+  import { useModal } from '/@/components/Modal';
+
+  const JMarkdownEditor = createAsyncComponent(() => import('/@/components/Form/src/jeecg/components/JMarkdownEditor.vue'));
 
   const route = useRoute();
   const router = useRouter();
   const { createMessage } = useMessage();
+  const userStore = useUserStore();
 
   const noteId = ref<string>((route.params.id as string) || '');
   const noteData = ref<Record<string, string | number>>({});
@@ -124,12 +147,20 @@
   const draftNoteContent = ref('');
   const saving = ref(false);
 
-  const keywordList = computed(() => {
+  const [registerVersionDrawer, { openDrawer: openVersionDrawer }] = useDrawer();
+  const [registerRegenerateModal, { openModal: openRegenerateModal }] = useModal();
+
+  const cleanSummary = computed(() => {
+    if (!noteData.value.aiSummary) return '';
+    return String(noteData.value.aiSummary).replace(/\*\*/g, '').trim();
+  });
+
+  const cleanKeywords = computed(() => {
     const kw = noteData.value.keywords;
     if (!kw || typeof kw !== 'string') return [];
     return kw
       .split(',')
-      .map((s: string) => s.trim())
+      .map((s: string) => s.replace(/["'\[\]]/g, '').trim())
       .filter(Boolean);
   });
 
@@ -288,7 +319,11 @@
   async function handleSave() {
     try {
       saving.value = true;
-      await editNote({ id: noteId.value, noteContent: draftNoteContent.value });
+      await editNote({
+        id: noteId.value,
+        noteContent: draftNoteContent.value,
+        baseVersion: noteData.value.currentVersion
+      });
       createMessage.success('保存成功');
       await loadNoteData();
       mode.value = 'preview';
@@ -297,6 +332,22 @@
     } finally {
       saving.value = false;
     }
+  }
+
+  const isOwner = computed(() => {
+    const currentUserId = userStore.getUserInfo?.id;
+    return noteData.value.studentId === currentUserId;
+  });
+
+  function handleOpenVersionHistory() {
+    openVersionDrawer(true, {
+      noteId: noteId.value,
+      currentContent: String(noteData.value.noteContent || ''),
+    });
+  }
+
+  function handleOpenRegenerate() {
+    openRegenerateModal(true, { noteId: noteId.value });
   }
 
   onMounted(() => {

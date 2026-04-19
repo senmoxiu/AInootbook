@@ -1,5 +1,15 @@
 import { BasicColumn, FormSchema } from '/@/components/Table';
 import { render } from '/@/utils/common/renderUtils';
+import { getTeachingList } from '/@/api/ainote/teaching.api';
+
+/** 可选课程列（学生选课用） */
+export const availableColumns: BasicColumn[] = [
+  { title: '课程名称', dataIndex: 'courseName', width: 180 },
+  { title: '课程代码', dataIndex: 'courseCode', width: 120 },
+  { title: '教师', dataIndex: 'teacherName', width: 100 },
+  { title: '组织', dataIndex: 'departName', width: 140 },
+  { title: '学期', dataIndex: 'semester', width: 120 },
+];
 
 /** 学生视图列：仅展示与自身选课相关的字段 */
 export const studentColumns: BasicColumn[] = [
@@ -71,32 +81,42 @@ export const teacherSearchSchema: FormSchema[] = [
   },
 ];
 
-/** 选课表单 Schema（教师/管理员新增或编辑选课使用） */
+/** 选课表单 Schema（管理员新增或编辑选课使用） */
 export const formSchema: FormSchema[] = [
   { label: 'ID', field: 'id', component: 'Input', show: false },
   {
     label: '教学任务',
     field: 'teachingId',
-    component: 'Input',
+    component: 'ApiSelect',
     required: true,
-    componentProps: { placeholder: '请输入教学任务ID' },
+    dynamicDisabled: ({ values }) => !!values.id,
+    componentProps: {
+      api: getTeachingList,
+      params: { pageSize: 200, status: 1 },
+      resultField: 'records',
+      valueField: 'id',
+      labelField: '_label',
+      showSearch: true,
+      filterOption: (input: string, option: { label?: string }) =>
+        (option.label ?? '').toLowerCase().includes(input.toLowerCase()),
+      afterFetch: (list: Recordable[]) =>
+        list.map((item) => ({
+          ...item,
+          _label: `${item.courseName ?? ''} - ${item.teacherName ?? ''} - ${item.semester ?? ''}`,
+        })),
+    },
   },
   {
     label: '学生',
     field: 'studentId',
-    component: 'Input',
-    componentProps: { placeholder: '请输入学生ID（可选，默认当前用户）' },
-  },
-  {
-    label: '班级ID',
-    field: 'classId',
-    component: 'Input',
-    componentProps: { placeholder: '请输入班级ID' },
-  },
-  {
-    label: '组织ID',
-    field: 'departId',
-    component: 'Input',
-    componentProps: { placeholder: '请输入组织ID' },
+    component: 'JSelectUser',
+    required: true,
+    dynamicDisabled: ({ values }) => !!values.id,
+    componentProps: {
+      placeholder: '请选择学生',
+      labelKey: 'realname',
+      rowKey: 'id',
+      maxSelectCount: 1,
+    },
   },
 ];
