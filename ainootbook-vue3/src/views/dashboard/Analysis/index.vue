@@ -60,7 +60,7 @@
 
 <script lang="ts" setup>
   import { ref, onMounted } from 'vue';
-  import { Statistic } from 'ant-design-vue';
+  import { Statistic as AStatistic } from 'ant-design-vue';
   import { Icon } from '/@/components/Icon';
   import Pie from '/@/components/chart/Pie.vue';
   import RankList from '/@/components/chart/RankList.vue';

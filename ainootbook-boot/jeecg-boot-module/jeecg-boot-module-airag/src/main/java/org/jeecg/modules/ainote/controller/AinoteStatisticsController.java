@@ -72,31 +72,29 @@ public class AinoteStatisticsController {
             @RequestParam String courseId,
             @Parameter(description = "返回关键词数量，默认20")
             @RequestParam(defaultValue = "20") Integer topN,
+            @Parameter(description = "学期，格式：2025-1")
+            @RequestParam(required = false) String semester,
             HttpServletRequest request) {
         String tenantId = TokenUtils.getTenantIdByRequest(request);
         if (oConvertUtils.isEmpty(tenantId)) {
             tenantId = "0";
         }
-        return Result.ok(statisticsService.getTopKeywords(courseId, tenantId, topN));
+        return Result.ok(statisticsService.getTopKeywords(courseId, tenantId, topN, semester));
     }
 
-    /**
-     * 查询素材类型分布
-     * 统计指定课程各类型素材（音频/视频/图片/文档）的数量分布。
-     *
-     * @param courseId 课程ID（必填）
-     */
     @GetMapping("/materials")
     @Operation(summary = "素材类型分布统计", description = "统计指定课程各类型素材数量")
     @RequiresRoles(value = {"teacher", "admin"}, logical = org.apache.shiro.authz.annotation.Logical.OR)
     public Result<?> getMaterialTypeStats(
             @Parameter(description = "课程ID", required = true)
             @RequestParam String courseId,
+            @Parameter(description = "学期，格式：2025-1")
+            @RequestParam(required = false) String semester,
             HttpServletRequest request) {
         String tenantId = TokenUtils.getTenantIdByRequest(request);
         if (oConvertUtils.isEmpty(tenantId)) {
             tenantId = "0";
         }
-        return Result.ok(statisticsService.getMaterialTypeStats(courseId, tenantId));
+        return Result.ok(statisticsService.getMaterialTypeStats(courseId, tenantId, semester));
     }
 }

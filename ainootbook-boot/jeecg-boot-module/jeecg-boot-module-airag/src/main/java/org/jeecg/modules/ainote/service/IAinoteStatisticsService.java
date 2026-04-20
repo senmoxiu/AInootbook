@@ -27,22 +27,20 @@ public interface IAinoteStatisticsService {
 
     /**
      * 获取课程高频关键词排行
-     * 对 ainote_note.keywords 字段做词频统计，按频次降序返回 topN 条。
      *
      * @param courseId 课程ID
      * @param tenantId 租户ID
      * @param topN     返回数量（最大50）
-     * @return 关键词频次列表
+     * @param semester 学期筛选（可为null）
      */
-    List<AinoteChapterStatVO.KeywordFreqVO> getTopKeywords(String courseId, String tenantId, int topN);
+    List<AinoteChapterStatVO.KeywordFreqVO> getTopKeywords(String courseId, String tenantId, int topN, String semester);
 
     /**
      * 获取素材类型分布统计
-     * 统计指定课程各类型素材（audio/video/image/document）数量。
      *
      * @param courseId 课程ID
      * @param tenantId 租户ID
-     * @return 素材类型统计列表
+     * @param semester 学期筛选（可为null）
      */
-    List<AinoteCourseStatVO.MaterialTypeStatVO> getMaterialTypeStats(String courseId, String tenantId);
+    List<AinoteCourseStatVO.MaterialTypeStatVO> getMaterialTypeStats(String courseId, String tenantId, String semester);
 }

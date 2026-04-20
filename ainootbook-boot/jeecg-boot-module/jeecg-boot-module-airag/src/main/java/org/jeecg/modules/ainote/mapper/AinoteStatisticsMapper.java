@@ -21,22 +21,28 @@ public interface AinoteStatisticsMapper {
             @Param("chapterId") String chapterId);
 
     /** 统计课程笔记总数 */
-    int countNotes(@Param("courseId") String courseId, @Param("tenantId") String tenantId);
+    int countNotes(@Param("courseId") String courseId, @Param("tenantId") String tenantId,
+                   @Param("semester") String semester);
 
     /** 统计AI处理完成笔记数 */
-    int countCompletedNotes(@Param("courseId") String courseId, @Param("tenantId") String tenantId);
+    int countCompletedNotes(@Param("courseId") String courseId, @Param("tenantId") String tenantId,
+                            @Param("semester") String semester);
 
     /** 统计素材总数 */
-    int countMaterials(@Param("courseId") String courseId, @Param("tenantId") String tenantId);
+    int countMaterials(@Param("courseId") String courseId, @Param("tenantId") String tenantId,
+                       @Param("semester") String semester);
 
     /** 统计参与学生数 */
-    int countStudents(@Param("courseId") String courseId, @Param("tenantId") String tenantId);
+    int countStudents(@Param("courseId") String courseId, @Param("tenantId") String tenantId,
+                      @Param("semester") String semester);
 
     /** 按素材类型分组统计 */
     List<AinoteCourseStatVO.MaterialTypeStatVO> selectMaterialTypeStats(
-            @Param("courseId") String courseId, @Param("tenantId") String tenantId);
+            @Param("courseId") String courseId, @Param("tenantId") String tenantId,
+            @Param("semester") String semester);
 
     /** 查询课程下所有笔记的关键词原始字段 */
     List<String> selectAllKeywords(
-            @Param("courseId") String courseId, @Param("tenantId") String tenantId);
+            @Param("courseId") String courseId, @Param("tenantId") String tenantId,
+            @Param("semester") String semester);
 }

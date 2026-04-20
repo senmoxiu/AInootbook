@@ -39,11 +39,11 @@ public class AinoteStatisticsServiceImpl implements IAinoteStatisticsService {
         AinoteCourseStatVO vo = new AinoteCourseStatVO();
         vo.setCourseId(courseId);
 
-        // 概览指标：四次独立聚合查询
-        vo.setTotalNotes(statisticsMapper.countNotes(courseId, tenantId));
-        vo.setCompletedNotes(statisticsMapper.countCompletedNotes(courseId, tenantId));
-        vo.setTotalMaterials(statisticsMapper.countMaterials(courseId, tenantId));
-        vo.setStudentCount(statisticsMapper.countStudents(courseId, tenantId));
+        // 概览指标：四次独立聚合查询（统一 semester 过滤口径）
+        vo.setTotalNotes(statisticsMapper.countNotes(courseId, tenantId, semester));
+        vo.setCompletedNotes(statisticsMapper.countCompletedNotes(courseId, tenantId, semester));
+        vo.setTotalMaterials(statisticsMapper.countMaterials(courseId, tenantId, semester));
+        vo.setStudentCount(statisticsMapper.countStudents(courseId, tenantId, semester));
 
         // 章节明细：按章节分组统计，计算完成率
         List<AinoteChapterStatVO> chapterStats =
@@ -56,25 +56,25 @@ public class AinoteStatisticsServiceImpl implements IAinoteStatisticsService {
         }
         vo.setChapterStats(chapterStats);
 
-        // 素材类型分布
-        vo.setMaterialTypeStats(statisticsMapper.selectMaterialTypeStats(courseId, tenantId));
+        // 素材类型分布（统一 semester 过滤口径）
+        vo.setMaterialTypeStats(statisticsMapper.selectMaterialTypeStats(courseId, tenantId, semester));
 
-        // 全课程高频关键词 TOP 20
-        vo.setTopKeywords(getTopKeywords(courseId, tenantId, 20));
+        // 全课程高频关键词 TOP 20（统一 semester 过滤口径）
+        vo.setTopKeywords(getTopKeywords(courseId, tenantId, 20, semester));
 
         return vo;
     }
 
     @Override
     public List<AinoteChapterStatVO.KeywordFreqVO> getTopKeywords(String courseId,
-                                                                    String tenantId, int topN) {
+                                                                    String tenantId, int topN, String semester) {
         if (oConvertUtils.isEmpty(courseId)) {
             throw new JeecgBootException("课程ID不能为空");
         }
         int limit = Math.min(Math.max(topN, 1), MAX_TOP_N);
 
         // 从数据库取出所有关键词原始字段，Java 层拆分并累加词频
-        List<String> rawKeywordsList = statisticsMapper.selectAllKeywords(courseId, tenantId);
+        List<String> rawKeywordsList = statisticsMapper.selectAllKeywords(courseId, tenantId, semester);
         Map<String, Integer> freqMap = new HashMap<>();
         for (String raw : rawKeywordsList) {
             if (oConvertUtils.isEmpty(raw)) {
@@ -103,10 +103,10 @@ public class AinoteStatisticsServiceImpl implements IAinoteStatisticsService {
 
     @Override
     public List<AinoteCourseStatVO.MaterialTypeStatVO> getMaterialTypeStats(String courseId,
-                                                                             String tenantId) {
+                                                                             String tenantId, String semester) {
         if (oConvertUtils.isEmpty(courseId)) {
             throw new JeecgBootException("课程ID不能为空");
         }
-        return statisticsMapper.selectMaterialTypeStats(courseId, tenantId);
+        return statisticsMapper.selectMaterialTypeStats(courseId, tenantId, semester);
     }
 }

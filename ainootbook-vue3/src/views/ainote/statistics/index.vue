@@ -143,13 +143,17 @@
 <script lang="ts" setup>
   import { ref, reactive, onMounted, onUnmounted } from 'vue';
   import { PageWrapper } from '/@/components/Page';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { getCourseList } from '/@/api/ainote/course.api';
+  import { getCourseStatistics, getTopKeywords, getMaterialTypeStats } from '/@/api/ainote/statistics.api';
   import {
     FileTextOutlined,
-    CheckCircleOutlined,
     UploadOutlined,
     TeamOutlined,
   } from '@ant-design/icons-vue';
   import * as echarts from 'echarts';
+
+  const { createMessage } = useMessage();
 
   // ─── 筛选表单 ───────────────────────────────────────────────
   const filterForm = reactive({
@@ -158,12 +162,8 @@
     semester: undefined as string | undefined,
   });
 
-  // 静态占位选项（待对接接口后替换）
-  const courseOptions = ref([
-    { label: '人工智能导论', value: 'c001' },
-    { label: '机器学习基础', value: 'c002' },
-    { label: '深度学习实践', value: 'c003' },
-  ]);
+  // 课程选项（从接口加载）
+  const courseOptions = ref<{ label: string; value: string }[]>([]);
   const chapterOptions = ref([
     { label: '第一章 绪论', value: 'ch001' },
     { label: '第二章 监督学习', value: 'ch002' },
@@ -194,12 +194,45 @@
     { title: '状态', dataIndex: 'noteStatus', key: 'noteStatus', align: 'center' as const },
     { title: '高频关键词', dataIndex: 'topKeywords', key: 'topKeywords' },
   ];
-  const tableData = ref([
-    { chapterId: 'ch001', chapterName: '第一章 绪论', uploadCount: 38, completedCount: 36, completionRate: 95, pendingCount: 2, topKeywords: '人工智能, 机器学习, 深度学习' },
-    { chapterId: 'ch002', chapterName: '第二章 监督学习', uploadCount: 35, completedCount: 30, completionRate: 86, pendingCount: 5, topKeywords: '分类, 回归, 决策树' },
-    { chapterId: 'ch003', chapterName: '第三章 神经网络', uploadCount: 32, completedCount: 28, completionRate: 88, pendingCount: 4, topKeywords: '激活函数, 反向传播, 梯度' },
-    { chapterId: 'ch004', chapterName: '第四章 卷积网络', uploadCount: 23, completedCount: 18, completionRate: 78, pendingCount: 5, topKeywords: '卷积, 池化, 特征图' },
-  ]);
+  const tableData = ref<any[]>([]);
+
+  async function loadCourses() {
+    try {
+      const res = await getCourseList({});
+      courseOptions.value = (res?.records || []).map((c: any) => ({
+        label: c.courseName,
+        value: c.id,
+      }));
+    } catch (e) {
+      console.error('加载课程列表失败', e);
+    }
+  }
+
+  async function fetchOverview() {
+    if (!filterForm.courseId) return;
+    const res = await getCourseStatistics({
+      courseId: filterForm.courseId,
+      semester: filterForm.semester,
+      chapterId: filterForm.chapterId,
+    });
+    overview.totalNotes = res.totalNotes || 0;
+    overview.completedNotes = res.completedNotes || 0;
+    overview.totalMaterials = res.totalMaterials || 0;
+    overview.studentCount = res.studentCount || 0;
+    tableData.value = res.chapterStats || [];
+  }
+
+  async function fetchKeywords() {
+    if (!filterForm.courseId) return;
+    const res = await getTopKeywords({ courseId: filterForm.courseId, topN: 20, semester: filterForm.semester });
+    return res || [];
+  }
+
+  async function fetchMaterials() {
+    if (!filterForm.courseId) return;
+    const res = await getMaterialTypeStats({ courseId: filterForm.courseId, semester: filterForm.semester });
+    return res || [];
+  }
 
   // ─── ECharts 实例 ────────────────────────────────────────────
   const uploadBarRef = ref<HTMLDivElement>();
@@ -212,12 +245,6 @@
   let materialPieChart: echarts.ECharts | null = null;
   let keywordBarChart: echarts.ECharts | null = null;
 
-  // 静态占位数据
-  const chapterNames = ['第一章 绪论', '第二章 监督学习', '第三章 神经网络', '第四章 卷积网络'];
-  const uploadCounts = [38, 35, 32, 23];
-  const completedCounts = [36, 30, 28, 18];
-  const completionRates = [95, 86, 88, 78];
-
   function initUploadBar() {
     if (!uploadBarRef.value) return;
     uploadBarChart = echarts.init(uploadBarRef.value);
@@ -225,11 +252,11 @@
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: { data: ['上传数', 'AI完成数'] },
       grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-      xAxis: { type: 'category', data: chapterNames, axisLabel: { interval: 0, rotate: 15 } },
+      xAxis: { type: 'category', data: [], axisLabel: { interval: 0, rotate: 15 } },
       yAxis: { type: 'value', name: '篇数' },
       series: [
-        { name: '上传数', type: 'bar', data: uploadCounts, itemStyle: { color: '#1677ff' }, barMaxWidth: 40 },
-        { name: 'AI完成数', type: 'bar', data: completedCounts, itemStyle: { color: '#52c41a' }, barMaxWidth: 40 },
+        { name: '上传数', type: 'bar', data: [], itemStyle: { color: '#1677ff' }, barMaxWidth: 40 },
+        { name: 'AI完成数', type: 'bar', data: [], itemStyle: { color: '#52c41a' }, barMaxWidth: 40 },
       ],
     });
   }
@@ -240,13 +267,13 @@
     completionLineChart.setOption({
       tooltip: { trigger: 'axis', formatter: '{b}<br/>完成率: {c}%' },
       grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-      xAxis: { type: 'category', data: chapterNames, axisLabel: { interval: 0, rotate: 15 } },
+      xAxis: { type: 'category', data: [], axisLabel: { interval: 0, rotate: 15 } },
       yAxis: { type: 'value', name: '完成率(%)', min: 0, max: 100 },
       series: [
         {
           name: '完成率',
           type: 'line',
-          data: completionRates,
+          data: [],
           smooth: true,
           symbol: 'circle',
           symbolSize: 8,
@@ -274,12 +301,7 @@
           label: { show: false, position: 'center' },
           emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' } },
           labelLine: { show: false },
-          data: [
-            { value: 98, name: '音频(MP3/WAV)', itemStyle: { color: '#1677ff' } },
-            { value: 72, name: '文档(PDF/Word)', itemStyle: { color: '#52c41a' } },
-            { value: 54, name: '图片(JPG/PNG)', itemStyle: { color: '#faad14' } },
-            { value: 32, name: '视频(MP4)', itemStyle: { color: '#ff4d4f' } },
-          ],
+          data: [],
         },
       ],
     });
@@ -288,17 +310,15 @@
   function initKeywordBar() {
     if (!keywordBarRef.value) return;
     keywordBarChart = echarts.init(keywordBarRef.value);
-    const keywords = ['人工智能', '机器学习', '深度学习', '神经网络', '卷积', '激活函数', '反向传播', '梯度下降', '分类', '回归', '决策树', '随机森林', '特征提取', '过拟合', '正则化', '批归一化', '注意力机制', 'Transformer', '迁移学习', '强化学习'];
-    const counts = [89, 76, 68, 62, 55, 51, 48, 45, 42, 39, 36, 33, 30, 28, 25, 23, 21, 19, 17, 15];
     keywordBarChart.setOption({
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       grid: { left: '15%', right: '4%', bottom: '3%', top: '3%', containLabel: true },
       xAxis: { type: 'value', name: '出现次数' },
-      yAxis: { type: 'category', data: keywords.slice().reverse(), axisLabel: { fontSize: 12 } },
+      yAxis: { type: 'category', data: [], axisLabel: { fontSize: 12 } },
       series: [
         {
           type: 'bar',
-          data: counts.slice().reverse(),
+          data: [],
           barMaxWidth: 20,
           itemStyle: {
             color: (params: { dataIndex: number }) => {
@@ -312,9 +332,69 @@
     });
   }
 
-  function onFilterChange() {
-    // TODO: 对接接口后在此处发起请求，当前使用静态数据
-    console.log('筛选条件变更:', filterForm);
+  async function onFilterChange() {
+    if (!filterForm.courseId) return;
+    uploadBarChart?.showLoading();
+    completionLineChart?.showLoading();
+    materialPieChart?.showLoading();
+    keywordBarChart?.showLoading();
+    tableLoading.value = true;
+
+    try {
+      const [overviewRes, keywordRes, materialRes] = await Promise.allSettled([
+        fetchOverview(),
+        fetchKeywords(),
+        fetchMaterials(),
+      ]);
+
+      if (overviewRes.status === 'rejected') {
+        createMessage.error('统计数据加载失败，请重试');
+      }
+
+      if (overviewRes.status === 'fulfilled') {
+        const uploadData = tableData.value.map((ch: any) => ch.uploadCount || 0);
+        const completedData = tableData.value.map((ch: any) => ch.completedCount || 0);
+        const completionData = tableData.value.map((ch: any) => ch.completionRate || 0);
+        const chapterNames = tableData.value.map((ch: any) => ch.chapterName || '');
+
+        uploadBarChart?.setOption({
+          xAxis: { data: chapterNames },
+          series: [
+            { data: uploadData },
+            { data: completedData },
+          ],
+        });
+
+        completionLineChart?.setOption({
+          xAxis: { data: chapterNames },
+          series: [{ data: completionData }],
+        });
+      }
+
+      if (materialRes.status === 'fulfilled') {
+        const data = materialRes.value || [];
+        const pieData = data.map((m: any) => ({ name: m.materialType, value: m.count }));
+        materialPieChart?.setOption({
+          series: [{ data: pieData }],
+        });
+      }
+
+      if (keywordRes.status === 'fulfilled') {
+        const data = keywordRes.value || [];
+        const keywords = data.map((k: any) => k.keyword);
+        const counts = data.map((k: any) => k.frequency);
+        keywordBarChart?.setOption({
+          yAxis: { data: keywords.slice().reverse() },
+          series: [{ data: counts.slice().reverse() }],
+        });
+      }
+    } finally {
+      uploadBarChart?.hideLoading();
+      completionLineChart?.hideLoading();
+      materialPieChart?.hideLoading();
+      keywordBarChart?.hideLoading();
+      tableLoading.value = false;
+    }
   }
 
   function onReset() {
@@ -336,6 +416,13 @@
     initMaterialPie();
     initKeywordBar();
     window.addEventListener('resize', handleResize);
+
+    loadCourses().then(() => {
+      if (courseOptions.value.length > 0) {
+        filterForm.courseId = courseOptions.value[0].value;
+        onFilterChange();
+      }
+    });
   });
 
   onUnmounted(() => {
