@@ -90,6 +90,37 @@ public interface AinoteNoteMapper extends BaseMapper<AinoteNote> {
     int incNoteViewCount(@Param("noteId") String noteId);
 
     /**
+     * 查询用户是否已点赞笔记，返回点赞记录ID（存在则已点赞）
+     */
+    String selectNoteLike(@Param("noteId") String noteId,
+                          @Param("userId") String userId,
+                          @Param("tenantId") Integer tenantId);
+
+    /**
+     * 新增笔记点赞关系
+     */
+    int insertNoteLike(@Param("id") String id,
+                       @Param("noteId") String noteId,
+                       @Param("userId") String userId,
+                       @Param("tenantId") Integer tenantId,
+                       @Param("createBy") String createBy,
+                       @Param("sysOrgCode") String sysOrgCode);
+
+    /**
+     * 删除笔记点赞关系
+     */
+    int deleteNoteLike(@Param("noteId") String noteId,
+                       @Param("userId") String userId,
+                       @Param("tenantId") Integer tenantId);
+
+    /**
+     * 批量查询用户已点赞的笔记ID列表
+     */
+    List<String> selectNoteLikeByNoteIds(@Param("noteIds") List<String> noteIds,
+                                          @Param("userId") String userId,
+                                          @Param("tenantId") Integer tenantId);
+
+    /**
      * 通过笔记ID批量查询语义检索结果基础信息
      */
     @Select({

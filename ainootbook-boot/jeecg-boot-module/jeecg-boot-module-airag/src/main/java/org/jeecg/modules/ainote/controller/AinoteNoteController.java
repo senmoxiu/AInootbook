@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.util.ShiroThreadPoolExecutor;
 import org.jeecg.common.util.TokenUtils;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.config.JeecgBaseConfig;
@@ -79,6 +81,9 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
 
     private final IAinoteAiConfigService ainoteAiConfigService;
 
+    @Resource(name = "viewCountExecutor")
+    private ShiroThreadPoolExecutor viewCountExecutor;
+
     /**
      * 分页列表查询
      */
@@ -128,7 +133,34 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         }
         // 返回详情 VO（包含关联表字段）
         AinoteNoteDetailVO detailVO = ((AinoteNoteMapper) ainoteNoteService.getBaseMapper()).queryNoteDetailById(id);
+        try {
+            viewCountExecutor.execute(() -> {
+                try {
+                    ((AinoteNoteMapper) ainoteNoteService.getBaseMapper()).incNoteViewCount(id);
+                } catch (Exception e) {
+                    log.warn("异步更新笔记浏览量失败: noteId={}", id, e);
+                }
+            });
+        } catch (Exception e) {
+            log.warn("提交笔记浏览量更新任务失败: noteId={}", id, e);
+        }
         return Result.OK(detailVO);
+    }
+
+    @Operation(summary = "点赞笔记")
+    @PostMapping(value = "/like")
+    @RequiresPermissions("ainote:note:like")
+    public Result<String> like(@RequestParam(name = "noteId") String noteId) {
+        ainoteNoteService.likeNote(noteId);
+        return Result.OK("点赞成功！");
+    }
+
+    @Operation(summary = "取消点赞")
+    @PostMapping(value = "/unlike")
+    @RequiresPermissions("ainote:note:like")
+    public Result<String> unlike(@RequestParam(name = "noteId") String noteId) {
+        ainoteNoteService.unlikeNote(noteId);
+        return Result.OK("取消点赞成功！");
     }
 
     @Operation(summary = "添加笔记")

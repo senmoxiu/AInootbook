@@ -8,6 +8,7 @@
         <a-descriptions-item label="是否公开">{{ noteData.isPublic == '1' ? '公开' : '私密' }}</a-descriptions-item>
         <a-descriptions-item label="创建人">{{ noteData.createByName || noteData.createBy }}</a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ noteData.createTime }}</a-descriptions-item>
+        <a-descriptions-item label="浏览次数">{{ noteData.viewCount ?? 0 }}</a-descriptions-item>
         <a-descriptions-item label="课程">{{ noteData.courseName || '-' }}</a-descriptions-item>
         <a-descriptions-item label="章节">{{ noteData.chapterName || '-' }}</a-descriptions-item>
       </a-descriptions>

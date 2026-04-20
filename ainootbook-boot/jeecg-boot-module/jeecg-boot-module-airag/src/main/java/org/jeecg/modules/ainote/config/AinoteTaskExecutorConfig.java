@@ -20,6 +20,11 @@ public class AinoteTaskExecutorConfig {
     private static final int DEFAULT_QUEUE_CAPACITY = 100;
     private static final long KEEP_ALIVE_SECONDS = 60L;
 
+    private static final int VIEW_COUNT_CORE_POOL_SIZE = 1;
+    private static final int VIEW_COUNT_MAX_POOL_SIZE = 2;
+    private static final int VIEW_COUNT_QUEUE_CAPACITY = 256;
+    private static final long VIEW_COUNT_KEEP_ALIVE_SECONDS = 30L;
+
     private final AinoteProperties ainoteProperties;
 
     public AinoteTaskExecutorConfig(AinoteProperties ainoteProperties) {
@@ -47,6 +52,20 @@ public class AinoteTaskExecutorConfig {
                 workQueue
         );
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        return executor;
+    }
+
+    @Bean(name = "viewCountExecutor", destroyMethod = "shutdown")
+    public ShiroThreadPoolExecutor viewCountExecutor() {
+        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(VIEW_COUNT_QUEUE_CAPACITY);
+        ShiroThreadPoolExecutor executor = new ShiroThreadPoolExecutor(
+                VIEW_COUNT_CORE_POOL_SIZE,
+                VIEW_COUNT_MAX_POOL_SIZE,
+                VIEW_COUNT_KEEP_ALIVE_SECONDS,
+                TimeUnit.SECONDS,
+                workQueue
+        );
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         return executor;
     }
 }

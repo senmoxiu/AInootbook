@@ -23,8 +23,24 @@
                     <a-tag v-for="(kw, idx) in splitKeywords(note.keywords)" :key="`${note.id}-kw-${idx}`" color="blue">{{ kw }}</a-tag>
                   </div>
                   <div class="public-notes__meta">
-                    <span>{{ note.createBy_dictText || note.createBy || '未知作者' }}</span>
-                    <span>{{ note.createTime }}</span>
+                    <div class="public-notes__meta-info">
+                      <span>{{ note.createBy_dictText || note.createBy || '未知作者' }}</span>
+                      <span>{{ note.createTime }}</span>
+                    </div>
+                    <span
+                      class="public-notes__like-btn"
+                      role="button"
+                      tabindex="0"
+                      :aria-label="note.isLiked ? '取消点赞' : '点赞'"
+                      :aria-pressed="!!note.isLiked"
+                      @click.stop="handleLike(note)"
+                      @keydown.enter.stop="handleLike(note)"
+                      @keydown.space.prevent.stop="handleLike(note)"
+                    >
+                      <LikeFilled v-if="note.isLiked" style="color: #1890ff" />
+                      <LikeOutlined v-else />
+                      {{ note.likeCount || 0 }}
+                    </span>
                   </div>
                 </div>
               </a-card>
@@ -44,10 +60,12 @@
 
 <script lang="ts" setup>
   import { ref, onMounted } from 'vue';
+  import { Pagination as APagination } from 'ant-design-vue';
   import { useRouter } from 'vue-router';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { PageWrapper } from '/@/components/Page';
-  import { getPublicNotes, type NoteRecord } from '/@/api/ainote/note.api';
+  import { getPublicNotes, likeNote, unlikeNote, type NoteRecord } from '/@/api/ainote/note.api';
+  import { LikeOutlined, LikeFilled } from '@ant-design/icons-vue';
 
   const PAGE_SIZE = 12;
 
@@ -89,6 +107,23 @@
 
   function goToDetail(id: string) {
     router.push(`/ainote/note/view/${id}`);
+  }
+
+  async function handleLike(note: NoteRecord) {
+    const wasLiked = note.isLiked;
+    note.isLiked = !wasLiked;
+    note.likeCount = Math.max(0, (note.likeCount || 0) + (wasLiked ? -1 : 1));
+    try {
+      if (wasLiked) {
+        await unlikeNote({ noteId: note.id });
+      } else {
+        await likeNote({ noteId: note.id });
+      }
+    } catch {
+      note.isLiked = wasLiked;
+      note.likeCount = Math.max(0, (note.likeCount || 0) + (wasLiked ? 1 : -1));
+      createMessage.error('操作失败，请重试');
+    }
   }
 
   function truncate(text: string | undefined, max: number): string {
@@ -161,8 +196,27 @@
     &__meta {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 12px;
       color: #999;
+    }
+
+    &__meta-info {
+      display: flex;
+      gap: 12px;
+    }
+
+    &__like-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #1890ff;
+      }
     }
 
     &__pagination {

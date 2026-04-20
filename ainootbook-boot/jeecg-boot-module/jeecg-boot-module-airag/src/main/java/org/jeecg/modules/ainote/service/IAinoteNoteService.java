@@ -68,6 +68,16 @@ public interface IAinoteNoteService extends IService<AinoteNote> {
     AinoteNote getByIdWithPermission(String id);
 
     /**
+     * 点赞笔记（幂等，已点赞则忽略）
+     */
+    void likeNote(String noteId);
+
+    /**
+     * 取消点赞（幂等，未点赞则忽略）
+     */
+    void unlikeNote(String noteId);
+
+    /**
      * 创建分享（16位 SecureRandom 分享码）
      */
     AinoteNoteShareVO createShare(AinoteNoteShareCreateDTO dto);

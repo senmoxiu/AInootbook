@@ -55,6 +55,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 笔记表 Service 实现
@@ -620,6 +621,62 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void likeNote(String noteId) {
+        if (oConvertUtils.isEmpty(noteId)) {
+            throw new JeecgBootException("noteId不能为空");
+        }
+        LoginUser user = getCurrentUser();
+        Integer tenantId = getRequiredTenantId();
+        AinoteNote note = getByIdWithPermission(noteId);
+        if (note == null) {
+            throw new JeecgBootException("笔记不存在或无权限访问");
+        }
+        String existedLikeId = baseMapper.selectNoteLike(noteId, user.getId(), tenantId);
+        if (oConvertUtils.isNotEmpty(existedLikeId)) {
+            return;
+        }
+        try {
+            baseMapper.insertNoteLike(
+                    IdWorker.getIdStr(), noteId, user.getId(),
+                    tenantId, user.getId(), note.getSysOrgCode());
+        } catch (DuplicateKeyException e) {
+            log.debug("重复点赞已忽略: noteId={}, userId={}", noteId, user.getId());
+            return;
+        }
+        UpdateWrapper<AinoteNote> uw = new UpdateWrapper<>();
+        uw.eq("id", noteId).eq("tenant_id", tenantId).ne("note_status", NOTE_STATUS_DELETED)
+          .setSql("like_count = like_count + 1");
+        update(null, uw);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void unlikeNote(String noteId) {
+        if (oConvertUtils.isEmpty(noteId)) {
+            throw new JeecgBootException("noteId不能为空");
+        }
+        LoginUser user = getCurrentUser();
+        Integer tenantId = getRequiredTenantId();
+        AinoteNote note = getByIdWithPermission(noteId);
+        if (note == null) {
+            throw new JeecgBootException("笔记不存在或无权限访问");
+        }
+        String existedLikeId = baseMapper.selectNoteLike(noteId, user.getId(), tenantId);
+        if (oConvertUtils.isEmpty(existedLikeId)) {
+            return;
+        }
+        int deleted = baseMapper.deleteNoteLike(noteId, user.getId(), tenantId);
+        if (deleted <= 0) {
+            return;
+        }
+        UpdateWrapper<AinoteNote> uw = new UpdateWrapper<>();
+        uw.eq("id", noteId).eq("tenant_id", tenantId).ne("note_status", NOTE_STATUS_DELETED)
+          .setSql("like_count = CASE WHEN like_count > 0 THEN like_count - 1 ELSE 0 END");
+        update(null, uw);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public AinoteNoteShareVO createShare(AinoteNoteShareCreateDTO dto) {
         LoginUser user = getCurrentUser();
 
@@ -745,7 +802,23 @@ public class AinoteNoteServiceImpl extends ServiceImpl<AinoteNoteMapper, AinoteN
         wrapper.orderByDesc("update_time");
 
         Page<AinoteNote> page = new Page<>(pageNo, pageSize);
-        return page(page, wrapper);
+        IPage<AinoteNote> result = page(page, wrapper);
+
+        // 批量填充当前用户点赞状态
+        List<AinoteNote> records = result.getRecords();
+        if (!records.isEmpty()) {
+            try {
+                LoginUser user = getCurrentUser();
+                Integer tenantId2 = getRequiredTenantId();
+                List<String> noteIds = records.stream().map(AinoteNote::getId).collect(Collectors.toList());
+                List<String> likedIds = baseMapper.selectNoteLikeByNoteIds(noteIds, user.getId(), tenantId2);
+                Set<String> likedSet = new HashSet<>(likedIds);
+                records.forEach(n -> n.setIsLiked(likedSet.contains(n.getId())));
+            } catch (Exception e) {
+                log.debug("填充点赞状态失败（未登录或无权限），跳过: {}", e.getMessage());
+            }
+        }
+        return result;
     }
 
     @Override

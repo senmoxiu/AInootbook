@@ -1,6 +1,7 @@
 package org.jeecg.modules.ainote.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -79,6 +80,10 @@ public class AinoteNote implements Serializable {
 
     @Schema(description = "点赞次数")
     private Integer likeCount;
+
+    @TableField(exist = false)
+    @Schema(description = "当前用户是否已点赞（非持久化字段）")
+    private Boolean isLiked;
 
     @Excel(name = "创建人", width = 15)
     @Dict(dictTable = "sys_user", dicCode = "id", dicText = "realname")

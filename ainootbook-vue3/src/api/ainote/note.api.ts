@@ -25,6 +25,8 @@ enum Api {
   versions = '/ainote/note/versions',
   versionDetail = '/ainote/note/version',
   rollback = '/ainote/note/rollback',
+  like = '/ainote/note/like',
+  unlike = '/ainote/note/unlike',
 }
 
 /** 笔记记录 */
@@ -44,6 +46,9 @@ export interface NoteRecord {
   createTime?: string;
   updateBy?: string;
   updateTime?: string;
+  viewCount?: number;
+  likeCount?: number;
+  isLiked?: boolean;
 }
 
 /** 语义搜索请求参数 */
@@ -280,6 +285,20 @@ export const regenerateNote = (data: RegenerateParams) => {
  */
 export const triggerRegeneration = (params: { noteId: string; knowledgeId: string }) => {
   return defHttp.post<void>({ url: Api.regenerate, params });
+};
+
+/**
+ * 点赞笔记
+ */
+export const likeNote = (params: { noteId: string }) => {
+  return defHttp.post<void>({ url: Api.like, params }, { joinParamsToUrl: true });
+};
+
+/**
+ * 取消点赞
+ */
+export const unlikeNote = (params: { noteId: string }) => {
+  return defHttp.post<void>({ url: Api.unlike, params }, { joinParamsToUrl: true });
 };
 
 //TODO：后续实现

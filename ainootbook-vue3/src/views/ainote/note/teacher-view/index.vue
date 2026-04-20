@@ -142,6 +142,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive, onMounted, onUnmounted } from 'vue';
+  import { Statistic as AStatistic } from 'ant-design-vue';
   import { PageWrapper } from '/@/components/Page';
   import {
     FileTextOutlined,
