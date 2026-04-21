@@ -3,6 +3,7 @@ package org.jeecg.modules.ainote.assembler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -58,7 +59,9 @@ public class AinoteNoteAssembler {
     private static final String TASK_TYPE_TIKA = "tika";
     private static final String TASK_TYPE_OCR = "ocr";
     private static final String TASK_TYPE_VIDEO = "video";
+    private static final String TASK_TYPE_INTEGRATE = "integrate";
     private static final String TASK_TYPE_SUMMARY = "summary";
+    private static final String TASK_TYPE_KEYWORDS = "keywords";
 
     private static final String DEFAULT_NOTE_TITLE = "AI Note";
     private static final String DEFAULT_INTEGRATE_PROMPT_KEY = "note_integrate";
@@ -87,6 +90,31 @@ public class AinoteNoteAssembler {
     private final AIChatHandler aiChatHandler;
     private final IAiragPromptsService promptsService;
     private final StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 供 IntegrateTaskHandler 调用：聚合源任务文本 → LLM 整合 → 写入 noteContent
+     */
+    public String integrateFromTasks(AinoteNote note, List<AinoteAiTask> tasks) {
+        List<AinoteAiTask> sourceTasks = extractSourceTasks(tasks);
+        Integer tenantId = resolveTenantId(note, sourceTasks);
+        String aggregatedText = aggregateText(sourceTasks);
+        if (oConvertUtils.isEmpty(aggregatedText)) {
+            log.warn("Skip integrating: no completed source text, noteId={}", note.getId());
+            return note.getNoteContent();
+        }
+        String markdown = integrateWithLLM(aggregatedText, tenantId, note.getNoteTitle());
+        if (markdown == null) {
+            AinoteAiConfig config = resolveConfig(tenantId);
+            String failureMode = trimToNull(config.getIntegrateFailureMode());
+            if ("fail_all".equalsIgnoreCase(failureMode)) {
+                throw new org.jeecg.common.exception.JeecgBootException("笔记整合失败（fail_all策略）: noteId=" + note.getId());
+            }
+            markdown = buildMarkdown(note.getNoteTitle(), aggregatedText);
+            log.warn("笔记整合LLM失败，回退本地拼装: noteId=", note.getId());
+        }
+        upsertNoteContent(note, markdown);
+        return markdown;
+    }
 
     public boolean assembleIfReady(String noteId) {
         return assembleIfReady(noteId, null);
@@ -118,63 +146,13 @@ public class AinoteNoteAssembler {
             return false;
         }
 
-        Integer tenantId = resolveTenantId(note, sourceTasks);
-        String aggregatedText = aggregateText(sourceTasks);
-        if (oConvertUtils.isEmpty(aggregatedText)) {
-            log.warn("Skip assembling: no completed asr/tika/ocr text, noteId={}", note.getId());
-            return false;
+        // 源任务全部终止后，确保 integrate 任务存在
+        AinoteAiTask integrateTask = findLatestTaskByType(tasks, TASK_TYPE_INTEGRATE);
+        if (integrateTask == null) {
+            aiTaskService.createTask(note.getId(), null, TASK_TYPE_INTEGRATE);
+            log.info("Integrate task created: noteId={}", note.getId());
         }
-
-        String markdown = integrateWithLLM(aggregatedText, tenantId, note.getNoteTitle());
-        if (markdown != null) {
-            log.info("笔记整合结果已应用: noteId={}, source=llm", note.getId());
-        } else {
-            AinoteAiConfig config = resolveConfig(tenantId);
-            String integrateFailureMode = trimToNull(config.getIntegrateFailureMode());
-            if ("fail_all".equalsIgnoreCase(integrateFailureMode)) {
-                log.warn("笔记整合阶段失败，按fail_all策略终止流程: noteId={}", note.getId());
-                return false;
-            }
-            markdown = buildMarkdown(note.getNoteTitle(), aggregatedText);
-            log.warn("笔记整合阶段失败，按skip策略回退到本地Markdown拼装: noteId={}", note.getId());
-        }
-        upsertNoteContent(note, markdown);
-
-        AinoteAiTask summaryTask = findLatestSummaryTask(tasks);
-        if (summaryTask == null) {
-            aiTaskService.createTask(note.getId(), null, TASK_TYPE_SUMMARY);
-            log.info("Summary task created: noteId={}", note.getId());
-            return true;
-        }
-
-        Integer summaryStatus = summaryTask.getTaskStatus();
-        if (summaryStatus == null || summaryStatus == STATUS_PENDING || summaryStatus == STATUS_PROCESSING) {
-            return true;
-        }
-        if (summaryStatus == STATUS_FAILED) {
-            if (shouldRecreateSummaryTask(summaryTask, sourceTasks)) {
-                aiTaskService.createTask(note.getId(), null, TASK_TYPE_SUMMARY);
-                log.info("Summary task recreated after source update: noteId={}, previousTaskId={}",
-                        note.getId(), summaryTask.getId());
-                return true;
-            }
-            log.warn("Summary task failed: noteId={}, taskId={}, error={}",
-                    note.getId(), summaryTask.getId(), summaryTask.getErrorMessage());
-            return false;
-        }
-
-        if (summaryStatus == STATUS_COMPLETED) {
-            String resolvedKnowledgeId = resolveKnowledgeId(knowledgeId, tenantId);
-            if (oConvertUtils.isEmpty(resolvedKnowledgeId)) {
-                throw new JeecgBootException("knowledgeId is required for vectorization");
-            }
-            if (note.getNoteStatus() != null && note.getNoteStatus() == NOTE_STATUS_COMPLETED) {
-                return true;
-            }
-            vectorizeAndFinalize(note.getId(), resolvedKnowledgeId);
-            return true;
-        }
-        return false;
+        return true;
     }
 
     private AinoteNote requireNoteWithPermission(String noteId) {
@@ -353,45 +331,31 @@ public class AinoteNoteAssembler {
             return;
         }
 
-        AinoteNote update = new AinoteNote();
-        update.setId(note.getId());
-        update.setNoteContent(markdown);
-        if (!noteService.updateById(update)) {
-            throw new JeecgBootException("Update note content failed: noteId=" + note.getId());
+        // 使用乐观锁防止覆盖用户编辑
+        UpdateWrapper<AinoteNote> uw = new UpdateWrapper<>();
+        uw.eq("id", note.getId());
+        uw.eq("current_version", note.getCurrentVersion());
+        uw.set("note_content", markdown);
+        if (!noteService.update(null, uw)) {
+            log.warn("笔记版本已变更，整合内容已丢弃: noteId={}", note.getId());
         }
     }
 
-    private AinoteAiTask findLatestSummaryTask(List<AinoteAiTask> tasks) {
+    private AinoteAiTask findLatestTaskByType(List<AinoteAiTask> tasks, String type) {
         for (int i = tasks.size() - 1; i >= 0; i--) {
             AinoteAiTask task = tasks.get(i);
-            if (task == null) {
-                continue;
-            }
-            if (TASK_TYPE_SUMMARY.equals(normalizeTaskType(task.getTaskType()))) {
+            if (task == null) continue;
+            if (type.equals(normalizeTaskType(task.getTaskType()))) {
                 return task;
             }
         }
         return null;
     }
 
-    private boolean shouldRecreateSummaryTask(AinoteAiTask summaryTask, List<AinoteAiTask> sourceTasks) {
-        if (summaryTask == null || sourceTasks == null || sourceTasks.isEmpty()) {
-            return false;
-        }
-        Date summaryCreatedAt = summaryTask.getCreateTime();
-        if (summaryCreatedAt == null) {
-            return false;
-        }
-        for (AinoteAiTask task : sourceTasks) {
-            if (task == null || task.getTaskStatus() == null || task.getTaskStatus() != STATUS_COMPLETED) {
-                continue;
-            }
-            Date completedAt = task.getCompletedAt();
-            if (completedAt != null && completedAt.after(summaryCreatedAt) && hasProcessResult(task.getProcessResult())) {
-                return true;
-            }
-        }
-        return false;
+    /** @deprecated 使用 findLatestTaskByType */
+    @Deprecated
+    private AinoteAiTask findLatestSummaryTask(List<AinoteAiTask> tasks) {
+        return findLatestTaskByType(tasks, TASK_TYPE_SUMMARY);
     }
 
     private void vectorizeAndFinalize(String noteId, String knowledgeId) {

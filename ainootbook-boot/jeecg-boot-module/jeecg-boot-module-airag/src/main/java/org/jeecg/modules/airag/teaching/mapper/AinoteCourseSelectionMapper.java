@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
 import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
+import org.jeecg.modules.airag.teaching.vo.SelectionGroupVO;
+
+import java.util.List;
 
 /**
  * 选课表 Mapper 接口
@@ -32,4 +35,29 @@ public interface AinoteCourseSelectionMapper extends BaseMapper<AinoteCourseSele
             @Param("studentId") String studentId,
             @Param("tenantId") Integer tenantId,
             @Param("courseName") String courseName);
+    /**
+     * 按教学任务聚合查询选课人数（管理员视图）
+     */
+    IPage<SelectionGroupVO> queryGroupedByTeaching(
+            Page<SelectionGroupVO> page,
+            @Param("tenantId") Integer tenantId,
+            @Param("courseName") String courseName,
+            @Param("semester") String semester,
+            @Param("teacherFilter") String teacherFilter);
+
+    /**
+     * 查询某教学任务下的所有选课学生明细
+     */
+    List<AinoteCourseSelectionVO> queryStudentsByTeachingId(
+            @Param("teachingId") String teachingId,
+            @Param("tenantId") Integer tenantId);
+
+    /**
+     * 查询当前用户已选课程列表（学生：已选课程；admin：全部课程）
+     */
+    IPage<org.jeecg.modules.airag.teaching.entity.AinoteCourse> queryMySelectedCourses(
+            Page<org.jeecg.modules.airag.teaching.entity.AinoteCourse> page,
+            @Param("studentId") String studentId,
+            @Param("tenantId") Integer tenantId,
+            @Param("isAdmin") boolean isAdmin);
 }

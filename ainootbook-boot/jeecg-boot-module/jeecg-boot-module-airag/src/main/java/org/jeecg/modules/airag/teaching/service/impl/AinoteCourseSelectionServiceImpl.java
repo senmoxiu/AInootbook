@@ -22,6 +22,7 @@ import org.jeecg.modules.airag.teaching.service.IAinoteCourseSelectionService;
 import org.jeecg.modules.airag.teaching.service.IAinoteTeachingService;
 import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
+import org.jeecg.modules.airag.teaching.vo.SelectionGroupVO;
 import org.jeecg.modules.ainote.util.RoleUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -183,9 +184,81 @@ public class AinoteCourseSelectionServiceImpl
         return baseMapper.queryAvailableTeachings(page, user.getId(), tenantId, courseName);
     }
 
+    @Override
+    public void clearByTeachingId(String teachingId) {
+        Integer tenantId = getCurrentTenantId();
+        if (tenantId == null) {
+            throw new JeecgBootException("获取租户信息失败");
+        }
+        UpdateWrapper<AinoteCourseSelection> uw = new UpdateWrapper<>();
+        uw.eq("teaching_id", teachingId).eq("tenant_id", tenantId).set("status", 0);
+        update(uw);
+    }
+
+    @Override
+    public IPage<SelectionGroupVO> queryGroupedByTeaching(Page<SelectionGroupVO> page, String courseName, String semester) {
+        Integer tenantId = getCurrentTenantId();
+        // 教师角色只能查看自己的教学任务
+        String teacherFilter = resolveTeacherFilter();
+        return baseMapper.queryGroupedByTeaching(page, tenantId, courseName, semester, teacherFilter);
+    }
+
+    @Override
+    public List<AinoteCourseSelectionVO> queryStudentsByTeachingId(String teachingId) {
+        Integer tenantId = getCurrentTenantId();
+        // 教师角色校验：确保该教学任务属于当前教师
+        verifyTeachingAccess(teachingId);
+        return baseMapper.queryStudentsByTeachingId(teachingId, tenantId);
+    }
+
+    @Override
+    public IPage<org.jeecg.modules.airag.teaching.entity.AinoteCourse> queryMySelectedCourses(
+            Page<org.jeecg.modules.airag.teaching.entity.AinoteCourse> page) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
+            throw new JeecgBootException("用户未登录");
+        }
+        Integer tenantId = getCurrentTenantId();
+        // admin 超级管理员判断：username == "admin"（不依赖 roleCode）
+        boolean isAdmin = "admin".equals(user.getUsername());
+        log.info("[queryMySelectedCourses] username={}, userId={}, tenantId={}, isAdmin={}",
+                user.getUsername(), user.getId(), tenantId, isAdmin);
+        return baseMapper.queryMySelectedCourses(page, user.getId(), tenantId, isAdmin);
+    }
+
     /**
-     * 获取当前租户ID
+     * 教师角色校验：确保当前教师有权访问指定教学任务
      */
+    private void verifyTeachingAccess(String teachingId) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) throw new JeecgBootException("用户未登录");
+        Set<String> roles = RoleUtils.parseRoles(user.getRoleCode());
+        if (roles.contains("admin")) return;
+        if (roles.contains("teacher")) {
+            AinoteTeaching teaching = ainoteTeachingService.getById(teachingId);
+            if (teaching == null) throw new JeecgBootException("教学任务不存在");
+            // teacher_id 可能是逗号分隔的多教师
+            String teacherId = teaching.getTeacherId();
+            if (teacherId == null || !Arrays.asList(teacherId.split(",")).contains(user.getId())) {
+                throw new JeecgBootException("无权访问该教学任务的选课数据");
+            }
+            return;
+        }
+        // 学生角色不应访问此接口，由 Controller 权限注解拦截
+    }
+
+    /**
+     * 教师角色过滤：返回当前教师 userId（admin 返回 null 表示不过滤）
+     */
+    private String resolveTeacherFilter() {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) throw new JeecgBootException("用户未登录");
+        Set<String> roles = RoleUtils.parseRoles(user.getRoleCode());
+        if (roles.contains("admin")) return null;
+        if (roles.contains("teacher")) return user.getId();
+        throw new JeecgBootException("当前角色无权访问选课聚合数据");
+    }
+
     private Integer getCurrentTenantId() {
         try {
             HttpServletRequest request = SpringContextUtils.getHttpServletRequest();

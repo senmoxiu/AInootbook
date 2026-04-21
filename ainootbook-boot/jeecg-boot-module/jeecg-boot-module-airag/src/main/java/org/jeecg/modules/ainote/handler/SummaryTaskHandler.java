@@ -47,8 +47,9 @@ import java.util.Map;
 public class SummaryTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandler {
 
     private static final String TASK_TYPE = "summary";
+    private static final String TASK_TYPE_KEYWORDS = "keywords";
     private static final int STATUS_COMPLETED = 2;
-    private static final int HARD_MAX_SUMMARY_LENGTH = 200;
+    private static final int HARD_MAX_SUMMARY_LENGTH = 5000;
     private static final int HARD_MAX_KEYWORDS_COUNT = 5;
     private static final int INPUT_TEXT_MAX_LENGTH = 20000;
     private static final int DEFAULT_TENANT_ID = 0;
@@ -150,61 +151,45 @@ public class SummaryTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandle
         List<ChatMessage> summaryMessages = buildPromptMessages(
                 sourceText, null, maxSummaryLength, maxKeywordsCount, summaryPrompt, AINOTE_SUMMARY_DEFAULT_V1);
         String summaryResp = invokeLlm(summaryModelId, summaryMessages);
+        log.debug("[SummaryRaw] noteId={}, length={}", noteId,
+                summaryResp == null ? 0 : summaryResp.length());
         String summary = parseSummaryResponse(summaryResp, maxSummaryLength);
 
         if (oConvertUtils.isEmpty(summary)) {
             throw new JeecgBootException("AI返回摘要为空");
         }
 
-        // Stage B: 生成 keywords
-        String keywordsPromptKey = resolvePromptKey(config.getKeywordsPromptKey(), DEFAULT_KEYWORDS_PROMPT_KEY);
-        AiragPrompts keywordsPrompt = resolvePrompt(keywordsPromptKey);
-        String keywordsModelId = resolveKeywordsModelId(task.getTenantId(), keywordsPrompt);
-        List<String> keywords = new ArrayList<>();
-        boolean keywordsSkipped = false;
-        String keywordsSkipReason = null;
-        try {
-            List<ChatMessage> keywordsMessages = buildPromptMessages(
-                    sourceText, summary, maxSummaryLength, maxKeywordsCount, keywordsPrompt, AINOTE_KEYWORDS_DEFAULT_V1);
-            String keywordsResp = invokeLlm(keywordsModelId, keywordsMessages);
-            keywords = parseKeywordsResponse(keywordsResp, maxKeywordsCount);
-        } catch (Exception e) {
-            keywordsSkipped = true;
-            keywordsSkipReason = safeMessage(e);
-            log.warn("关键词阶段执行失败，按skip策略完成: noteId={}", noteId, e);
-        }
-
-        // 版本校验：防止陈旧摘要覆盖新版本内容
+        // 写入摘要（keywords 留空，由 KeywordsTaskHandler 填充）
         Integer noteVersion = note.getCurrentVersion();
         UpdateWrapper<AinoteNote> noteUpdateWrapper = new UpdateWrapper<>();
         noteUpdateWrapper.eq("id", noteId);
         noteUpdateWrapper.eq("current_version", noteVersion);
         noteUpdateWrapper.set("rendered_content", markdownPrecompileService.precompile(note.getNoteContent()));
         noteUpdateWrapper.set("ai_summary", summary);
-        noteUpdateWrapper.set("keywords", String.join(",", keywords));
         boolean writeSuccess = noteService.update(null, noteUpdateWrapper);
         if (!writeSuccess) {
-            log.warn("笔记版本已变更，摘要结果已丢弃: noteId={}, taskVersion={}", noteId, noteVersion);
+            log.warn("笔记版本已变更，摘要结果已丢弃，跳过下游任务: noteId={}, taskVersion={}", noteId, noteVersion);
+            // 版本冲突时不创建 keywords 任务，避免基于旧数据生成关键词
+            JSONObject result = new JSONObject();
+            result.put("summary", summary);
+            result.put("versionConflict", true);
+            return result.toJSONString();
         }
+
+        // 创建 keywords 任务（异步线程，用 createTaskBySystem 跳过 Shiro）
+        aiTaskService.createTaskBySystem(noteId, null, TASK_TYPE_KEYWORDS,
+                note.getTenantId(), note.getCreateBy());
+        log.info("Keywords task created after summary: noteId={}", noteId);
 
         JSONObject result = new JSONObject();
         result.put("summary", summary);
-        result.put("keywords", keywords);
         JSONObject resultMeta = new JSONObject();
         resultMeta.put("sourceType", sourceType);
         resultMeta.put("summaryPromptKey", summaryPromptKey);
         resultMeta.put("summaryModelId", summaryModelId != null ? summaryModelId : "default");
-        resultMeta.put("keywordsPromptKey", keywordsPromptKey);
-        resultMeta.put("keywordsModelId", keywordsModelId != null ? keywordsModelId : "default");
-        resultMeta.put("skipped", keywordsSkipped);
-        if (keywordsSkipped) {
-            resultMeta.put("skipStage", "keywords");
-            resultMeta.put("skipStrategy", "skip");
-            resultMeta.put("skipReason", keywordsSkipReason);
-        }
         result.put("resultMeta", resultMeta);
-        log.info("Summary任务完成: noteId={}, sourceType={}, summaryLength={}, keywordsCount={}, keywordsSkipped={}",
-                noteId, sourceType, summary.length(), keywords.size(), keywordsSkipped);
+        log.info("Summary任务完成: noteId={}, sourceType={}, summaryLength={}",
+                noteId, sourceType, summary.length());
         return result.toJSONString();
     }
 
@@ -460,7 +445,8 @@ public class SummaryTaskHandler implements AinoteAiTaskWorker.AinoteAiTaskHandle
 
     private String normalizeSummary(String summary, int maxLen) {
         String s = cleanText(oConvertUtils.getString(summary, "")).trim();
-        if (s.length() > maxLen) {
+        // 服务端兜底截断，防止超长内容写入数据库
+        if (maxLen > 0 && s.length() > maxLen) {
             s = s.substring(0, maxLen);
         }
         return s;

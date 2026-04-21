@@ -150,8 +150,26 @@ public class SysUserController {
     @RequiresPermissions("system:user:listAll")
     @RequestMapping(value = "/listAll", method = RequestMethod.GET)
     public Result<IPage<SysUser>> queryAllPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
-                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
+                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                   @RequestParam(name = "roleCodes", required = false) String roleCodes,
+                                                   HttpServletRequest req) {
         QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
+        // 按角色过滤：只返回指定角色的用户（参数化查询，防止 SQL 注入）
+        if (oConvertUtils.isNotEmpty(roleCodes)) {
+            List<String> codeList = Arrays.stream(roleCodes.split(","))
+                    .map(String::trim)
+                    .filter(s -> s.matches("^[a-zA-Z0-9_]+$"))
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toList());
+            if (!codeList.isEmpty()) {
+                queryWrapper.inSql("id",
+                    "SELECT sur.user_id FROM sys_user_role sur " +
+                    "INNER JOIN sys_role sr ON sur.role_id = sr.id " +
+                    "WHERE sr.role_code IN ({0})",
+                    codeList.stream().map(c -> "'" + c + "'").collect(java.util.stream.Collectors.joining(","))
+                );
+            }
+        }
         return sysUserService.queryPageList(req, queryWrapper, pageSize, pageNo);
     }
 
@@ -526,11 +544,34 @@ public class SysUserController {
             @RequestParam(name="realname",required=false) String realname,
             @RequestParam(name="username",required=false) String username,
             @RequestParam(name="isMultiTranslate",required=false) String isMultiTranslate,
-            @RequestParam(name="id",required = false) String id) {
+            @RequestParam(name="id",required = false) String id,
+            @RequestParam(name="roleCodes",required = false) String roleCodes) {
         // 代码逻辑说明: VUEN-1702【禁止问题】sql注入漏洞
         String[] arr = new String[]{departId, realname, username, id};
         SqlInjectionUtil.filterContent(arr, SymbolConstant.SINGLE_QUOTATION_MARK);
-        IPage<SysUser> pageList = sysUserDepartService.queryDepartUserPageList(departId, username, realname, pageSize, pageNo,id,isMultiTranslate);
+        IPage<SysUser> pageList = sysUserDepartService.queryDepartUserPageList(departId, username, realname, pageSize, pageNo, id, isMultiTranslate);
+        // 按角色过滤（参数化查询，防止 SQL 注入）
+        if (oConvertUtils.isNotEmpty(roleCodes) && pageList.getRecords() != null) {
+            List<String> codeList = Arrays.stream(roleCodes.split(","))
+                    .map(String::trim)
+                    .filter(s -> s.matches("^[a-zA-Z0-9_]+$"))
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toList());
+            if (!codeList.isEmpty()) {
+                QueryWrapper<SysUser> roleWrapper = new QueryWrapper<>();
+                roleWrapper.inSql("id",
+                    "SELECT sur.user_id FROM sys_user_role sur " +
+                    "INNER JOIN sys_role sr ON sur.role_id = sr.id " +
+                    "WHERE sr.role_code IN ({0})",
+                    codeList.stream().map(c -> "'" + c + "'").collect(java.util.stream.Collectors.joining(","))
+                );
+                java.util.Set<String> allowedIds = sysUserService.list(roleWrapper)
+                        .stream().map(SysUser::getId).collect(java.util.stream.Collectors.toSet());
+                pageList.setRecords(pageList.getRecords().stream()
+                        .filter(u -> allowedIds.contains(u.getId()))
+                        .collect(java.util.stream.Collectors.toList()));
+            }
+        }
         return Result.OK(pageList);
     }
 
