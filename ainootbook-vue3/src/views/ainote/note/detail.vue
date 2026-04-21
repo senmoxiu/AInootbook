@@ -14,35 +14,6 @@
       </a-descriptions>
     </a-card>
 
-    <!-- AI 摘要与关键词 -->
-    <a-card title="AI摘要与关键词" :bordered="false" class="!mb-4">
-      <template #extra v-if="isOwner">
-        <a-space>
-          <a-button @click="handleOpenVersionHistory">版本历史</a-button>
-          <a-button type="primary" @click="handleOpenRegenerate">AI 重新生成</a-button>
-        </a-space>
-      </template>
-      <div v-if="noteData.aiSummary" class="mb-2">{{ cleanSummary }}</div>
-      <div v-if="noteData.keywords">
-        <a-tag v-for="kw in cleanKeywords" :key="kw" color="blue">{{ kw }}</a-tag>
-      </div>
-      <a-empty v-if="!noteData.aiSummary && !noteData.keywords" description="暂无AI摘要" />
-    </a-card>
-
-    <!-- 笔记内容 -->
-    <a-card title="笔记内容" :bordered="false" class="!mb-4">
-      <template #extra>
-        <a-button v-if="mode === 'preview' && isOwner" type="primary" @click="handleEdit">编辑</a-button>
-        <a-space v-else-if="mode === 'edit'">
-          <a-button @click="handleCancel" :disabled="saving">取消</a-button>
-          <a-button type="primary" @click="handleSave" :loading="saving">保存</a-button>
-        </a-space>
-      </template>
-      <MarkdownViewer v-if="mode === 'preview' && noteData.noteContent" :value="sanitizedContent" />
-      <JMarkdownEditor v-else-if="mode === 'edit'" v-model:value="draftNoteContent" />
-      <a-empty v-else description="暂无内容" />
-    </a-card>
-
     <!-- 素材列表（仅创建者可见）-->
     <a-card v-if="isOwner" title="素材列表" :bordered="false" class="!mb-4">
       <template #extra>
@@ -82,7 +53,33 @@
 
     <!-- AI 生成（仅创建者可见）-->
     <a-card v-if="isOwner" title="AI生成" :bordered="false" class="!mb-4">
-      <AiProcessProgress :noteId="noteId" knowledgeId="" @completed="loadNoteData" />
+      <AiProcessProgress ref="aiProgressRef" :noteId="noteId" knowledgeId="" @completed="loadNoteData" @openRegenerate="handleOpenRegenerate" />
+    </a-card>
+
+    <!-- AI 摘要与关键词 -->
+    <a-card title="AI摘要与关键词" :bordered="false" class="!mb-4">
+      <template #extra v-if="isOwner">
+        <a-button @click="handleOpenVersionHistory">版本历史</a-button>
+      </template>
+      <div v-if="noteData.aiSummary" class="mb-2 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{{ cleanSummary }}</div>
+      <div v-if="noteData.keywords">
+        <a-tag v-for="kw in cleanKeywords" :key="kw" color="blue">{{ kw }}</a-tag>
+      </div>
+      <a-empty v-if="!noteData.aiSummary && !noteData.keywords" description="暂无AI摘要" />
+    </a-card>
+
+    <!-- 笔记内容 -->
+    <a-card title="笔记内容" :bordered="false" class="!mb-4">
+      <template #extra>
+        <a-button v-if="mode === 'preview' && isOwner" type="primary" @click="handleEdit">编辑</a-button>
+        <a-space v-else-if="mode === 'edit'">
+          <a-button @click="handleCancel" :disabled="saving">取消</a-button>
+          <a-button type="primary" @click="handleSave" :loading="saving">保存</a-button>
+        </a-space>
+      </template>
+      <MarkdownViewer v-if="mode === 'preview' && noteData.noteContent" :value="sanitizedContent" />
+      <JMarkdownEditor v-else-if="mode === 'edit'" v-model:value="draftNoteContent" />
+      <a-empty v-else description="暂无内容" />
     </a-card>
 
     <!-- 分享（仅创建者可见）-->
@@ -106,7 +103,7 @@
     <NoteVersionDrawer @register="registerVersionDrawer" @success="loadNoteData" />
 
     <!-- AI 重新生成弹窗 -->
-    <NoteRegenerateModal @register="registerRegenerateModal" @success="loadNoteData" />
+    <NoteRegenerateModal @register="registerRegenerateModal" @success="handleRegenerateSuccess" />
   </PageWrapper>
 </template>
 
@@ -119,6 +116,7 @@
   import { getNoteById, shareNote, editNote } from '/@/api/ainote/note.api';
   import { getMaterialList, uploadMaterial, getPresignedUrl, deleteMaterial } from '/@/api/ainote/material.api';
   import AiProcessProgress from './components/AiProcessProgress.vue';
+  import type { ComponentPublicInstance } from 'vue';
   import { MarkdownViewer } from '/@/components/Markdown';
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
   import { SoundOutlined, PictureOutlined, VideoCameraOutlined, FileTextOutlined } from '@ant-design/icons-vue';
@@ -147,13 +145,18 @@
   const mode = ref<'preview' | 'edit'>('preview');
   const draftNoteContent = ref('');
   const saving = ref(false);
+  const aiProgressRef = ref<ComponentPublicInstance & { startProgress: () => void } | null>(null);
 
   const [registerVersionDrawer, { openDrawer: openVersionDrawer }] = useDrawer();
   const [registerRegenerateModal, { openModal: openRegenerateModal }] = useModal();
 
   const cleanSummary = computed(() => {
     if (!noteData.value.aiSummary) return '';
-    return String(noteData.value.aiSummary).replace(/\*\*/g, '').trim();
+    return String(noteData.value.aiSummary)
+      .replace(/\*\*/g, '')
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
   });
 
   const cleanKeywords = computed(() => {
@@ -349,6 +352,11 @@
 
   function handleOpenRegenerate() {
     openRegenerateModal(true, { noteId: noteId.value });
+  }
+
+  function handleRegenerateSuccess() {
+    aiProgressRef.value?.startProgress();
+    loadNoteData();
   }
 
   onMounted(() => {

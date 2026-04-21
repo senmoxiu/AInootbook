@@ -4,9 +4,6 @@
       <BellOutlined />
     </Badge>
 
-    <DynamicNotice ref="dynamicNoticeRef" v-bind="dynamicNoticeProps" />
-    <DetailModal @register="registerDetail" />
-
     <sys-message-modal @register="registerMessageModal" @refresh="reloadCount" :messageCount="messageCount"></sys-message-modal>
     <!--  修改密码弹窗  -->
     <ChangePasswordModal @register="changePwdModal"></ChangePasswordModal>
@@ -16,21 +13,16 @@
   import { computed, defineComponent, ref, unref, reactive, onMounted, getCurrentInstance } from 'vue';
   import { Popover, Tabs, Badge } from 'ant-design-vue';
   import { BellOutlined } from '@ant-design/icons-vue';
-  // import { tabListData } from './data';
   import { getUnreadMessageCount, editCementSend, clearAllUnReadMessage } from './notify.api';
   import NoticeList from './NoticeList.vue';
-  import DetailModal from '/@/views/monitor/mynews/DetailModal.vue';
-  import DynamicNotice from '/@/views/monitor/mynews/DynamicNotice.vue';
   import { useModal } from '/@/components/Modal';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useGlobSetting } from '/@/hooks/setting';
   import { useUserStore } from '/@/store/modules/user';
   import { connectWebSocket, onWebSocket } from '/@/hooks/web/useWebSocket';
-  import { readAllMsg } from '/@/views/monitor/mynews/mynews.api';
   import { getToken } from '/@/utils/auth';
   import md5 from 'crypto-js/md5';
   import { useRouter } from 'vue-router';
-
   import SysMessageModal from '/@/views/system/message/components/SysMessageModal.vue';
   import ChangePasswordModal from './ChangePasswordModal.vue';
   import { ElectronEnum } from '/@/enums/jeecgEnum';
@@ -44,8 +36,6 @@
       TabPane: Tabs.TabPane,
       Badge,
       NoticeList,
-      DetailModal,
-      DynamicNotice,
       SysMessageModal,
       ChangePasswordModal,
     },
@@ -54,21 +44,7 @@
       const instance: any = getCurrentInstance();
       const userStore = useUserStore();
       const glob = useGlobSetting();
-      const dynamicNoticeProps = reactive({ path: '', formData: {} });
-      const [registerDetail, detailModal] = useModal();
-      const router = useRouter();
-      // const listData = ref(tabListData);
-      // const count = computed(() => {
-      //   let count = 0;
-      //   for (let i = 0; i < listData.value.length; i++) {
-      //     count += listData.value[i].count;
-      //   }
-      //   return count;
-      // });
-      const chatRef = ref();
-
       const [registerMessageModal, { openModal: openMessageModal }] = useModal();
-      const [registerBookModal, { openModal: openBookModal }] = useModal();
       const [changePwdModal, { openModal: openPwdModal }] = useModal();
       //通知消息类型
       const noticeType = ref<string>('system');
@@ -133,16 +109,6 @@
         } catch (e) {
           console.error(e);
         }
-        if (record.openType === 'component') {
-          dynamicNoticeProps.path = record.openPage;
-          dynamicNoticeProps.formData = { id: record.busId };
-          instance.refs.dynamicNoticeRef?.detail(record.openPage);
-        } else {
-          detailModal.openModal(true, {
-            record,
-            isUpdate: true,
-          });
-        }
         popoverVisible.value = false;
       }
 
@@ -206,7 +172,6 @@
       // 清空消息
       function onEmptyNotify() {
         popoverVisible.value = false;
-        readAllMsg({}, loadData);
       }
       async function reloadCount(id) {
         try {
@@ -218,14 +183,6 @@
       }
 
       /**
-       * 获取消息未读数
-       */
-      function getSystemUnreadNum() {}
-
-      function clickAddressBook() {
-        openBookModal(true, {});
-      }
-
       /**
        * 清除全部未读消息
        */
@@ -257,8 +214,6 @@
 
       return {
         prefixCls,
-        // listData,
-        // count,
         clickBadge,
         registerMessageModal,
         reloadCount,
@@ -266,12 +221,6 @@
         onEmptyNotify,
         numberStyle: {},
         popoverVisible,
-        registerDetail,
-        dynamicNoticeProps,
-        chatRef,
-        getSystemUnreadNum,
-        clickAddressBook,
-        registerBookModal,
         messageCount,
         clearAllUnMessage,
         changePwdModal,

@@ -4,9 +4,9 @@
       <template #departSelect="{ model, field }">
         <DepartTreeSelect
           v-model:value="model[field]"
-          placeholder="请选择组织（院系/专业/班级）"
+          placeholder="请选择组织（学院/专业）"
           :multiple="false"
-          :orgCategories="['5', '6', '7']"
+          :orgTypes="['2', '3', '4']"
         />
       </template>
     </BasicForm>

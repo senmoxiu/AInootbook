@@ -173,7 +173,7 @@ const checkDraft = () => {
 
 const fetchCourses = async () => {
   try {
-    const res = await courseApi.getCourseList({ pageSize: 100 })
+    const res = await courseApi.getMySelectedCourses({ pageSize: 100 })
     courseOptions.value = (res as any).result?.records || (res as any).records || []
   } catch (err) {
     console.error(err)

@@ -1,6 +1,6 @@
 import { BasicColumn, FormSchema } from '/@/components/Table';
 import { render } from '/@/utils/common/renderUtils';
-import { getCourseList } from '/@/api/ainote/course.api';
+import { getCourseList, getMySelectedCourses } from '/@/api/ainote/course.api';
 
 /**
  * 笔记表格列定义
@@ -172,11 +172,15 @@ export const createFormSchema: FormSchema[] = [
   {
     label: '课程',
     field: 'courseId',
-    component: 'JDictSelectTag',
+    component: 'ApiSelect',
     required: true,
     componentProps: {
+      api: getMySelectedCourses,
+      labelField: 'courseName',
+      valueField: 'id',
+      resultField: 'records',
       placeholder: '请选择课程',
-      dictCode: 'ainote_course,course_name,id',
+      params: { pageSize: 100 },
     },
   },
   {
@@ -222,11 +226,15 @@ export const editFormSchema: FormSchema[] = [
   {
     label: '课程',
     field: 'courseId',
-    component: 'JDictSelectTag',
+    component: 'ApiSelect',
     componentProps: {
-      dictCode: 'ainote_course,course_name,id',
+      api: getMySelectedCourses,
+      labelField: 'courseName',
+      valueField: 'id',
+      resultField: 'records',
       placeholder: '所属课程',
       disabled: true,
+      params: { pageSize: 100 },
     },
   },
   {

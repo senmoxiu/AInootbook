@@ -24,6 +24,10 @@ export interface AiConfigRecord {
   integrateModelId?: string;
   knowledgeId?: string;
   summaryPromptKey?: string;
+  /** 整合提示词 Key */
+  integratePromptKey?: string;
+  /** 关键词提示词 Key */
+  keywordsPromptKey?: string;
   maxSummaryLength?: number;
   maxKeywordsCount?: number;
   /** ASR 失败处理策略 */

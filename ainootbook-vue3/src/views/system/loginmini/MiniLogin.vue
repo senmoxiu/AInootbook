@@ -129,42 +129,11 @@
                     >
                   </div>
                   <div class="aui-flex">
-                    <a class="aui-linek-code aui-flex-box" @click="codeHandleClick">{{ t('sys.login.qrSignInFormTitle') }}</a>
-                  </div>
-                  <div class="aui-flex">
                     <a class="aui-linek-code aui-flex-box" @click="registerHandleClick">{{ t('sys.login.registerButton') }}</a>
                   </div>
                 </div>
               </div>
               <a-form @keyup.enter.native="loginHandleClick">
-                <!-- 第三方登录已禁用 -->
-                <div v-if="false" class="aui-flex aui-third-text">
-                  <div class="aui-flex-box aui-third-border">
-                    <span>{{ t('sys.login.otherSignIn') }}</span>
-                  </div>
-                </div>
-                <div v-if="false" class="aui-flex" :class="`${prefixCls}-sign-in-way`">
-                  <div class="aui-flex-box">
-                    <div class="aui-third-login">
-                      <a title="github" @click="onThirdLogin('github')"><GithubFilled /></a>
-                    </div>
-                  </div>
-                  <div class="aui-flex-box">
-                    <div class="aui-third-login">
-                      <a title="企业微信" @click="onThirdLogin('wechat_enterprise')"><icon-font class="item-icon" type="icon-qiyeweixin3" /></a>
-                    </div>
-                  </div>
-                  <div class="aui-flex-box">
-                    <div class="aui-third-login">
-                      <a title="钉钉" @click="onThirdLogin('dingtalk')"><DingtalkCircleFilled /></a>
-                    </div>
-                  </div>
-                  <div class="aui-flex-box">
-                    <div class="aui-third-login">
-                      <a title="微信" @click="onThirdLogin('wechat_open')"><WechatFilled /></a>
-                    </div>
-                  </div>
-                </div>
               </a-form>
             </div>
           </div>
@@ -177,12 +146,6 @@
     <div v-show="type === 'register'" :class="`${prefixCls}-form`">
       <MiniRegister ref="registerRef" @go-back="goBack" @success="handleSuccess" />
     </div>
-    <div v-show="type === 'codeLogin'" :class="`${prefixCls}-form`">
-      <MiniCodelogin ref="codeRef" @go-back="goBack" @success="handleSuccess" />
-    </div>
-    <!-- 第三方登录相关弹框 -->
-    <ThirdModal ref="thirdModalRef"></ThirdModal>
-
     <!-- 图片验证码弹窗 -->
     <CaptchaModal @register="captchaRegisterModal" @ok="getLoginCode" />
   </div>
@@ -196,26 +159,20 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { SmsEnum } from '/@/views/sys/login/useLogin';
-  import ThirdModal from '/@/views/sys/login/ThirdModal.vue';
   import MiniForgotpad from './MiniForgotpad.vue';
   import MiniRegister from './MiniRegister.vue';
-  import MiniCodelogin from './MiniCodelogin.vue';
   import logoImg from '/@/assets/loginmini/icon/jeecg_logo.png';
   import { AppLocalePicker, AppDarkModeToggle } from '/@/components/Application';
   import { useLocaleStore } from '/@/store/modules/locale';
   import { createLocalStorage } from '/@/utils/cache';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useAppInject } from '/@/hooks/web/useAppInject';
-  import { GithubFilled, WechatFilled, DingtalkCircleFilled, createFromIconfontCN } from '@ant-design/icons-vue';
   import CaptchaModal from '@/components/jeecg/captcha/CaptchaModal.vue';
   import { useModal } from '@/components/Modal';
   import { ExceptionEnum } from '@/enums/exceptionEnum';
   import { encryptAESCBC } from '/@/utils/cipher';
   import { defHttp } from '@/utils/http/axios';
 
-  const IconFont = createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_2316098_umqusozousr.js',
-  });
   const { prefixCls } = useDesign('mini-login');
   const { notification, createMessage } = useMessage();
   const userStore = useUserStore();
@@ -248,10 +205,6 @@
     loginOrgCode: '',
   });
   const loginRef = ref();
-  //第三方登录弹窗
-  const thirdModalRef = ref();
-  //扫码登录
-  const codeRef = ref();
   //是否显示获取验证码
   const showInterval = ref<boolean>(true);
   //60s
@@ -514,14 +467,6 @@
   }
 
   /**
-   * 第三方登录
-   * @param type
-   */
-  function onThirdLogin(type) {
-    thirdModalRef.value.onThirdLogin(type);
-  }
-
-  /**
    * 忘记密码
    */
   function forgetHandelClick() {
@@ -558,16 +503,6 @@
     type.value = 'register';
     setTimeout(() => {
       registerRef.value.initForm();
-    }, 300);
-  }
-
-  /**
-   * 注册
-   */
-  function codeHandleClick() {
-    type.value = 'codeLogin';
-    setTimeout(() => {
-      codeRef.value.initFrom();
     }, 300);
   }
 

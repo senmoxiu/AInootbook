@@ -2,7 +2,7 @@
   <BasicDrawer v-bind="$attrs" @register="registerDrawer" title="批量配置教学任务" :width="600" :showFooter="true" @ok="handleSubmit" destroyOnClose>
     <BasicForm @register="registerForm">
       <template #departTreeSelect="{ model, field }">
-        <DepartTreeSelect v-model:value="model[field]" placeholder="请选择组织（可多选）" :multiple="true" />
+        <DepartTreeSelect v-model:value="model[field]" placeholder="请选择组织（可多选）" :multiple="true" :orgTypes="['2', '3', '4']" />
       </template>
     </BasicForm>
 

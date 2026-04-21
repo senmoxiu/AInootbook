@@ -250,7 +250,8 @@ export const useUserStore = defineStore({
       if (!this.getToken) {
         return null;
       }
-      const { userInfo, sysAllDictItems } = await getUserInfo();
+      const res = await getUserInfo();
+      const { userInfo, sysAllDictItems, roleCode } = res;
       if (userInfo) {
         const { roles = [] } = userInfo;
         if (isArray(roles)) {
@@ -259,6 +260,10 @@ export const useUserStore = defineStore({
         } else {
           userInfo.roles = [];
           this.setRoleList([]);
+        }
+        // 注入顶层 roleCode 到 userInfo，供各页面角色判断使用
+        if (roleCode) {
+          userInfo.roleCode = roleCode;
         }
         this.setUserInfo(userInfo);
       }

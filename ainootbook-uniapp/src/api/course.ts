@@ -102,4 +102,14 @@ export const courseApi = {
       method: 'DELETE',
       query: { id },
     }),
+
+  /** 获取当前用户已选课程（学生：已选课程；admin：全部课程） */
+  getMySelectedCourses: (params?: { pageNo?: number; pageSize?: number }, options: CourseRequestOptions = {}) =>
+    http<CourseListResult | CourseApiResponse<CourseListResult>>({
+      url: '/teaching/selection/myCourses',
+      method: 'GET',
+      query: params,
+      cache: options.cache ?? true,
+      hideErrorToast: options.hideErrorToast,
+    }),
 }

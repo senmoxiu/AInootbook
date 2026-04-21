@@ -5,6 +5,9 @@ const { createConfirm } = useMessage();
 
 enum Api {
   list = '/teaching/selection/list',
+  listGrouped = '/teaching/selection/listGrouped',
+  studentsByTeaching = '/teaching/selection/studentsByTeaching',
+  clearByTeaching = '/teaching/selection/clearByTeaching',
   save = '/teaching/selection/add',
   edit = '/teaching/selection/edit',
   delete = '/teaching/selection/delete',
@@ -60,3 +63,12 @@ export const dropCourse = (params: { id: string }) => defHttp.post({ url: Api.dr
 
 /** 查询当前学期可选课程（排除已选） */
 export const getAvailableTeachings = (params: Record<string, unknown>) => defHttp.get({ url: Api.available, params });
+
+/** 按课程聚合查询选课人数（管理员视图） */
+export const getGroupedSelectionList = (params: Record<string, unknown>) => defHttp.get({ url: Api.listGrouped, params });
+
+/** 查询某教学任务下的选课学生明细 */
+export const getStudentsByTeaching = (params: { teachingId: string }) => defHttp.get({ url: Api.studentsByTeaching, params });
+
+/** 清空某教学任务下的所有选课记录 */
+export const clearSelectionByTeaching = (teachingId: string) => defHttp.delete({ url: Api.clearByTeaching, params: { teachingId } }, { joinParamsToUrl: true });

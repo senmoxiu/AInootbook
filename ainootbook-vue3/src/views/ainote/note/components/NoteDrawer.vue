@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, unref, watch, nextTick } from 'vue';
+  import { ref, computed, unref, nextTick } from 'vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
   import { createFormSchema, editFormSchema } from '../note.data';
@@ -75,7 +75,7 @@
   // 根据模式选择不同的表单 Schema
   const currentSchema = computed(() => (unref(isUpdate) ? editFormSchema : createFormSchema));
 
-  const [registerForm, { resetFields, setFieldsValue, validate, resetSchema, getFieldsValue }] = useForm({
+  const [registerForm, { resetFields, setFieldsValue, validate, resetSchema, updateSchema, getFieldsValue }] = useForm({
     labelWidth: 100,
     schemas: createFormSchema,
     showActionButtonGroup: false,
@@ -93,6 +93,16 @@
 
     // 动态切换表单 Schema（必须用 resetSchema 完整替换，updateSchema 只合并已有字段）
     await resetSchema(unref(currentSchema));
+
+    // 注入课程字段的 onChange 回调（新增模式）
+    if (!unref(isUpdate)) {
+      await updateSchema({
+        field: 'courseId',
+        componentProps: {
+          onChange: handleCourseChange,
+        },
+      });
+    }
 
     if (unref(isUpdate)) {
       // 编辑模式：通过 queryById 获取完整数据（列表 VO 不含 noteContent 等大字段）
@@ -123,32 +133,21 @@
 
   const getTitle = computed(() => (!unref(isUpdate) ? '新增笔记' : '编辑笔记'));
 
-  // 监听课程选择变化，联动加载章节树
-  watch(
-    () => {
+  // 课程选择变化 → 联动加载章节树
+  async function handleCourseChange(courseId: string) {
+    if (courseId && courseId !== currentCourseId.value) {
+      currentCourseId.value = courseId;
       try {
-        const values = getFieldsValue();
-        return values?.courseId;
+        const tree = await getChapterTreeList({ courseId });
+        chapterTreeData.value = tree || [];
       } catch {
-        return undefined;
-      }
-    },
-    async (courseId) => {
-      if (courseId && courseId !== currentCourseId.value) {
-        currentCourseId.value = courseId;
-        try {
-          const tree = await getChapterTreeList({ courseId });
-          chapterTreeData.value = tree || [];
-        } catch {
-          chapterTreeData.value = [];
-        }
-      } else if (!courseId) {
-        currentCourseId.value = '';
         chapterTreeData.value = [];
       }
-    },
-    { deep: true }
-  );
+    } else if (!courseId) {
+      currentCourseId.value = '';
+      chapterTreeData.value = [];
+    }
+  }
 
   async function handleSubmit() {
     try {

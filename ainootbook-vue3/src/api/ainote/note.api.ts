@@ -76,11 +76,21 @@ export interface NoteShareResult {
   expireTime?: string;
 }
 
+/** AI 生成进度 - 单步 */
+export interface NoteProgressStep {
+  key: string;
+  label: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'skipped';
+  progress: number;
+  errorMsg?: string;
+}
+
 /** AI 生成进度 */
 export interface NoteProgressResult {
   progress: number;
   status: 'idle' | 'processing' | 'completed' | 'failed';
   errorMsg?: string;
+  steps?: NoteProgressStep[];
 }
 
 /** 笔记版本记录 */
@@ -232,10 +242,10 @@ export const cancelGeneration = (params: { noteId: string }) => {
 };
 
 /**
- * 查询 AI 生成进度
+ * 查询 AI 生成进度（单次轮询最长等 30s，后端 AI 任务响应慢）
  */
 export const getGenerationProgress = (params: { noteId: string; knowledgeId?: string }) => {
-  return defHttp.get<NoteProgressResult>({ url: Api.progress, params });
+  return defHttp.get<NoteProgressResult>({ url: Api.progress, params, timeout: 30 * 1000 });
 };
 
 /**

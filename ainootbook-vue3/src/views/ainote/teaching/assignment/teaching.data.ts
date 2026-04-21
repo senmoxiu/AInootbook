@@ -40,11 +40,6 @@ export const columns: BasicColumn[] = [
       return render.renderTag(render.renderDict(text, 'ainote_teaching_status'), color);
     },
   },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    width: 150,
-  },
 ];
 
 /**
@@ -103,11 +98,14 @@ export const formSchema: FormSchema[] = [
   {
     label: '教师',
     field: 'teacherId',
-    component: 'JDictSelectTag',
+    component: 'JSelectUserByDepartment',
     required: true,
     componentProps: {
       placeholder: '请选择教师',
-      dictCode: 'sys_user,realname,id',
+      rowKey: 'id',
+      labelKey: 'realname',
+      useCompanyShortName: false,
+      params: { roleCodes: 'teacher' },
     },
   },
   {

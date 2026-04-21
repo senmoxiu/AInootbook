@@ -5,6 +5,7 @@ const { createConfirm } = useMessage();
 
 enum Api {
   list = '/teaching/course/list',
+  myCourses = '/teaching/selection/myCourses',
   save = '/teaching/course/add',
   edit = '/teaching/course/edit',
   delete = '/teaching/course/delete',
@@ -20,6 +21,14 @@ enum Api {
  */
 export const getCourseList = (params) => {
   return defHttp.get({ url: Api.list, params });
+};
+
+/**
+ * 查询当前用户已选课程（学生：已选课程；admin：全部课程）
+ * 用于笔记新增时的课程选择，确保学生只能选择已选课程
+ */
+export const getMySelectedCourses = (params?) => {
+  return defHttp.get({ url: Api.myCourses, params });
 };
 
 /**

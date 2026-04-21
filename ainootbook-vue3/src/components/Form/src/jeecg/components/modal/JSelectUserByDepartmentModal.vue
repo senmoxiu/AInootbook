@@ -253,6 +253,7 @@
             pageNo: 1,
             pageSize: 100,
             realname: `*${searchText.value}*`,
+            ...(props.params || {}),
           },
         })
         .then((result: any) => {

@@ -28,8 +28,12 @@
     value?: string | string[];
     placeholder?: string;
     multiple?: boolean;
-    /** 允许的 orgCategory 列表，不传则展示所有组织 */
-    orgCategories?: string[];
+    /**
+     * 允许的 orgType 列表（按层级过滤）
+     * orgType: 1=公司 2=学院 3=专业 4=班级
+     * 不传则展示所有节点
+     */
+    orgTypes?: string[];
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -57,22 +61,22 @@
     try {
       const result = await queryTreeList();
       if (result && Array.isArray(result)) {
-        // 如果指定了 orgCategories，按条件过滤；否则展示所有节点
-        state.treeData = props.orgCategories?.length ? filterAndTransformTree(result) : transformTree(result);
+        // 如果指定了 orgTypes，按条件过滤；否则展示所有节点
+        state.treeData = props.orgTypes?.length ? filterAndTransformTree(result) : transformTree(result);
       }
     } catch (error) {
       console.error('加载部门树数据失败:', error);
     }
   }
 
-  // 直接转换树数据（不过滤 orgCategory）
+  // 直接转换树数据（不过滤）
   function transformTree(nodes: any[]): any[] {
     return nodes.map((node) => {
       const newNode: any = {
         title: node.title || node.departName,
         value: node.key || node.id,
         key: node.key || node.id,
-        orgCategory: node.orgCategory || node.org_category,
+        orgType: node.orgType,
       };
       if (node.children && node.children.length > 0) {
         newNode.children = transformTree(node.children);
@@ -81,22 +85,22 @@
     });
   }
 
-  // 过滤并转换树数据（仅保留指定 orgCategory 的节点）
+  // 过滤并转换树数据（按 orgType 过滤）
   function filterAndTransformTree(nodes: any[]): any[] {
-    const allowed = props.orgCategories || [];
+    const allowed = props.orgTypes || [];
     const result: any[] = [];
 
     for (const node of nodes) {
-      const orgCategory = node.orgCategory || node.org_category;
-      if (allowed.includes(orgCategory)) {
+      const orgType = String(node.orgType ?? '');
+      if (allowed.includes(orgType)) {
         const newNode: any = {
           title: node.title || node.departName,
           value: node.key || node.id,
           key: node.key || node.id,
-          orgCategory: orgCategory,
+          orgType: orgType,
         };
 
-        // 递归处理子节点
+        // 递归处理子节点（找更深层级）
         if (node.children && node.children.length > 0) {
           const children = filterAndTransformTree(node.children);
           if (children.length > 0) {
@@ -106,7 +110,7 @@
 
         result.push(newNode);
       } else if (node.children && node.children.length > 0) {
-        // 如果当前节点不符合条件，但有子节点，继续递归查找
+        // 当前节点不符合条件，继续向下找
         const children = filterAndTransformTree(node.children);
         result.push(...children);
       }

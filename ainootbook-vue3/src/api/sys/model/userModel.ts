@@ -45,6 +45,8 @@ export interface GetUserInfoModel {
   userInfo?: any;
   // 缓存字典项
   sysAllDictItems?: any;
+  // 角色编码（逗号分隔）
+  roleCode?: string;
 }
 
 /**

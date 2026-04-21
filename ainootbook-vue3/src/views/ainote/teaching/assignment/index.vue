@@ -65,7 +65,7 @@
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, searchFormSchema } from './teaching.data';
   import { getTeachingList, deleteTeaching, batchDeleteTeaching } from '/@/api/ainote/teaching.api';
-  import { queryDepartTreeSync } from '/@/api/common/api';
+  import { queryDepartTreeSync, queryTreeList } from '/@/api/common/api';
   import TeachingDrawer from './TeachingDrawer.vue';
   import TeachingConfigDrawer from './TeachingConfigDrawer.vue';
 
@@ -98,7 +98,7 @@
         }
         return params;
       },
-      immediate: false, // 不立即加载，等待选择组织后再加载
+      immediate: true,
     },
   });
 
@@ -113,10 +113,17 @@
   async function loadTreeData() {
     try {
       treeLoading.value = true;
-      const result = await queryDepartTreeSync();
+      const result = await queryTreeList();
       if (result && Array.isArray(result)) {
         // 过滤并转换树数据（仅保留 org_category ∈ {5,6,7} 的节点）
         treeData.value = filterAndTransformTree(result);
+        // 自动选中第一个节点并加载列表
+        if (treeData.value.length > 0 && !currentDepartId.value) {
+          const firstKey = treeData.value[0].key;
+          selectedKeys.value = [firstKey];
+          currentDepartId.value = firstKey;
+          reload();
+        }
       }
     } catch (error) {
       console.error('加载组织树数据失败:', error);
@@ -125,18 +132,17 @@
     }
   }
 
-  // 过滤并转换树数据（仅保留 org_category ∈ {5,6,7} 的节点）
+  // 过滤并转换树数据（按 orgType 区分层级：2=学院 3=专业 4=班级）
   function filterAndTransformTree(nodes: any[]): any[] {
     const result: any[] = [];
 
     for (const node of nodes) {
-      // 检查 org_category 是否为 5（院系）、6（专业）、7（班级）
-      const orgCategory = node.orgCategory || node.org_category;
-      if (orgCategory === '5' || orgCategory === '6' || orgCategory === '7') {
+      const orgType = String(node.orgType ?? '');
+      if (orgType === '2' || orgType === '3' || orgType === '4') {
         const newNode: any = {
           title: node.title || node.departName,
           key: node.key || node.id,
-          orgCategory: orgCategory,
+          orgType: orgType,
         };
 
         // 递归处理子节点
@@ -149,7 +155,7 @@
 
         result.push(newNode);
       } else if (node.children && node.children.length > 0) {
-        // 如果当前节点不符合条件，但有子节点，继续递归查找
+        // 当前节点不符合条件（如学校根节点），继续向下找
         const children = filterAndTransformTree(node.children);
         result.push(...children);
       }

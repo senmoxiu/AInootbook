@@ -148,6 +148,7 @@
   import { getCourseStatistics, getTopKeywords, getMaterialTypeStats } from '/@/api/ainote/statistics.api';
   import {
     FileTextOutlined,
+    CheckCircleOutlined,
     UploadOutlined,
     TeamOutlined,
   } from '@ant-design/icons-vue';
@@ -176,12 +177,12 @@
     { label: '2024-2025 第一学期', value: '2024-1' },
   ]);
 
-  // ─── 概览数据（静态占位）────────────────────────────────────
+  // ─── 概览数据 ────────────────────────────────────────────────
   const overview = reactive({
-    totalNotes: 128,
-    completedNotes: 112,
-    totalMaterials: 256,
-    studentCount: 43,
+    totalNotes: 0,
+    completedNotes: 0,
+    totalMaterials: 0,
+    studentCount: 0,
   });
 
   // ─── 表格 ────────────────────────────────────────────────────

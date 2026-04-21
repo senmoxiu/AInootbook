@@ -2,6 +2,30 @@ import { BasicColumn, FormSchema } from '/@/components/Table';
 import { render } from '/@/utils/common/renderUtils';
 import { getTeachingList } from '/@/api/ainote/teaching.api';
 
+/** 管理员聚合视图列（按课程聚合） */
+export const groupedColumns: BasicColumn[] = [
+  { title: '课程名称', dataIndex: 'courseName', width: 180 },
+  { title: '课程代码', dataIndex: 'courseCode', width: 120 },
+  { title: '教师', dataIndex: 'teacherName', width: 100 },
+  { title: '组织', dataIndex: 'departName', width: 140 },
+  { title: '学期', dataIndex: 'semester', width: 120 },
+  { title: '选课人数', dataIndex: 'studentCount', key: 'studentCount', width: 100 },
+];
+
+/** 管理员聚合视图搜索表单 */
+export const groupedSearchSchema: FormSchema[] = [
+  { label: '课程名称', field: 'courseName', component: 'Input', colProps: { span: 6 } },
+  { label: '学期', field: 'semester', component: 'Input', colProps: { span: 6 } },
+];
+
+/** 学生明细列（抽屉内展示） */
+export const studentDetailColumns = [
+  { title: '学生姓名', dataIndex: 'studentName', width: 100 },
+  { title: '组织', dataIndex: 'departName', width: 140 },
+  { title: '选课时间', dataIndex: 'selectedAt', width: 150 },
+  { title: '操作', dataIndex: 'action', key: 'action', width: 80, fixed: 'right' },
+];
+
 /** 可选课程列（学生选课用） */
 export const availableColumns: BasicColumn[] = [
   { title: '课程名称', dataIndex: 'courseName', width: 180 },
