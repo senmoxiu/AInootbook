@@ -10,6 +10,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.util.TokenUtils;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourse;
 import org.jeecg.modules.airag.teaching.service.IAinoteCourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,11 @@ public class AinoteCourseController extends JeecgController<AinoteCourse, IAinot
     @Operation(summary = "添加课程")
     @PostMapping(value = "/add")
     @RequiresPermissions("teaching:course:add")
-    public Result<String> add(@RequestBody AinoteCourse ainoteCourse) {
+    public Result<String> add(@RequestBody AinoteCourse ainoteCourse, HttpServletRequest req) {
+        String tenantIdStr = TokenUtils.getTenantIdByRequest(req);
+        if (oConvertUtils.isNotEmpty(tenantIdStr)) {
+            ainoteCourse.setTenantId(Integer.parseInt(tenantIdStr));
+        }
         ainoteCourseService.save(ainoteCourse);
         return Result.OK("添加成功！");
     }

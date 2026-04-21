@@ -47,7 +47,7 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
     private static final int STATUS_COMPLETED = 2;
     private static final int STATUS_FAILED = 3;
 
-    private static final Set<String> ALLOWED_TASK_TYPES = Set.of("asr", "tika", "ocr", "video", "summary");
+    private static final Set<String> ALLOWED_TASK_TYPES = Set.of("asr", "tika", "ocr", "video", "summary", "integrate", "keywords");
 
     /** WR-02: 最大重试次数（可后续迁移到配置文件） */
     private static final int MAX_RETRY_COUNT = 3;
@@ -146,6 +146,53 @@ public class AinoteAiTaskServiceImpl extends ServiceImpl<AinoteAiTaskMapper, Ain
 
         log.info("创建AI任务成功: taskId={}, noteId={}, materialId={}, taskType={}, tenantId={}",
                 task.getId(), noteId, materialId, taskType, tenantId);
+        return task;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AinoteAiTask createTaskBySystem(String noteId, String materialId, String taskType,
+                                           Integer tenantId, String createBy) {
+        if (oConvertUtils.isEmpty(noteId) || noteId.isBlank()) throw new JeecgBootException("笔记ID不能为空");
+        if (oConvertUtils.isEmpty(taskType) || taskType.isBlank()) throw new JeecgBootException("任务类型不能为空");
+        if (!ALLOWED_TASK_TYPES.contains(taskType)) {
+            throw new JeecgBootException("任务类型不合法，仅支持: " + String.join(", ", ALLOWED_TASK_TYPES));
+        }
+        if (tenantId == null) throw new JeecgBootException("tenantId不能为空");
+
+        AinoteNote note = noteService.getById(noteId);
+        if (note == null) throw new JeecgBootException("笔记不存在: " + noteId);
+        if (note.getNoteStatus() != null && note.getNoteStatus() == 3) throw new JeecgBootException("笔记已删除");
+
+        // CAS 去重
+        QueryWrapper<AinoteAiTask> dupCheck = new QueryWrapper<>();
+        dupCheck.eq("note_id", noteId).eq("task_type", taskType).eq("tenant_id", tenantId)
+                .in("task_status", STATUS_PENDING, STATUS_PROCESSING);
+        if (oConvertUtils.isNotEmpty(materialId) && !materialId.isBlank()) {
+            dupCheck.eq("material_id", materialId);
+        } else {
+            dupCheck.isNull("material_id");
+        }
+        if (aiTaskMapper.selectCount(dupCheck) > 0) {
+            log.info("已有相同类型任务处理中，跳过创建: noteId={}, taskType={}", noteId, taskType);
+            return null;
+        }
+
+        AinoteAiTask task = new AinoteAiTask();
+        task.setNoteId(noteId);
+        task.setMaterialId(materialId);
+        task.setTaskType(taskType);
+        task.setTaskStatus(STATUS_PENDING);
+        task.setRetryCount(0);
+        task.setTenantId(tenantId);
+        task.setCreateBy(oConvertUtils.isNotEmpty(createBy) ? createBy : "system");
+        task.setCreateTime(new Date());
+
+        int inserted = aiTaskMapper.insert(task);
+        if (inserted <= 0) throw new JeecgBootException("创建任务失败");
+
+        log.info("创建AI任务成功(system): taskId={}, noteId={}, taskType={}, tenantId={}",
+                task.getId(), noteId, taskType, tenantId);
         return task;
     }
 

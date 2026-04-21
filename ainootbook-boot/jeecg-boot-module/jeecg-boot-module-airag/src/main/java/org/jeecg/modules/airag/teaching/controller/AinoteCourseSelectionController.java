@@ -22,11 +22,13 @@ import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
 import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.service.IAinoteCourseSelectionService;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
+import org.jeecg.modules.airag.teaching.vo.SelectionGroupVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 选课管理 Controller
@@ -40,6 +42,43 @@ public class AinoteCourseSelectionController
 
     @Autowired
     private IAinoteCourseSelectionService selectionService;
+
+    @Operation(summary = "清空某教学任务下的所有选课（软删除）")
+    @DeleteMapping("/clearByTeaching")
+    @RequiresPermissions("teaching:selection:delete")
+    public Result<String> clearByTeaching(@RequestParam String teachingId) {
+        selectionService.clearByTeachingId(teachingId);
+        return Result.OK("已清空该课程所有选课记录");
+    }
+
+    @Operation(summary = "按课程聚合查询选课人数（管理员视图）")
+    @GetMapping("/listGrouped")
+    @RequiresPermissions("teaching:selection:list")
+    public Result<IPage<SelectionGroupVO>> listGrouped(
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String courseName,
+            @RequestParam(required = false) String semester) {
+        Page<SelectionGroupVO> page = new Page<>(pageNo, pageSize);
+        return Result.OK(selectionService.queryGroupedByTeaching(page, courseName, semester));
+    }
+
+    @Operation(summary = "查询某教学任务下的选课学生明细")
+    @GetMapping("/studentsByTeaching")
+    @RequiresPermissions("teaching:selection:list")
+    public Result<List<AinoteCourseSelectionVO>> studentsByTeaching(
+            @RequestParam String teachingId) {
+        return Result.OK(selectionService.queryStudentsByTeachingId(teachingId));
+    }
+
+    @Operation(summary = "查询我的已选课程（学生：已选课程；admin：全部课程）")
+    @GetMapping("/myCourses")
+    public Result<IPage<org.jeecg.modules.airag.teaching.entity.AinoteCourse>> myCourses(
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "100") Integer pageSize) {
+        Page<org.jeecg.modules.airag.teaching.entity.AinoteCourse> page = new Page<>(pageNo, pageSize);
+        return Result.OK(selectionService.queryMySelectedCourses(page));
+    }
 
     @Operation(summary = "分页列表查询（联表 VO）")
     @GetMapping(value = "/list")

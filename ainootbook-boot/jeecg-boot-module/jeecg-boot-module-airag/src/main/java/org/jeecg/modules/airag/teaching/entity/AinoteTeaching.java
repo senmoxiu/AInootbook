@@ -32,7 +32,7 @@ public class AinoteTeaching implements Serializable {
 
     @Excel(name = "教师", width = 15, dictTable = "sys_user", dicCode = "id", dicText = "realname")
     @Dict(dictTable = "sys_user", dicCode = "id", dicText = "realname")
-    @Schema(description = "教师ID")
+    @Schema(description = "教师ID，多个用逗号分隔")
     private String teacherId;
 
     @Excel(name = "课程", width = 15, dictTable = "ainote_course", dicCode = "id", dicText = "course_name")

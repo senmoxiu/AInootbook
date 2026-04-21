@@ -57,4 +57,11 @@ public interface IAinoteTeachingService extends IService<AinoteTeaching> {
      * @return 是否删除成功
      */
     boolean batchDeleteWithPermission(List<String> ids);
+
+    /**
+     * 查询指定部门及其所有子孙部门的 ID 列表
+     * @param departId 根部门ID
+     * @return 包含自身及所有子孙的 ID 列表
+     */
+    List<String> getDepartAndSubIds(String departId);
 }

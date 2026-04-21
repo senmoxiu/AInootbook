@@ -1,16 +1,22 @@
 package org.jeecg.modules.ainote.controller;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.TokenUtils;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.ainote.mapper.AinoteNoteMapper;
 import org.jeecg.modules.ainote.service.IAinoteStatisticsService;
+import org.jeecg.modules.ainote.util.RoleUtils;
 import org.jeecg.modules.ainote.vo.AinoteCourseStatVO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +36,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class AinoteStatisticsController {
 
     private final IAinoteStatisticsService statisticsService;
+    private final AinoteNoteMapper ainoteNoteMapper;
+
+    /**
+     * 校验教师是否有权限查询该课程
+     * 管理员跳过校验，教师必须在 ainote_teaching 表中有对应记录
+     */
+    private void validateTeacherCoursePermission(String courseId, String teacherId, Integer tenantId) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (user == null) {
+            throw new RuntimeException("用户未登录");
+        }
+        // 管理员跳过校验
+        if (RoleUtils.hasRole(user.getRoleCode(), "admin")) {
+            return;
+        }
+        // 教师校验：查询该教师的所有课程ID
+        List<String> teacherCourseIds = ainoteNoteMapper.selectTeacherCourseIds(teacherId, tenantId);
+        if (!teacherCourseIds.contains(courseId)) {
+            throw new RuntimeException("无权限查询该课程统计数据");
+        }
+    }
 
     /**
      * 查询课程笔记统计概览
@@ -50,10 +77,16 @@ public class AinoteStatisticsController {
             @Parameter(description = "章节ID，不传则返回全部章节")
             @RequestParam(required = false) String chapterId,
             HttpServletRequest request) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         String tenantId = TokenUtils.getTenantIdByRequest(request);
         if (oConvertUtils.isEmpty(tenantId)) {
             tenantId = "0";
         }
+        Integer tenantIdInt = Integer.parseInt(tenantId);
+
+        // 权限校验：教师只能查询自己教授的课程
+        validateTeacherCoursePermission(courseId, user.getId(), tenantIdInt);
+
         return Result.ok(statisticsService.getCourseStatistics(courseId, tenantId, semester, chapterId));
     }
 
@@ -75,10 +108,12 @@ public class AinoteStatisticsController {
             @Parameter(description = "学期，格式：2025-1")
             @RequestParam(required = false) String semester,
             HttpServletRequest request) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         String tenantId = TokenUtils.getTenantIdByRequest(request);
         if (oConvertUtils.isEmpty(tenantId)) {
             tenantId = "0";
         }
+        validateTeacherCoursePermission(courseId, user.getId(), Integer.parseInt(tenantId));
         return Result.ok(statisticsService.getTopKeywords(courseId, tenantId, topN, semester));
     }
 
@@ -91,10 +126,12 @@ public class AinoteStatisticsController {
             @Parameter(description = "学期，格式：2025-1")
             @RequestParam(required = false) String semester,
             HttpServletRequest request) {
+        LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         String tenantId = TokenUtils.getTenantIdByRequest(request);
         if (oConvertUtils.isEmpty(tenantId)) {
             tenantId = "0";
         }
+        validateTeacherCoursePermission(courseId, user.getId(), Integer.parseInt(tenantId));
         return Result.ok(statisticsService.getMaterialTypeStats(courseId, tenantId, semester));
     }
 }

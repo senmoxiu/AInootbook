@@ -8,6 +8,7 @@ import org.jeecg.modules.airag.teaching.dto.AinoteCourseSelectionAddDTO;
 import org.jeecg.modules.airag.teaching.entity.AinoteCourseSelection;
 import org.jeecg.modules.airag.teaching.vo.AvailableTeachingVO;
 import org.jeecg.modules.airag.teaching.vo.AinoteCourseSelectionVO;
+import org.jeecg.modules.airag.teaching.vo.SelectionGroupVO;
 
 import java.util.List;
 
@@ -55,4 +56,28 @@ public interface IAinoteCourseSelectionService extends IService<AinoteCourseSele
     IPage<AvailableTeachingVO> queryAvailableTeachings(
             Page<AvailableTeachingVO> page,
             String courseName);
+
+    /**
+     * 按教学任务聚合查询选课人数（管理员视图）
+     */
+    IPage<SelectionGroupVO> queryGroupedByTeaching(
+            Page<SelectionGroupVO> page,
+            String courseName,
+            String semester);
+
+    /**
+     * 清空某教学任务下的所有选课记录（软删除）
+     */
+    void clearByTeachingId(String teachingId);
+
+    /**
+     * 查询某教学任务下的所有选课学生明细
+     */
+    List<AinoteCourseSelectionVO> queryStudentsByTeachingId(String teachingId);
+
+    /**
+     * 查询当前用户已选课程列表（学生：已选课程；admin：全部课程）
+     */
+    IPage<org.jeecg.modules.airag.teaching.entity.AinoteCourse> queryMySelectedCourses(
+            Page<org.jeecg.modules.airag.teaching.entity.AinoteCourse> page);
 }

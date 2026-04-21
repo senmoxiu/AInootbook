@@ -55,7 +55,7 @@
         JOIN ainote_teaching t ON t.id = n.teaching_id
         LEFT JOIN sys_user su ON su.id = n.student_id
         LEFT JOIN ainote_course c ON c.id = n.course_id
-        WHERE t.teacher_id = #{teacherId}
+        WHERE FIND_IN_SET(#{teacherId}, t.teacher_id)
           AND n.tenant_id = #{tenantId}
           AND n.note_status != 3
         <if test="courseId != null and courseId != ''">

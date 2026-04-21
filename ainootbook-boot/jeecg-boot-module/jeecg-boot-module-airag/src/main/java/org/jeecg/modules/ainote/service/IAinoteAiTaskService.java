@@ -16,6 +16,11 @@ public interface IAinoteAiTaskService extends IService<AinoteAiTask> {
     AinoteAiTask createTask(String noteId, String materialId, String taskType);
 
     /**
+     * 异步线程内创建任务（无 Shiro 上下文），直接传入 tenantId 和 createBy
+     */
+    AinoteAiTask createTaskBySystem(String noteId, String materialId, String taskType, Integer tenantId, String createBy);
+
+    /**
      * 抢占任务（PENDING -> PROCESSING）
      */
     boolean claimTask(String taskId);

@@ -153,7 +153,7 @@ public interface AinoteNoteMapper extends BaseMapper<AinoteNote> {
             "<script>",
             "SELECT DISTINCT course_id",
             "FROM ainote_teaching",
-            "WHERE teacher_id = #{teacherId}",
+            "WHERE FIND_IN_SET(#{teacherId}, teacher_id)",
             "<if test='tenantId != null'>",
             "  AND tenant_id = #{tenantId}",
             "</if>",

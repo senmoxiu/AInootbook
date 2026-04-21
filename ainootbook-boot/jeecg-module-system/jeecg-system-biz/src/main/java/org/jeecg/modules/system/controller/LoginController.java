@@ -161,6 +161,9 @@ public class LoginController {
 			log.debug("2 获取用户信息耗时 (首页面配置)" + (System.currentTimeMillis() - start) + "毫秒");
 			
 			obj.put("userInfo",sysUser);
+				// 注入 roleCode，供前端角色判断使用
+				Set<String> roleSet = sysUserService.getUserRolesSet(username);
+				obj.put("roleCode", String.join(",", roleSet));
 			obj.put("sysAllDictItems", sysDictService.queryAllDictItems());
 			log.debug("3 获取用户信息耗时 (字典数据)" + (System.currentTimeMillis() - start) + "毫秒");
 			

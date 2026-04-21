@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 教学关系表 Controller
@@ -46,7 +48,17 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
             @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             HttpServletRequest req) {
-        QueryWrapper<AinoteTeaching> queryWrapper = QueryGenerator.initQueryWrapper(ainoteTeaching, req.getParameterMap());
+        // 提取 departId 后从参数 map 中移除，防止 QueryGenerator 生成精确等值条件
+        String departId = req.getParameter("departId");
+        Map<String, String[]> paramMap = new HashMap<>(req.getParameterMap());
+        paramMap.remove("departId");
+        // 实体上也清空，双重保险
+        ainoteTeaching.setDepartId(null);
+        QueryWrapper<AinoteTeaching> queryWrapper = QueryGenerator.initQueryWrapper(ainoteTeaching, paramMap);
+        // 若传了 departId，改为 IN 查询（包含自身及所有子孙节点）
+        if (oConvertUtils.isNotEmpty(departId)) {
+            queryWrapper.in("depart_id", ainoteTeachingService.getDepartAndSubIds(departId));
+        }
         // 应用数据权限过滤
         ainoteTeachingService.applyDataPermission(queryWrapper);
         Page<AinoteTeachingVO> page = new Page<>(pageNo, pageSize);
@@ -57,7 +69,6 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
     @Operation(summary = "通过id查询")
     @GetMapping(value = "/queryById")
     public Result<AinoteTeaching> queryById(@RequestParam(name = "id") String id) {
-        // 带数据权限校验的查询
         QueryWrapper<AinoteTeaching> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
         ainoteTeachingService.applyDataPermission(queryWrapper);
@@ -72,11 +83,8 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
     @PostMapping(value = "/add")
     @RequiresPermissions("teaching:assignment:add")
     public Result<String> add(@RequestBody AinoteTeaching ainoteTeaching, HttpServletRequest request) {
-        // 校验组织ID
         ainoteTeachingService.validateDepartId(ainoteTeaching.getDepartId());
-        // 校验学期格式
         ainoteTeachingService.validateSemester(ainoteTeaching.getSemester());
-        // 强制填充 teacherId 和 tenantId，防止越权
         LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         if (user == null) {
             throw new JeecgBootException("用户未登录");
@@ -91,7 +99,6 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
     @RequestMapping(value = "/edit", method = {RequestMethod.PUT, RequestMethod.POST})
     @RequiresPermissions("teaching:assignment:edit")
     public Result<String> edit(@RequestBody AinoteTeaching ainoteTeaching, HttpServletRequest request) {
-        // 校验数据权限
         QueryWrapper<AinoteTeaching> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", ainoteTeaching.getId());
         ainoteTeachingService.applyDataPermission(queryWrapper);
@@ -99,16 +106,12 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
         if (existing == null) {
             return Result.error("数据不存在或无权限编辑");
         }
-        // 校验组织ID
         if (ainoteTeaching.getDepartId() != null) {
             ainoteTeachingService.validateDepartId(ainoteTeaching.getDepartId());
         }
-        // 校验学期格式
         if (ainoteTeaching.getSemester() != null) {
             ainoteTeachingService.validateSemester(ainoteTeaching.getSemester());
         }
-        // 禁止修改 teacherId 和 tenantId
-        ainoteTeaching.setTeacherId(null);
         ainoteTeaching.setTenantId(null);
         ainoteTeachingService.updateById(ainoteTeaching);
         return Result.OK("编辑成功！");
@@ -144,9 +147,6 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
         return Result.OK(result);
     }
 
-    /**
-     * 获取当前租户ID
-     */
     private Integer getTenantId(HttpServletRequest request) {
         String tenantIdStr = TokenUtils.getTenantIdByRequest(request);
         if (oConvertUtils.isNotEmpty(tenantIdStr)) {
@@ -154,5 +154,4 @@ public class AinoteTeachingController extends JeecgController<AinoteTeaching, IA
         }
         return null;
     }
-
 }

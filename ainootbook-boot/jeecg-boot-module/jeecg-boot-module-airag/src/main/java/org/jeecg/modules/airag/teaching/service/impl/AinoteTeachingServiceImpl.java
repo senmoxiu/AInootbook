@@ -44,8 +44,8 @@ public class AinoteTeachingServiceImpl extends ServiceImpl<AinoteTeachingMapper,
     /** 学期格式：YYYY-YYYY-NN */
     private static final Pattern SEMESTER_PATTERN = Pattern.compile("^\\d{4}-\\d{4}-\\d{2}$");
 
-    /** 允许的组织类别：5=院系，6=专业，7=班级 */
-    private static final Set<String> ALLOWED_ORG_CATEGORIES = Set.of("5", "6", "7");
+    /** 允许的机构类型：2=学院，3=专业，4=班级（按 orgType 字段判断，orgCategory 在本项目数据中不可靠） */
+    private static final Set<String> ALLOWED_ORG_TYPES = Set.of("2", "3", "4");
 
     @Override
     public void applyDataPermission(QueryWrapper<AinoteTeaching> wrapper) {
@@ -58,9 +58,9 @@ public class AinoteTeachingServiceImpl extends ServiceImpl<AinoteTeachingMapper,
         if (tenantId != null) {
             wrapper.eq("tenant_id", tenantId);
         }
-        // 教师角色强制过滤
+        // 教师角色强制过滤（teacher_id 字段存逗号分隔多个ID，用 FIND_IN_SET 匹配）
         if (isTeacherRole(user)) {
-            wrapper.eq("teacher_id", user.getId());
+            wrapper.apply("FIND_IN_SET({0}, teacher_id)", user.getId());
         }
     }
 
@@ -73,8 +73,8 @@ public class AinoteTeachingServiceImpl extends ServiceImpl<AinoteTeachingMapper,
         if (depart == null) {
             throw new JeecgBootException("组织不存在：" + departId);
         }
-        if (!ALLOWED_ORG_CATEGORIES.contains(depart.getOrgCategory())) {
-            throw new JeecgBootException("组织类别不合法，仅支持院系/专业/班级");
+        if (!ALLOWED_ORG_TYPES.contains(depart.getOrgType())) {
+            throw new JeecgBootException("组织类别不合法，仅支持学院/专业/班级");
         }
     }
 
@@ -181,6 +181,31 @@ public class AinoteTeachingServiceImpl extends ServiceImpl<AinoteTeachingMapper,
             Page<AinoteTeachingVO> page,
             QueryWrapper<AinoteTeaching> wrapper) {
         return baseMapper.queryTeachingVoPage(page, wrapper);
+    }
+
+    /**
+     * 查询指定部门及其所有子孙部门的 ID 列表
+     * 通过 ISysBaseAPI.getAllSysDepart() 获取全量部门树，递归提取子孙节点
+     */
+    @Override
+    public List<String> getDepartAndSubIds(String departId) {
+        List<SysDepartModel> allDeparts = sysBaseAPI.getAllSysDepart();
+        List<String> result = new ArrayList<>();
+        result.add(departId);
+        collectSubIds(departId, allDeparts, result);
+        return result;
+    }
+
+    /**
+     * 递归收集子孙部门 ID
+     */
+    private void collectSubIds(String parentId, List<SysDepartModel> allDeparts, List<String> result) {
+        for (SysDepartModel depart : allDeparts) {
+            if (parentId.equals(depart.getParentId())) {
+                result.add(depart.getId());
+                collectSubIds(depart.getId(), allDeparts, result);
+            }
+        }
     }
 
     /**

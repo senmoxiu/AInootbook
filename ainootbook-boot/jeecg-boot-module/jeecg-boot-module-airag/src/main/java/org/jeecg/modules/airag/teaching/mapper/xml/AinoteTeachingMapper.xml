@@ -23,7 +23,11 @@
         SELECT
             t.id,
             t.teacher_id    AS teacherId,
-            u.realname      AS teacherName,
+            (
+                SELECT GROUP_CONCAT(u2.realname ORDER BY u2.realname SEPARATOR '、')
+                FROM sys_user u2
+                WHERE FIND_IN_SET(u2.id, t.teacher_id)
+            )               AS teacherName,
             t.course_id     AS courseId,
             c.course_name   AS courseName,
             c.course_code   AS courseCode,
@@ -40,7 +44,6 @@
             </if>
         ) t
         LEFT JOIN ainote_course c ON t.course_id = c.id
-        LEFT JOIN sys_user u ON t.teacher_id = u.id
         LEFT JOIN sys_depart d ON t.depart_id = d.id
     </select>
 

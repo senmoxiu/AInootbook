@@ -103,7 +103,11 @@ public class AinoteNoteController extends JeecgController<AinoteNote, IAinoteNot
         QueryWrapper<AinoteNote> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("n.tenant_id", tenantId);
         queryWrapper.ne("n.note_status", 3);
-        queryWrapper.eq("n.student_id", user.getId());
+        String roleCode = oConvertUtils.getString(user.getRoleCode(), "");
+        // 教师/管理员查所有学生笔记（按课程范围），学生只查自己的
+        if (!RoleUtils.hasRole(roleCode, "teacher") && !RoleUtils.hasRole(roleCode, "admin")) {
+            queryWrapper.eq("n.student_id", user.getId());
+        }
 
         // 前端搜索条件
         if (oConvertUtils.isNotEmpty(ainoteNote.getNoteTitle())) {
